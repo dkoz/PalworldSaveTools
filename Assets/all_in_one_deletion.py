@@ -2098,6 +2098,54 @@ def unlock_all_private_chests():
     print(msg)
     messagebox.showinfo("Unlocked", msg)
     refresh_all()
+from config_items import get_valid_item_ids
+def remove_invalid_items_from_save():
+    folder_path = current_save_path
+    if not folder_path:
+        messagebox.showerror("Error", "No save loaded!")
+        return
+    global loaded_level_json
+    try:
+        wsd = loaded_level_json["properties"]["worldSaveData"]["value"]
+    except KeyError:
+        messagebox.showerror("Error", "Invalid Level.sav structure!")
+        return
+
+    valid_ids = get_valid_item_ids()
+    removed = 0
+
+    def deep_clean(data):
+        nonlocal removed
+        if isinstance(data, dict):
+            if data.get("prop_name") == "Slots" and "value" in data and isinstance(data["value"], dict):
+                for slot in data["value"].get("values", []):
+                    raw = slot.get("RawData", {})
+                    val = raw.get("value", {})
+                    if isinstance(val, dict):
+                        item = val.get("item")
+                        static_id = item.get("static_id") if isinstance(item, dict) else None
+                        if static_id and static_id not in valid_ids:
+                            val["count"] = 0
+                            removed += 1
+            elif "RawData" in data and isinstance(data["RawData"], dict):
+                val = data["RawData"].get("value", {})
+                if isinstance(val, dict):
+                    item = val.get("item")
+                    static_id = item.get("static_id") if isinstance(item, dict) else None
+                    if static_id and static_id not in valid_ids:
+                        val["count"] = 0
+                        removed += 1
+            for v in data.values():
+                deep_clean(v)
+        elif isinstance(data, list):
+            for item in data:
+                deep_clean(item)
+
+    deep_clean(wsd)
+    msg = f"Invalid items purged from save! Total removed: {removed}"
+    print(msg)
+    messagebox.showinfo("AutoItemCleaner", msg)
+    refresh_all()
 def all_in_one_deletion():
     global window, stat_labels, guild_tree, base_tree, player_tree, guild_members_tree
     global guild_search_var, base_search_var, player_search_var, guild_members_search_var
@@ -2313,6 +2361,7 @@ def all_in_one_deletion():
     delete_menu.add_command(label="Generate PalDefender killnearestbase commands", command=open_kill_nearest_base_ui)
     delete_menu.add_command(label="Reset Anti-Air Turrets", command=reset_anti_air_turrets)
     delete_menu.add_command(label="Unlock All Private Chests", command=unlock_all_private_chests)
+    delete_menu.add_command(label="Remove All Invalid Items", command=remove_invalid_items_from_save)
     menubar.add_cascade(label="Delete", menu=delete_menu)
     view_menu = tk.Menu(menubar, tearoff=0)
     view_menu.add_command(label="Show Base Map", command=show_base_map)
