@@ -2226,6 +2226,57 @@ def remove_invalid_items_from_save():
     print(msg)
     messagebox.showinfo("AutoItemCleaner", msg)
     refresh_all()
+def fix_missions():
+    folder_path = current_save_path
+    if not folder_path:
+        messagebox.showerror("Error", "No save loaded!")
+        return
+    save_path = os.path.join(current_save_path, "Players")
+    if not os.path.exists(save_path):
+        messagebox.showerror("Error", f"'Players' folder not found in: {current_save_path}")
+        return
+    total = 0
+    fixed = 0
+    skipped = 0
+    def deep_delete_completed_quest_array(data):
+        found = False
+        if isinstance(data, dict):
+            if "CompletedQuestArray" in data:
+                data["CompletedQuestArray"]["value"]["values"] = []
+                return True
+            for v in data.values():
+                if deep_delete_completed_quest_array(v):
+                    found = True
+        elif isinstance(data, list):
+            for item in data:
+                if deep_delete_completed_quest_array(item):
+                    found = True
+        return found
+    for filename in os.listdir(save_path):
+        if filename.endswith(".sav") and "_dps" not in filename:
+            total += 1
+            file_path = os.path.join(save_path, filename)
+            try:
+                player_json = sav_to_json(file_path)
+            except Exception as e:
+                skipped += 1
+                print(f"{filename}: unreadable ({e})")
+                continue
+            if deep_delete_completed_quest_array(player_json):
+                try:
+                    json_to_sav(player_json, file_path)
+                    fixed += 1
+                    print(f"{filename}: missions reset")
+                except Exception as e:
+                    skipped += 1
+                    print(f"{filename}: save failed ({e})")
+            else:
+                skipped += 1
+                print(f"{filename}: no CompletedQuestArray field")
+    result_msg = f"Total players: {total}\nMissions reset: {fixed}\nSkipped: {skipped}"
+    print(result_msg)
+    messagebox.showinfo("Missions Reset", result_msg)
+    refresh_all()
 def all_in_one_deletion():
     global window, stat_labels, guild_tree, base_tree, player_tree, guild_members_tree
     global guild_search_var, base_search_var, player_search_var, guild_members_search_var
@@ -2442,6 +2493,7 @@ def all_in_one_deletion():
     delete_menu.add_command(label=t("deletion.menu.reset_anti_air"), command=reset_anti_air_turrets)
     delete_menu.add_command(label=t("deletion.menu.unlock_private_chests"), command=unlock_all_private_chests)
     delete_menu.add_command(label=t("deletion.menu.remove_invalid_items"), command=remove_invalid_items_from_save)
+    delete_menu.add_command(label="Fix / Reset Missions", command=fix_missions)
     menubar.add_cascade(label=t("deletion.menu.delete"), menu=delete_menu)
     view_menu = tk.Menu(menubar, tearoff=0)
     view_menu.add_command(label=t("deletion.menu.show_map"), command=show_base_map)

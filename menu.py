@@ -1,10 +1,68 @@
 import os, sys, shutil
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="pygame.pkgdata")
 from pathlib import Path
 import importlib.util
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from PIL import Image, ImageTk
+import os, sys, urllib.request, zipfile, subprocess, re
+GITHUB_RAW_URL = "https://raw.githubusercontent.com/deafdudecomputers/PalworldSaveTools/main/Assets/common.py"
+GITHUB_LATEST_ZIP = "https://github.com/deafdudecomputers/PalworldSaveTools/releases/latest/download/PST_standalone.zip"
+def check_github_update(auto_download=False, download_folder="PST_update", force_test=False):
+    try:
+        import urllib.request
+        r = urllib.request.urlopen(GITHUB_RAW_URL, timeout=5)
+        content = r.read().decode("utf-8")
+        match = re.search(r'APP_VERSION\s*=\s*"([^"]+)"', content)
+        latest = match.group(1) if match else None
+        local, _ = get_versions()
+        if force_test:
+            local = "0.0.1"
+        if latest:
+            local_tuple = tuple(int(x) for x in local.split("."))
+            latest_tuple = tuple(int(x) for x in latest.split("."))
+            if local_tuple >= latest_tuple:
+                print(f"{GREEN_FONT}You are on the latest version: {local}{RESET_FONT}")
+                return True, latest
+            else:
+                print(f"{YELLOW_FONT}Update available! Local: {local}, Latest: {latest}{RESET_FONT}")
+                if auto_download:
+                    if os.path.exists(download_folder):
+                        import shutil
+                        shutil.rmtree(download_folder)
+                    os.makedirs(download_folder, exist_ok=True)
+                    zip_path = os.path.join(download_folder, "PST_standalone.zip")
+                    try:
+                        print("Downloading latest release...")
+                        urllib.request.urlretrieve(GITHUB_LATEST_ZIP, zip_path)
+                        print(f"{GREEN_FONT}Downloaded latest PST_standalone.zip to {zip_path}{RESET_FONT}")
+                        print("Extracting...")
+                        with zipfile.ZipFile(zip_path, 'r') as zf:
+                            zf.extractall(download_folder)
+                        os.remove(zip_path)
+                        print(f"{GREEN_FONT}Extraction complete and ZIP deleted.{RESET_FONT}")
+                        new_exe = None
+                        for root, dirs, files in os.walk(download_folder):
+                            if "PalworldSaveTools.exe" in files:
+                                new_exe = os.path.join(root, "PalworldSaveTools.exe")
+                                break
+                        if new_exe:
+                            print(f"{YELLOW_FONT}Launching new PST and exiting current...{RESET_FONT}")
+                            subprocess.Popen([new_exe])
+                            sys.exit(0)
+                        else:
+                            print(f"{RED_FONT}New executable not found in {download_folder}{RESET_FONT}")
+                    except Exception as e:
+                        print(f"{RED_FONT}Failed to download or extract latest ZIP: {e}{RESET_FONT}")
+                return False, latest
+        else:
+            print(f"{RED_FONT}Could not parse APP_VERSION from GitHub.{RESET_FONT}")
+            return True, None
+    except Exception as e:
+        print(f"{RED_FONT}Failed to check GitHub version: {e}{RESET_FONT}")
+        return True, None
 def is_frozen():
     return getattr(sys, 'frozen', False)
 def get_assets_path():
@@ -364,5 +422,6 @@ if __name__ == "__main__":
     tools_version, game_version = get_versions()
     set_console_title(f"PalworldSaveTools v{tools_version}")
     clear_console() 
+    check_github_update(auto_download=True, download_folder="PST_update", force_test=False)
     app = MenuGUI()
     app.mainloop()
