@@ -132,6 +132,7 @@
   "deletion.menu.reset_anti_air": "Réinitialiser la défense anti-aérienne",
   "deletion.menu.unlock_private_chests": "Déverrouiller tous les coffres privés",
   "deletion.menu.remove_invalid_items": "Supprimer tous les objets invalides",
+  "deletion.menu.reset_missions": "Réinitialiser les missions",
   "deletion.menu.view": "Affichage",
   "deletion.menu.show_map": "Afficher la carte des bases",
   "deletion.menu.generate_map": "Générer la carte",

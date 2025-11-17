@@ -181,6 +181,7 @@
   "deletion.menu.reset_anti_air": "Reset Anti-Air Turrets",
   "deletion.menu.unlock_private_chests": "Unlock All Private Chests",
   "deletion.menu.remove_invalid_items": "Remove All Invalid Items",
+  "deletion.menu.reset_missions": "Reset Missions",
   "deletion.menu.view": "View",
   "deletion.menu.show_map": "Show Base Map",
   "deletion.menu.generate_map": "Generate Map",

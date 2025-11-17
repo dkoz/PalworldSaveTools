@@ -23,6 +23,13 @@ player_result = None
 files_to_delete = set()
 def refresh_stats(section):
     stats = get_current_stats()
+    section_keys = {
+        "Before Deletion": "deletion.stats.before",
+        "After Deletion": "deletion.stats.after",
+        "Deletion Result": "deletion.stats.result",
+        "After Reset": "deletion.stats.after"
+    }
+    display_section = t(section_keys.get(section, section))
     if section == "Before Deletion":
         refresh_stats.stats_before = stats
     if section == "After Reset":
@@ -1369,12 +1376,12 @@ def get_current_stats():
                 continue
             total_pals += 1
     return dict(Players=total_players, Guilds=total_guilds, Bases=total_bases, Pals=total_pals)
-def update_stats_section(stat_labels, section, data):
-    section_key = section.lower().replace(" ", "")
-    for key, val in data.items():
-        label_key = f"{section_key}_{key.lower()}"
+def update_stats_section(stat_labels, section, stats):
+    key_sec = section.lower().replace(" ", "")
+    for field_key, value in stats.items():
+        label_key = f"{key_sec}_{field_key.lower()}"
         if label_key in stat_labels:
-            stat_labels[label_key].config(text=f"{key.capitalize()}: {val}")
+            stat_labels[label_key].config(text=f"{t(f'deletion.stats.{field_key.lower()}')}: {value}")
 def create_search_panel(parent, label_text, search_var, search_callback, tree_columns, tree_headings, tree_col_widths, width, height, tree_height=12):
     panel = ttk.Frame(parent, style="TFrame")
     panel.place(width=width, height=height)
@@ -2042,7 +2049,6 @@ def create_stats_panel(parent, style):
     style.configure("Stat.TFrame", background="#444444")
     style.configure("Stat.TLabel", background="#444444", foreground="white", font=("Arial", 10))
     stat_frame = ttk.Frame(parent, style="Stat.TFrame", borderwidth=2, relief="solid")
-    # Keep English keys for internal logic; display localized labels
     sections = [
         ("Before Deletion", "deletion.stats.before"),
         ("After Deletion", "deletion.stats.after"),
@@ -2053,7 +2059,7 @@ def create_stats_panel(parent, style):
         ("Bases", "deletion.stats.bases"),
         ("Players", "deletion.stats.players"),
         ("Pals", "deletion.stats.pals"),
-    ]
+    ] 
     stat_labels = {}
     for col, (sec_key, sec_label_key) in enumerate(sections):
         ttk.Label(stat_frame, text=t(sec_label_key), style="Stat.TLabel", font=("Arial", 10, "bold")).grid(row=0, column=col, padx=20, pady=5)
@@ -2493,7 +2499,7 @@ def all_in_one_deletion():
     delete_menu.add_command(label=t("deletion.menu.reset_anti_air"), command=reset_anti_air_turrets)
     delete_menu.add_command(label=t("deletion.menu.unlock_private_chests"), command=unlock_all_private_chests)
     delete_menu.add_command(label=t("deletion.menu.remove_invalid_items"), command=remove_invalid_items_from_save)
-    delete_menu.add_command(label="Fix / Reset Missions", command=fix_missions)
+    delete_menu.add_command(label=t("deletion.menu.reset_missions"), command=fix_missions)
     menubar.add_cascade(label=t("deletion.menu.delete"), menu=delete_menu)
     view_menu = tk.Menu(menubar, tearoff=0)
     view_menu.add_command(label=t("deletion.menu.show_map"), command=show_base_map)

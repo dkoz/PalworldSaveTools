@@ -139,6 +139,7 @@
   "deletion.menu.reset_anti_air": "重置防空炮",
   "deletion.menu.unlock_private_chests": "解锁全部私有箱子",
   "deletion.menu.remove_invalid_items": "移除所有无效物品",
+  "deletion.menu.reset_missions": "重置任务",
   "deletion.menu.view": "视图",
   "deletion.menu.show_map": "显示基地地图",
   "deletion.menu.generate_map": "生成地图",

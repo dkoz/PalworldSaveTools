@@ -140,6 +140,7 @@
   "deletion.menu.reset_anti_air": "Reiniciar cañón antiaéreo",
   "deletion.menu.unlock_private_chests": "Desbloquear todos los cofres privados",
   "deletion.menu.remove_invalid_items": "Eliminar todos los objetos inválidos",
+  "deletion.menu.reset_missions": "Restablecer misiones",
   "deletion.menu.view": "Vista",
   "deletion.menu.show_map": "Mostrar mapa de bases",
   "deletion.menu.generate_map": "Generar mapa",

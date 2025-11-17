@@ -132,6 +132,7 @@
   "deletion.menu.reset_anti_air": "대공포 리셋",
   "deletion.menu.unlock_private_chests": "모든 개인 상자 잠금 해제",
   "deletion.menu.remove_invalid_items": "모든 무효 아이템 제거",
+  "deletion.menu.reset_missions": "미션 초기화",
   "deletion.menu.view": "보기",
   "deletion.menu.show_map": "기지 지도 표시",
   "deletion.menu.generate_map": "지도 생성",

@@ -306,81 +306,46 @@ def update_target_character_with_exported_map(targ_uid, exported_map):
         targ_lvl["CharacterSaveParameterMap"]["value"].append(fast_deepcopy(exported_map))
         updated = 1
     return updated
-def update_guild_data(targ_lvl, targ_json, host_guid, targ_uid, source_guild_dict):
-    if "GroupSaveDataMap" not in targ_lvl or targ_lvl["GroupSaveDataMap"].get("value") is None:
-        targ_lvl["GroupSaveDataMap"] = {"value": []}
-    group_map = {}
-    target_guild = None
-    for g in targ_lvl["GroupSaveDataMap"]["value"]:
-        raw = g.get("value", {}).get("RawData", {}).get("value", {})
-        group_map[g["key"]] = g
-        if "players" in raw and any(p.get("player_uid") == targ_uid for p in raw["players"]):
-            target_guild = g
-    group_id = target_guild["key"] if target_guild else None
-    restored = False
-    for gkey, gdata in group_map.items():
-        if gkey in source_guild_dict:
-            raw = gdata.get("value", {}).get("RawData", {}).get("value", {})
-            for p in raw.get("players", []):
-                if p["player_uid"] == host_guid:
-                    dest_guild = target_guild if target_guild else gdata
-                    dest_raw = dest_guild["value"]["RawData"]["value"]
-                    if not any(pl.get("player_uid") == targ_uid for pl in dest_raw.get("players", [])):
-                        new_player = fast_deepcopy(p)
-                        new_player["player_uid"] = targ_uid
-                        dest_raw.setdefault("players", []).append(new_player)
-                        if dest_raw.get("admin_player_uid") == host_guid:
-                            dest_raw["admin_player_uid"] = targ_uid
-                        restored = True
-                        group_id = dest_guild["key"]
-                    break
-            if restored:
+def update_guild_data(targ_lvl,targ_json,host_guid,targ_uid,source_guild_dict):
+    guild_list=targ_lvl.get("GroupSaveDataMap",{}).get("value",[])
+    player_guild=None
+    for g in guild_list:
+        raw=g.get("value",{}).get("RawData",{}).get("value",{})
+        for p in raw.get("players",[]):
+            if p.get("player_uid")==targ_uid:
+                player_guild=g
                 break
-    old_guild = None
-    for g in source_guild_dict.values():
-        raw = g.get("value", {}).get("RawData", {}).get("value", {})
-        if "players" in raw and any(p["player_uid"] == host_guid for p in raw["players"]):
-            old_guild = fast_deepcopy(g)
-            raw = old_guild["value"]["RawData"]["value"]
-            for p in raw.get("players", []):
-                if p["player_uid"] == host_guid:
-                    p["player_uid"] = targ_uid
-                    break
-            if raw.get("admin_player_uid") == host_guid or raw.get("admin_player_uid") not in [p["player_uid"] for p in raw.get("players", [])]:
-                raw["admin_player_uid"] = raw["players"][0]["player_uid"] if raw.get("players") else None
-            raw["base_ids"] = []
-            raw["map_object_instance_ids_base_camp_points"] = []
-            targ_lvl["GroupSaveDataMap"]["value"].append(old_guild)
-            group_id = old_guild["key"]
-            restored = True
+        if player_guild:
             break
-    final_guild = old_guild if old_guild else (target_guild if target_guild else old_guild)
-    if final_guild:
-        dest_raw = final_guild["value"]["RawData"]["value"]
-        if not any(p.get("player_uid") == targ_uid for p in dest_raw.get("players", [])):
-            for g in source_guild_dict.values():
-                raw = g.get("value", {}).get("RawData", {}).get("value", {})
-                for p in raw.get("players", []):
-                    if p["player_uid"] == host_guid:
-                        new_player = fast_deepcopy(p)
-                        new_player["player_uid"] = targ_uid
-                        dest_raw.setdefault("players", []).append(new_player)
-                        if dest_raw.get("admin_player_uid") == host_guid:
-                            dest_raw["admin_player_uid"] = targ_uid
-                        break
-                else:
-                    continue
-                break
-    for g in targ_lvl["GroupSaveDataMap"]["value"]:
-        if g == final_guild:
+    if not player_guild:
+        player_guild={"key":UUID(bytes=os.urandom(16)),"value":{"GroupType":{"value":{"value":"EPalGroupType::Guild"}},"RawData":{"value":{"group_id":UUID(bytes=os.urandom(16)),"players":[],"admin_player_uid":targ_uid}}}}
+        guild_list.append(player_guild)
+    raw=player_guild["value"]["RawData"]["value"]
+    if not any(p.get("player_uid")==targ_uid for p in raw["players"]):
+        for g in source_guild_dict.values():
+            raw_s=g.get("value",{}).get("RawData",{}).get("value",{})
+            for p in raw_s.get("players",[]):
+                if p["player_uid"]==host_guid:
+                    np=fast_deepcopy(p)
+                    np["player_uid"]=targ_uid
+                    raw["players"].append(np)
+                    break
+            else:
+                continue
+            break
+    raw["players"]=[p for p in raw["players"] if p.get("player_uid")]
+    if raw.get("admin_player_uid") not in [p["player_uid"] for p in raw["players"]]:
+        raw["admin_player_uid"]=raw["players"][0]["player_uid"] if raw["players"] else targ_uid
+    for g in guild_list:
+        if g is player_guild:
             continue
-        raw = g.get("value", {}).get("RawData", {}).get("value", {})
-        if "players" in raw:
-            raw["players"] = [p for p in raw["players"] if p.get("player_uid") != targ_uid]
-            if raw.get("admin_player_uid") == targ_uid and raw.get("players"):
-                raw["admin_player_uid"] = raw["players"][0]["player_uid"]
-    targ_lvl["GroupSaveDataMap"]["value"] = [g for g in targ_lvl["GroupSaveDataMap"]["value"] if g.get("value", {}).get("RawData", {}).get("value", {}).get("players")]
-    return group_id
+        r=g.get("value",{}).get("RawData",{}).get("value",{})
+        if "players" in r:
+            r["players"]=[p for p in r["players"] if p.get("player_uid")!=targ_uid]
+            if r.get("admin_player_uid")==targ_uid and r.get("players"):
+                r["admin_player_uid"]=r["players"][0]["player_uid"]
+    targ_lvl["GroupSaveDataMap"]["value"]=[g for g in guild_list if g.get("value",{}).get("RawData",{}).get("value",{}).get("players")]
+    return raw["group_id"]
 def reassign_owner_uid(param_maps, new_owner_uid):
     for character in param_maps:
         try:
