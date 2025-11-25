@@ -65,6 +65,7 @@ def sav_to_json(path):
     raw_gvas, _ = decompress_sav_to_gvas(data)
     g = GvasFile.read(raw_gvas, PALWORLD_TYPE_HINTS, SKP_PALWORLD_CUSTOM_PROPERTIES, allow_nan=True)
     return g.dump()
+    #return rust_parse_save(path)
 def json_to_sav(j,path):
     g = GvasFile.load(j)
     t = 0x32 if "Pal.PalworldSaveGame" in g.header.save_game_class_name else 0x31

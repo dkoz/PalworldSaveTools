@@ -13,41 +13,48 @@ else:
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 root_dir = base_dir
 def get_save_game_pass():
-    zip_files = find_zip_files(root_dir)
+    save_converter_done.destination_folder=None
+    save_extractor_done.clear()
+    saves_path=os.path.join(root_dir,"saves")
+    if os.path.exists(saves_path):shutil.rmtree(saves_path)
+    zip_files=find_zip_files(root_dir)
+    selected_zip=None
     if zip_files:
-        top = tk.Toplevel()
+        top=tk.Toplevel()
         top.title(t("xgp.title.select_zip"))
         top.geometry("600x300")
         top.config(bg="#2f2f2f")
-        try: top.iconbitmap(ICON_PATH)
-        except Exception as e: print(f"Could not set icon: {e}")
-        style = ttk.Style(top)
+        try:top.iconbitmap(ICON_PATH)
+        except:pass
+        style=ttk.Style(top)
         style.theme_use('clam')
-        style.configure("TLabel", background="#2f2f2f", foreground="white", font=("Arial", 11))
-        style.configure("TButton", background="#555555", foreground="white", font=("Arial", 11), padding=6)
-        style.map("TButton", background=[("active", "#666666"), ("!disabled", "#555555")], foreground=[("disabled", "#888888"), ("!disabled", "white")])
-        ttk.Label(top, text=t("xgp.label.select_zip"),).pack(pady=10)
-        listbox = tk.Listbox(top, listvariable=tk.StringVar(value=zip_files), height=min(10, len(zip_files)), bg="#444444", fg="white", selectbackground="#666666", font=("Arial", 11))
-        listbox.pack(padx=10, pady=5, fill='both', expand=True)
-        listbox.selection_set(tk.END)
+        style.configure("TLabel",background="#2f2f2f",foreground="white",font=("Arial",11))
+        style.configure("TButton",background="#555555",foreground="white",font=("Arial",11),padding=6)
+        style.map("TButton",background=[("active","#666666")])
+        ttk.Label(top,text=t("xgp.label.select_zip")).pack(pady=10)
+        lb=tk.Listbox(top,listvariable=tk.StringVar(value=zip_files),height=min(10,len(zip_files)),bg="#444444",fg="white",selectbackground="#666666",font=("Arial",11))
+        lb.pack(padx=10,pady=5,fill='both',expand=True)
+        lb.selection_set(tk.END)
         def use_selected():
-            sel = listbox.curselection()
+            nonlocal selected_zip
+            sel=lb.curselection()
             if sel:
-                full_zip_path = os.path.join(root_dir, listbox.get(sel[0]))
+                selected_zip=os.path.join(root_dir,lb.get(sel[0]))
                 top.destroy()
-                process_zip_file(full_zip_path)
-                check_progress()
-        ttk.Button(top, text=t("xgp.btn.use_selected_zip"), command=use_selected).pack(pady=10)
-        top.wait_window() 
-    default_source = os.path.expandvars(r"%LOCALAPPDATA%\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData\wgs")
-    if not os.path.exists(default_source): default_source = os.path.join(root_dir, "saves")
-    source_folder = filedialog.askdirectory(title=t("xgp.dialog.select_xgp_zip_folder"), initialdir=default_source)
-    if not source_folder: return
-    default_dest = os.path.expandvars(r"%localappdata%\Pal\Saved\SaveGames")
-    destination_folder = filedialog.askdirectory(title=t("xgp.dialog.select_output_folder"), initialdir=default_dest)
-    if not destination_folder: return
-    print(t("xgp.msg.dest_folder", dest=destination_folder))
-    save_converter_done.destination_folder = destination_folder
+        ttk.Button(top,text=t("xgp.btn.use_selected_zip"),command=use_selected).pack(pady=10)
+        top.wait_window()
+    if selected_zip:
+        check_for_zip_files(os.path.dirname(selected_zip))
+        check_progress()
+        return
+    default_source=os.path.expandvars(r"%LOCALAPPDATA%\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData\wgs")
+    if not os.path.exists(default_source):default_source=os.path.join(root_dir,"saves")
+    source_folder=filedialog.askdirectory(title=t("xgp.dialog.select_xgp_zip_folder"),initialdir=default_source)
+    if not source_folder:return
+    default_dest=os.path.expandvars(r"%localappdata%\Pal\Saved\SaveGames")
+    destination_folder=filedialog.askdirectory(title=t("xgp.dialog.select_output_folder"),initialdir=default_dest)
+    if not destination_folder:return
+    save_converter_done.destination_folder=destination_folder
     check_for_zip_files(source_folder)
     check_progress()
 def get_save_steam():
@@ -58,11 +65,21 @@ def check_progress():
     while not save_extractor_done.is_set(): time.sleep(0.2)
     convert_save_files()
 def check_for_zip_files(search_dir):
-    saves_path = os.path.join(root_dir, "saves")
-    if not find_zip_files(saves_path):
-        threading.Thread(target=run_save_extractor, args=(search_dir,), daemon=True).start()
-    else:
-        process_zip_files()
+    saves_path=os.path.join(root_dir,"saves")
+    if os.path.exists(saves_path):shutil.rmtree(saves_path)
+    os.makedirs(saves_path,exist_ok=True)
+    if os.path.isfile(search_dir) and search_dir.endswith(".zip"):
+        unzip_file(search_dir,saves_path)
+        save_extractor_done.set()
+        return
+    if os.path.isdir(search_dir):
+        for f in os.listdir(search_dir):
+            if f.endswith(".zip"):
+                unzip_file(os.path.join(search_dir,f),saves_path)
+                save_extractor_done.set()
+                return
+        shutil.copytree(search_dir,saves_path,dirs_exist_ok=True)
+        save_extractor_done.set()
 def process_zip_files():
     saves_path = os.path.join(root_dir, "saves")
     if is_folder_empty(saves_path):

@@ -23,3 +23,4 @@ from palworld_coord import sav_to_map
 from common import ICON_PATH
 from collections import defaultdict
 import pygame
+from rust_loader import rust_parse_save

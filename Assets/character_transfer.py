@@ -479,8 +479,11 @@ def main(skip_msgbox=False):
         print(f"UUID Error: Invalid UUID format: {e}")
         return
     if str(host_guid).endswith('000000000001') or str(targ_uid).endswith('000000000001'):
-        messagebox.showerror("Error", "Error! Cannot transfer 0001 UID player! Please use Fix Host Save instead!")
-        return
+        #messagebox.showerror("Error", "Error! Cannot transfer 0001 UID player! Please use Fix Host Save instead!")
+        messagebox.showwarning(
+    "0001 Character Warning",
+    "Warning: Transferring the 0001 host character may cause flicky or unstable guild/pal behavior.\n\nIf you're trying to fix host issues, please use the 'Fix Host Save' option instead.")
+        #return
     if not load_json_files():
         print("Load Error: Failed to load JSON files.")
         return
