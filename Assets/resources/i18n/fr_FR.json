@@ -189,5 +189,7 @@
   "deletion.stats.guilds": "Guildes",
   "deletion.stats.bases": "Bases",
   "deletion.stats.players": "Joueurs",
-  "deletion.stats.pals": "Pals"
+  "deletion.stats.pals": "Pals",  
+  "guild.menu.title": "Guilde",
+  "guild.menu.move_selected_player_to_selected_guild": "Déplacer le joueur sélectionné vers la guilde sélectionnée"
 }

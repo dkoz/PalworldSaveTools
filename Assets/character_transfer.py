@@ -306,46 +306,75 @@ def update_target_character_with_exported_map(targ_uid, exported_map):
         targ_lvl["CharacterSaveParameterMap"]["value"].append(fast_deepcopy(exported_map))
         updated = 1
     return updated
-def update_guild_data(targ_lvl,targ_json,host_guid,targ_uid,source_guild_dict):
+def get_guild_individual_handles(targ_lvl,targ_uid):
     guild_list=targ_lvl.get("GroupSaveDataMap",{}).get("value",[])
-    player_guild=None
     for g in guild_list:
         raw=g.get("value",{}).get("RawData",{}).get("value",{})
         for p in raw.get("players",[]):
             if p.get("player_uid")==targ_uid:
-                player_guild=g
+                return raw.get("individual_character_handle_ids",[])
+    return []
+def update_guild_data(targ_lvl,targ_json,host_guid,targ_uid,source_guild_dict):
+    if "GroupSaveDataMap" not in targ_lvl or targ_lvl["GroupSaveDataMap"].get("value") is None:
+        targ_lvl["GroupSaveDataMap"]={"value":[]}
+    guilds=targ_lvl["GroupSaveDataMap"]["value"]
+    target_guild=None
+    for g in guilds:
+        raw=g.get("value",{}).get("RawData",{}).get("value",{})
+        if any(p.get("player_uid")==targ_uid for p in raw.get("players",[])):
+            target_guild=g
+            break
+    source_player=None
+    source_guild=None
+    for g in source_guild_dict.values():
+        raw=g.get("value",{}).get("RawData",{}).get("value",{})
+        for p in raw.get("players",[]):
+            if p["player_uid"]==host_guid:
+                source_player=fast_deepcopy(p)
+                source_guild=g
                 break
-        if player_guild:
+        if source_guild:
             break
-    if not player_guild:
-        player_guild={"key":UUID(bytes=os.urandom(16)),"value":{"GroupType":{"value":{"value":"EPalGroupType::Guild"}},"RawData":{"value":{"group_id":UUID(bytes=os.urandom(16)),"players":[],"admin_player_uid":targ_uid}}}}
-        guild_list.append(player_guild)
-    raw=player_guild["value"]["RawData"]["value"]
-    if not any(p.get("player_uid")==targ_uid for p in raw["players"]):
-        for g in source_guild_dict.values():
-            raw_s=g.get("value",{}).get("RawData",{}).get("value",{})
-            for p in raw_s.get("players",[]):
-                if p["player_uid"]==host_guid:
-                    np=fast_deepcopy(p)
-                    np["player_uid"]=targ_uid
-                    raw["players"].append(np)
-                    break
-            else:
-                continue
-            break
-    raw["players"]=[p for p in raw["players"] if p.get("player_uid")]
-    if raw.get("admin_player_uid") not in [p["player_uid"] for p in raw["players"]]:
-        raw["admin_player_uid"]=raw["players"][0]["player_uid"] if raw["players"] else targ_uid
-    for g in guild_list:
-        if g is player_guild:
-            continue
-        r=g.get("value",{}).get("RawData",{}).get("value",{})
-        if "players" in r:
-            r["players"]=[p for p in r["players"] if p.get("player_uid")!=targ_uid]
-            if r.get("admin_player_uid")==targ_uid and r.get("players"):
-                r["admin_player_uid"]=r["players"][0]["player_uid"]
-    targ_lvl["GroupSaveDataMap"]["value"]=[g for g in guild_list if g.get("value",{}).get("RawData",{}).get("value",{}).get("players")]
-    return raw["group_id"]
+    if source_player:
+        source_player["player_uid"]=targ_uid
+    if target_guild:
+        raw=target_guild["value"]["RawData"]["value"]
+        raw["players"]=[p for p in raw["players"] if p.get("player_uid")!=targ_uid]
+        raw["players"].append(source_player)
+        if raw.get("admin_player_uid")==host_guid:
+            raw["admin_player_uid"]=targ_uid
+        return target_guild["key"]
+    if source_guild:
+        cloned=fast_deepcopy(source_guild)
+        cloned["key"]=UUID(os.urandom(16))
+        raw=cloned["value"]["RawData"]["value"]
+        raw["group_id"]=UUID(os.urandom(16))
+        raw["players"]=[source_player]
+        raw["admin_player_uid"]=targ_uid
+        raw["base_ids"]=[]
+        raw["map_object_instance_ids_base_camp_points"]=[]
+        raw["individual_character_handle_ids"]=[]
+        raw["level"]={}
+        raw["base_camp_ids"]=[] if "base_camp_ids" in raw else []
+        guilds.append(cloned)
+        return cloned["key"]
+    new_g={
+        "key":UUID(os.urandom(16)),
+        "value":{
+            "GroupType":{"value":{"value":"EPalGroupType::Guild"}},
+            "RawData":{"value":{
+                "group_id":UUID(os.urandom(16)),
+                "players":[{"player_uid":targ_uid,"player_info":{"player_name":targ_json["SaveData"]["value"]["NickName"]["value"]}}],
+                "admin_player_uid":targ_uid,
+                "individual_character_handle_ids":[],
+                "base_ids":[],
+                "map_object_instance_ids_base_camp_points":[],
+                "group_name":{"value":"Transferred Guild"}
+            }}
+        }
+    }
+    guilds.append(new_g)
+    return new_g["key"]
 def reassign_owner_uid(param_maps, new_owner_uid):
     for character in param_maps:
         try:
@@ -478,12 +507,6 @@ def main(skip_msgbox=False):
     except Exception as e:
         print(f"UUID Error: Invalid UUID format: {e}")
         return
-    if str(host_guid).endswith('000000000001') or str(targ_uid).endswith('000000000001'):
-        #messagebox.showerror("Error", "Error! Cannot transfer 0001 UID player! Please use Fix Host Save instead!")
-        messagebox.showwarning(
-    "0001 Character Warning",
-    "Warning: Transferring the 0001 host character may cause flicky or unstable guild/pal behavior.\n\nIf you're trying to fix host issues, please use the 'Fix Host Save' option instead.")
-        #return
     if not load_json_files():
         print("Load Error: Failed to load JSON files.")
         return

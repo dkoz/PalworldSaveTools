@@ -189,5 +189,7 @@
   "deletion.stats.guilds": "길드",
   "deletion.stats.bases": "기지",
   "deletion.stats.players": "플레이어",
-  "deletion.stats.pals": "펄"
+  "deletion.stats.pals": "펄",
+  "guild.menu.title": "길드",
+  "guild.menu.move_selected_player_to_selected_guild": "선택한 플레이어를 선택한 길드로 이동"
 }

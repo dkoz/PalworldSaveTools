@@ -198,7 +198,9 @@
   "deletion.stats.guilds": "公会",
   "deletion.stats.bases": "基地",
   "deletion.stats.players": "玩家",
-  "deletion.stats.pals": "帕鲁"
+  "deletion.stats.pals": "帕鲁",
+  "guild.menu.title": "公会",
+  "guild.menu.move_selected_player_to_selected_guild": "将选中的玩家移动到选中的公会"
 }
 
 

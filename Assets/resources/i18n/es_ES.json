@@ -201,5 +201,9 @@
   "deletion.stats.guilds": "Gremios",
   "deletion.stats.bases": "Bases",
   "deletion.stats.players": "Jugadores",
-  "deletion.stats.pals": "Pals"
+  "deletion.stats.pals": "Pals",
+  
+  "guild.menu.title": "Gremio",
+  "guild.menu.move_selected_player_to_selected_guild": "Mover jugador seleccionado al gremio seleccionado"
+
 }

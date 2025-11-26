@@ -189,5 +189,7 @@
   "deletion.stats.guilds": "ギルド",
   "deletion.stats.bases": "基地",
   "deletion.stats.players": "プレイヤー",
-  "deletion.stats.pals": "パル"
+  "deletion.stats.pals": "パル",
+  "guild.menu.title": "ギルド",
+  "guild.menu.move_selected_player_to_selected_guild": "選択したプレイヤーを選択したギルドへ移動"
 }

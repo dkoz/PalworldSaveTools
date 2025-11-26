@@ -201,5 +201,8 @@
   "deletion.stats.guilds": "Gilden",
   "deletion.stats.bases": "Basen",
   "deletion.stats.players": "Spieler",
-  "deletion.stats.pals": "Pals"
+  "deletion.stats.pals": "Pals",
+  
+  "guild.menu.title": "Gilde",
+  "guild.menu.move_selected_player_to_selected_guild": "Ausgewählten Spieler in ausgewählte Gilde verschieben"
 }

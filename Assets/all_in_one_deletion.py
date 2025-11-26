@@ -2284,6 +2284,86 @@ def fix_missions():
     print(result_msg)
     messagebox.showinfo("Missions Reset", result_msg)
     refresh_all()
+def move_selected_player_to_selected_guild():
+    if not current_save_path or not loaded_level_json:
+        messagebox.showerror("Error", "No save loaded!")
+        return
+    sel_player = player_tree.selection()
+    sel_guild = guild_tree.selection()
+    if not sel_player:
+        messagebox.showerror("Error", "Select a player")
+        return
+    if not sel_guild:
+        messagebox.showerror("Error", "Select a guild")
+        return
+    player_uid_raw = player_tree.item(sel_player[0])['values'][0]
+    player_uid = player_uid_raw.replace('-', '')
+    target_gid_raw = guild_tree.item(sel_guild[0])['values'][1]
+    target_gid = target_gid_raw.replace('-', '')
+    wsd = loaded_level_json['properties']['worldSaveData']['value']
+    group_map = wsd['GroupSaveDataMap']['value']
+    base_list = wsd.get('BaseCampSaveData', {}).get('value', [])
+    def nu(x): return str(x).replace('-', '')
+    origin_group=target_group=found=None
+    for g in group_map:
+        if g['value']['GroupType']['value']['value']!='EPalGroupType::Guild': continue
+        raw=g['value']['RawData']['value']
+        for p in raw.get('players',[]):
+            if nu(p.get('player_uid',''))==player_uid:
+                origin_group=g
+                found=p
+        if nu(g['key'])==target_gid:
+            target_group=g
+    if not found:
+        messagebox.showerror("Error","Player not found in guilds")
+        return
+    if not target_group:
+        messagebox.showerror("Error","Target guild missing")
+        return
+    if origin_group is target_group:
+        messagebox.showinfo("Info","Already in this guild")
+        return
+    origin_raw=origin_group['value']['RawData']['value']
+    newplayers=[p for p in origin_raw.get('players',[]) if nu(p.get('player_uid',''))!=player_uid]
+    origin_raw['players']=newplayers
+    if not newplayers:
+        gid=origin_group['key']
+        for b in base_list[:]:
+            if are_equal_uuids(b['value']['RawData']['value'].get('group_id_belong_to'),gid):
+                delete_base_camp(b,gid,loaded_level_json)
+        group_map.remove(origin_group)
+    else:
+        admin=nu(origin_raw.get('admin_player_uid',''))
+        if admin not in {nu(p['player_uid']) for p in newplayers}:
+            origin_raw['admin_player_uid']=newplayers[0]['player_uid']
+    target_raw=target_group['value']['RawData']['value']
+    tplayers=target_raw.get('players',[])
+    if all(nu(p['player_uid'])!=player_uid for p in tplayers):
+        tplayers.append(found)
+    target_raw['players']=tplayers
+    if nu(target_raw.get('admin_player_uid','')) not in {nu(p['player_uid']) for p in tplayers}:
+        target_raw['admin_player_uid']=found['player_uid']
+    new_gid=target_raw['group_id']
+    for character in wsd['CharacterSaveParameterMap']['value']:
+        try:
+            sp=character['value']['RawData']['value']['object']['SaveParameter']['value']
+            if nu(sp.get('OwnerPlayerUId',{}).get('value'))==player_uid:
+                character['value']['RawData']['value']['group_id']=new_gid
+                sp['OwnerPlayerUId']['value']=found['player_uid']
+        except:
+            pass
+    for param in wsd['CharacterSaveParameterMap']['value']:
+        try:
+            pal=param['value']['RawData']['value']
+            sp=pal['object']['SaveParameter']['value']
+            uid=nu(sp.get('OwnerPlayerUId',{}).get('value'))
+            if uid==player_uid:
+                pal['group_id']=new_gid
+        except:
+            pass
+    refresh_all()
+    refresh_stats("After Deletion")
+    messagebox.showinfo("Done",f"Player {player_uid_raw} moved to guild {target_gid_raw}")
 def all_in_one_deletion():
     global window, stat_labels, guild_tree, base_tree, player_tree, guild_members_tree
     global guild_search_var, base_search_var, player_search_var, guild_members_search_var
@@ -2509,6 +2589,9 @@ def all_in_one_deletion():
     exclusions_menu = tk.Menu(menubar, tearoff=0)
     exclusions_menu.add_command(label=t("deletion.menu.save_exclusions"), command=save_exclusions_func)
     menubar.add_cascade(label=t("deletion.menu.exclusions"), menu=exclusions_menu)
+    guild_menu = tk.Menu(menubar, tearoff=0)
+    guild_menu.add_command(label=t("guild.menu.move_selected_player_to_selected_guild"), command=move_selected_player_to_selected_guild)
+    menubar.add_cascade(label=t("guild.menu.title"), menu=guild_menu)
     window.config(menu=menubar)
     def on_f5_press(event):
         folder = current_save_path

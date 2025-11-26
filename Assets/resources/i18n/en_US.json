@@ -195,6 +195,9 @@
   "deletion.stats.bases": "Bases",
   "deletion.stats.players": "Players",
   "deletion.stats.pals": "Pals"
+  ,
+  "guild.menu.title": "Guild",
+  "guild.menu.move_selected_player_to_selected_guild": "Move Selected Player to Selected Guild"
 }
 
 

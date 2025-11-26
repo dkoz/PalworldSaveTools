@@ -196,5 +196,7 @@
   "deletion.stats.guilds": "Гильдии",
   "deletion.stats.bases": "Базы",
   "deletion.stats.players": "Игроки",
-  "deletion.stats.pals": "Палы"
+  "deletion.stats.pals": "Палы",
+  "guild.menu.title": "Гильдия",
+  "guild.menu.move_selected_player_to_selected_guild": "Переместить выбранного игрока в выбранную гильдию"
 }
