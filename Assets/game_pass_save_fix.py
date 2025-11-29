@@ -13,84 +13,46 @@ else:
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 root_dir = base_dir
 def get_save_game_pass():
-    save_converter_done.destination_folder=None
-    save_extractor_done.clear()
-    saves_path=os.path.join(root_dir,"saves")
-    if os.path.exists(saves_path):shutil.rmtree(saves_path)
-    zip_files=find_zip_files(root_dir)
-    selected_zip=None
-    if zip_files:
-        top=tk.Toplevel()
-        top.title(t("xgp.title.select_zip"))
-        top.geometry("600x300")
-        top.config(bg="#2f2f2f")
-        try:top.iconbitmap(ICON_PATH)
-        except:pass
-        style=ttk.Style(top)
-        style.theme_use('clam')
-        style.configure("TLabel",background="#2f2f2f",foreground="white",font=("Arial",11))
-        style.configure("TButton",background="#555555",foreground="white",font=("Arial",11),padding=6)
-        style.map("TButton",background=[("active","#666666")])
-        ttk.Label(top,text=t("xgp.label.select_zip")).pack(pady=10)
-        lb=tk.Listbox(top,listvariable=tk.StringVar(value=zip_files),height=min(10,len(zip_files)),bg="#444444",fg="white",selectbackground="#666666",font=("Arial",11))
-        lb.pack(padx=10,pady=5,fill='both',expand=True)
-        lb.selection_set(tk.END)
-        def use_selected():
-            nonlocal selected_zip
-            sel=lb.curselection()
-            if sel:
-                selected_zip=os.path.join(root_dir,lb.get(sel[0]))
-                top.destroy()
-        ttk.Button(top,text=t("xgp.btn.use_selected_zip"),command=use_selected).pack(pady=10)
-        top.wait_window()
-    if selected_zip:
-        check_for_zip_files(os.path.dirname(selected_zip))
-        check_progress()
-        return
+    if os.path.exists("./saves"): shutil.rmtree("./saves")
     default_source=os.path.expandvars(r"%LOCALAPPDATA%\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData\wgs")
-    if not os.path.exists(default_source):default_source=os.path.join(root_dir,"saves")
-    source_folder=filedialog.askdirectory(title=t("xgp.dialog.select_xgp_zip_folder"),initialdir=default_source)
-    if not source_folder:return
-    default_dest=os.path.expandvars(r"%localappdata%\Pal\Saved\SaveGames")
-    destination_folder=filedialog.askdirectory(title=t("xgp.dialog.select_output_folder"),initialdir=default_dest)
-    if not destination_folder:return
-    save_converter_done.destination_folder=destination_folder
-    check_for_zip_files(source_folder)
-    check_progress()
+    source_folder=filedialog.askdirectory(title="Select your XGP Palworld save folder",initialdir=default_source)
+    if not source_folder:
+        print("No folder selected.")
+        return
+    global xgp_source_folder
+    xgp_source_folder=source_folder
+    print(f"Using XGP folder: {xgp_source_folder}")
+    save_extractor_done.clear()
+    threading.Thread(target=run_save_extractor, daemon=True).start()
+    threading.Thread(target=check_progress, daemon=True).start()
 def get_save_steam():
     folder = filedialog.askdirectory(title="Select Steam Save Folder to Transfer")
     if not folder: return
     threading.Thread(target=transfer_steam_to_gamepass, args=(folder,), daemon=True).start()
 def check_progress():
-    while not save_extractor_done.is_set(): time.sleep(0.2)
-    convert_save_files()
-def check_for_zip_files(search_dir):
-    saves_path=os.path.join(root_dir,"saves")
-    if os.path.exists(saves_path):shutil.rmtree(saves_path)
-    os.makedirs(saves_path,exist_ok=True)
-    if os.path.isfile(search_dir) and search_dir.endswith(".zip"):
-        unzip_file(search_dir,saves_path)
-        save_extractor_done.set()
+    if save_extractor_done.is_set():
+        print("Extraction complete. Converting save files...")
+        threading.Thread(target=convert_save_files, daemon=True).start()
+    else:
+        window.after(500, check_progress)
+def check_for_zip_files():
+    zip_files=find_zip_files("./")
+    if not zip_files:
+        print("No palworld_*.zip detected. Running extractor...")
+        threading.Thread(target=run_save_extractor, daemon=True).start()
         return
-    if os.path.isdir(search_dir):
-        for f in os.listdir(search_dir):
-            if f.endswith(".zip"):
-                unzip_file(os.path.join(search_dir,f),saves_path)
-                save_extractor_done.set()
-                return
-        shutil.copytree(search_dir,saves_path,dirs_exist_ok=True)
-        save_extractor_done.set()
+    print("palworld_*.zip detected. Processing...")
+    process_zip_files()
 def process_zip_files():
-    saves_path = os.path.join(root_dir, "saves")
-    if is_folder_empty(saves_path):
-        zip_files = find_zip_files(root_dir)
+    if is_folder_empty("./saves"):
+        zip_files=find_zip_files("./")
         if zip_files:
-            for full_zip_path in [os.path.join(root_dir, z) for z in zip_files]:
-                unzip_file(full_zip_path, saves_path)
+            print(f"Unzipping {zip_files[0]}...")
+            unzip_file(zip_files[0], "./saves")
             save_extractor_done.set()
-        else:
-            print(t("xgp.err.no_xgp_saves"))
-            window.quit()
+            return
+        print("No save files found on XGP. Reinstall Palworld on GamePass and try again.")
+        window.quit()
     else:
         save_extractor_done.set()
 def process_zip_file(file_path: str):
@@ -101,44 +63,24 @@ def process_zip_file(file_path: str):
     shutil.copy2(file_path, os.path.join(xgp_original_saves_path, os.path.basename(file_path)))
     save_extractor_done.set()
 def convert_save_files():
-    saves_path = os.path.join(root_dir, "saves")
-    saveFolders = list_folders_in_directory(saves_path)
+    saveFolders=list_folders_in_directory("./saves")
     if not saveFolders:
-        print(t("xgp.err.no_saves"))
+        print("No save files found")
         return
-    saveList = []
+    saveList=[]
     for saveName in saveFolders:
-        name = convert_sav_JSON(saveName)
+        name=convert_sav_JSON(saveName)
         if name: saveList.append(name)
-    window.after(0, lambda: update_combobox(saveList))
-    print(t("xgp.msg.choose_save"))
-def run_save_extractor(search_dir):
+    update_combobox(saveList)
+    print("Choose a save to convert:")
+def run_save_extractor():
     try:
-        print(t("xgp.msg.running_extractor"))
-        import xgp_save_extract
-        zip_file_path = xgp_save_extract.main()
-        print(t("xgp.msg.extract_ok", path=zip_file_path))
-        saves_path = os.path.join(root_dir, "saves")
-        os.makedirs(saves_path, exist_ok=True)
-        if zip_file_path and os.path.exists(zip_file_path):
-            target_zip_path = os.path.join(saves_path, os.path.basename(zip_file_path))
-            shutil.move(zip_file_path, target_zip_path)
-            process_zip_file(target_zip_path)
-        else:
-            zip_files = find_zip_files(root_dir)
-            if zip_files:
-                print(t("xgp.msg.found_leftover"))
-                for z in zip_files:
-                    full_zip_path = os.path.join(root_dir, z)
-                    target_zip_path = os.path.join(saves_path, z)
-                    shutil.move(full_zip_path, target_zip_path)
-                    process_zip_file(target_zip_path)
-            else:
-                print(t("xgp.err.no_zip_created"))
-                messagebox.showerror(t("Error"), t("xgp.err.extract_failed"))
+        import xgp_save_extract as extractor
+        zip_file_path = extractor.main()
+        print("Extractor finished successfully")
+        process_zip_files()
     except Exception as e:
-        print(t("xgp.err.extraction_exception", err=e))
-        traceback.print_exc()
+        print(f"Extractor error: {e}")
 def list_folders_in_directory(directory):
     try:
         if not os.path.exists(directory): os.makedirs(directory)
@@ -198,26 +140,29 @@ def generate_random_name(length=32):
     return "".join(random.choices(string.ascii_uppercase + string.digits, k=length))
 def move_save_steam(saveName):
     try:
-        destination_folder = getattr(save_converter_done, 'destination_folder', None)
+        destination_folder=getattr(save_converter_done,"destination_folder",None)
         if not destination_folder:
-            destination_folder = filedialog.askdirectory(title=t("xgp.dialog.select_output_folder"))
-            if not destination_folder: return
-        source_folder = os.path.join(root_dir, "saves", saveName)
+            default_dest=os.path.expandvars(r"%localappdata%\Pal\Saved\SaveGames")
+            initial_dir=default_dest if os.path.exists(default_dest) else root_dir
+            destination_folder=filedialog.askdirectory(title=t("xgp.dialog.select_output_folder"),initialdir=initial_dir)
+            if not destination_folder:return
+            save_converter_done.destination_folder=destination_folder
+        source_folder=os.path.join(root_dir,"saves",saveName)
         if not os.path.exists(source_folder):
-            raise FileNotFoundError(t("xgp.err.source_not_found", src=source_folder))
-        def ignore_folders(_, names): return {n for n in names if n in {"Level", "Slot1", "Slot2", "Slot3"}}
-        new_name = generate_random_name()
-        xgp_converted_saves_path = os.path.join(root_dir, "XGP_converted_saves")
-        os.makedirs(xgp_converted_saves_path, exist_ok=True)
-        new_converted_target_folder = os.path.join(xgp_converted_saves_path, new_name)
-        shutil.copytree(source_folder, new_converted_target_folder, dirs_exist_ok=True, ignore=ignore_folders)
-        new_target_folder = os.path.join(destination_folder, new_name)
-        shutil.copytree(source_folder, new_target_folder, dirs_exist_ok=True, ignore=ignore_folders)
-        messagebox.showinfo(t("Success"), t("xgp.msg.convert_copied", dest=destination_folder))
+            raise FileNotFoundError(t("xgp.err.source_not_found",src=source_folder))
+        def ignore_folders(_,names):return {n for n in names if n in {"Level","Slot1","Slot2","Slot3"}}
+        new_name=generate_random_name()
+        xgp_converted_saves_path=os.path.join(root_dir,"XGP_converted_saves")
+        os.makedirs(xgp_converted_saves_path,exist_ok=True)
+        new_converted_target_folder=os.path.join(xgp_converted_saves_path,new_name)
+        shutil.copytree(source_folder,new_converted_target_folder,dirs_exist_ok=True,ignore=ignore_folders)
+        new_target_folder=os.path.join(destination_folder,new_name)
+        shutil.copytree(source_folder,new_target_folder,dirs_exist_ok=True,ignore=ignore_folders)
+        messagebox.showinfo(t("Success"),t("xgp.msg.convert_copied",dest=destination_folder))
     except Exception as e:
-        print(t("xgp.err.copy_exception", err=e))
+        print(t("xgp.err.copy_exception",err=e))
         traceback.print_exc()
-        messagebox.showerror(t("Error"), t("xgp.err.copy_failed", err=e))
+        messagebox.showerror(t("Error"),t("xgp.err.copy_failed",err=e))
 def transfer_steam_to_gamepass(source_folder):
     try:
         import_path = os.path.join(base_dir, "palworld_xgp_import")

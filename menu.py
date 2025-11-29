@@ -416,14 +416,17 @@ def center_window(win):
 def on_exit():
     app.destroy()
     sys.exit(0)
-if __name__ == "__main__":
+if __name__=="__main__":
     try:
         init_language("zh_CN")
     except Exception:
         pass
-    tools_version, game_version = get_versions()
-    set_console_title(f"PalworldSaveTools v{tools_version}")
-    clear_console() 
-    check_github_update(auto_download=True, download_folder="PST_update", force_test=False)
-    app = MenuGUI()
-    app.mainloop()
+    tv,gv=get_versions()
+    set_console_title(f"PalworldSaveTools v{tv}")
+    clear_console()
+    check_github_update(auto_download=True,download_folder="PST_update",force_test=False)
+    import tkinter as tk
+    tk._default_root=None
+    from Assets.all_in_one_deletion import all_in_one_deletion
+    window=all_in_one_deletion()
+    window.mainloop()

@@ -1,9 +1,14 @@
 from import_libs import *
+from menu import *
 try:
     from i18n import t
 except Exception:
     def t(key, **fmt):
         return key.format(**fmt) if fmt else key
+import sys, os
+base_dir = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
+sys.path.insert(0, os.path.join(base_dir, "palworld_save_tools", "commands"))
+from convert import main as convert_main
 current_save_path = None
 loaded_level_json = None
 original_loaded_level_json = None
@@ -21,6 +26,12 @@ guild_result = None
 base_result = None
 player_result = None
 files_to_delete = set()
+def change_language(lang):
+    set_language(lang)
+    load_resources(lang)
+    window.destroy()
+    new_win = all_in_one_deletion()
+    new_win.mainloop()
 def refresh_stats(section):
     stats = get_current_stats()
     section_keys = {
@@ -59,6 +70,57 @@ def backup_whole_directory(source_folder, backup_folder):
     backup_path = os.path.join(backup_folder, f"PalworldSave_backup_{timestamp}")
     shutil.copytree(source_folder, backup_path)
     print(f"Backup of {source_folder} created at: {backup_path}")
+from menu import run_tool
+def open_convert_level_to_json():
+    run_tool((0, 0))
+def open_convert_json_to_level():
+    run_tool((0, 1))
+def open_convert_players_to_json():
+    run_tool((0, 2))
+def open_convert_players_to_sav():
+    run_tool((0, 3))
+def open_gamepass_converter():
+    run_tool((0, 4))
+def open_id_converter():
+    run_tool((0, 5))
+def open_slot_injector():
+    run_tool((1, 1))
+def open_modify_save():
+    run_tool((1, 2))
+def open_character_transfer():
+    run_tool((1, 3))
+def open_fix_host_save():
+    run_tool((1, 4))
+def open_restore_map():
+    run_tool((1, 5))
+def convert_json_to_sav(input_file,output_file):
+    old_argv=sys.argv
+    try:
+        sys.argv=["convert",input_file,"--output",output_file]
+        convert_main()
+    finally:
+        sys.argv=old_argv
+def convert_sav_to_json(input_file,output_file):
+    old_argv=sys.argv
+    try:
+        sys.argv=["convert",input_file,"--output",output_file]
+        convert_main()
+    finally:
+        sys.argv=old_argv
+def import_json_to_sav():
+    p=filedialog.askopenfilename(title="Select Level.json",filetypes=[("Level.json","Level.json")])
+    if not p:return
+    out=filedialog.asksaveasfilename(title="Save as Level.sav",defaultextension=".sav",initialfile="Level.sav")
+    if not out:return
+    convert_json_to_sav(p,out)
+    messagebox.showinfo("Success","Converted Level.json to Level.sav")
+def export_current_save_to_json():
+    in_path=filedialog.askopenfilename(title="Select Level.sav",filetypes=[("Level.sav","Level.sav")])
+    if not in_path:return
+    out=filedialog.asksaveasfilename(title="Export to Level.json",defaultextension=".json",initialfile="Level.json")
+    if not out:return
+    convert_sav_to_json(in_path,out)
+    messagebox.showinfo("Success","Converted Level.sav to Level.json")
 def sav_to_json(path):
     with open(path,"rb") as f:
         data = f.read()
@@ -618,15 +680,22 @@ def refresh_all():
     base_tree.delete(*base_tree.get_children())
     player_tree.delete(*player_tree.get_children())
     for g in loaded_level_json['properties']['worldSaveData']['value']['GroupSaveDataMap']['value']:
-        if g['value']['GroupType']['value']['value'] == 'EPalGroupType::Guild':
-            name = g['value']['RawData']['value'].get('guild_name', "Unknown")
-            gid = as_uuid(g['key'])
-            guild_tree.insert("", "end", values=(name, gid))
-    base_camps = loaded_level_json['properties']['worldSaveData']['value'].get('BaseCampSaveData', {}).get('value', [])
+        if g['value']['GroupType']['value']['value']=='EPalGroupType::Guild':
+            name=g['value']['RawData']['value'].get('guild_name',"Unknown")
+            gid=as_uuid(g['key'])
+            guild_tree.insert("", "end", values=(name,gid))
+    base_camps=loaded_level_json['properties']['worldSaveData']['value'].get('BaseCampSaveData',{}).get('value',[])
     for b in base_camps:
         base_tree.insert("", "end", values=(str(b['key']),))
-    for uid, name, gid, seen, level in get_players():
-        player_tree.insert("", "end", iid=uid, values=(uid, name, gid, seen, level))
+    used=set()
+    for uid,name,gid,seen,level in get_players():
+        iid=uid
+        c=1
+        while iid in used:
+            iid=f"{uid}_{c}"
+            c+=1
+        used.add(iid)
+        player_tree.insert("", "end", iid=iid, values=(uid,name,gid,seen,level))
 def on_guild_search(q=None):
     if q is None:
         q = guild_search_var.get()
@@ -1383,22 +1452,22 @@ def update_stats_section(stat_labels, section, stats):
         label_key = f"{key_sec}_{field_key.lower()}"
         if label_key in stat_labels:
             stat_labels[label_key].config(text=f"{t(f'deletion.stats.{field_key.lower()}')}: {value}")
-def create_search_panel(parent, label_text, search_var, search_callback, tree_columns, tree_headings, tree_col_widths, width, height, tree_height=12):
-    panel = ttk.Frame(parent, style="TFrame")
-    panel.place(width=width, height=height)
-    topbar = ttk.Frame(panel, style="TFrame")
-    topbar.pack(fill='x', padx=5, pady=5)
-    lbl = ttk.Label(topbar, text=label_text, font=("Arial", 10), style="TLabel")
+def create_search_panel(parent,label_text,search_var,search_callback,tree_columns,tree_headings,tree_col_widths,width,height,tree_height=12):
+    panel=ttk.Frame(parent,style="TFrame")
+    panel.place(width=width,height=height)
+    topbar=ttk.Frame(panel,style="TFrame")
+    topbar.pack(fill='x',padx=5,pady=5)
+    lbl=ttk.Label(topbar,text=label_text,font=("Arial",10),style="TLabel")
     lbl.pack(side='left')
-    entry = ttk.Entry(topbar, textvariable=search_var)
-    entry.pack(side='left', fill='x', expand=True, padx=(5, 0))
-    entry.bind("<KeyRelease>", lambda e: search_callback(entry.get()))
-    tree = ttk.Treeview(panel, columns=tree_columns, show='headings', height=tree_height)
-    tree.pack(fill='both', expand=True, padx=5, pady=(0, 5))
-    for col, head, width_col in zip(tree_columns, tree_headings, tree_col_widths):
-        tree.heading(col, text=head)
-        tree.column(col, width=width_col, anchor='w')
-    return panel, tree, entry
+    entry=ttk.Entry(topbar,textvariable=search_var)
+    entry.pack(side='left',fill='x',expand=True,padx=(5,0))
+    entry.bind("<KeyRelease>",lambda e:search_callback(entry.get()))
+    tree=ttk.Treeview(panel,columns=tree_columns,show='headings',height=tree_height,selectmode="extended")
+    tree.pack(fill='both',expand=True,padx=5,pady=(0,5))
+    for col,head,width_col in zip(tree_columns,tree_headings,tree_col_widths):
+        tree.heading(col,text=head)
+        tree.column(col,width=width_col,anchor='w')
+    return panel,tree,entry
 from PIL import Image, ImageDraw, ImageFont
 def pil_text_to_surface(text, size=20, color=(255,255,255)):
     font_paths = [
@@ -2364,12 +2433,298 @@ def move_selected_player_to_selected_guild():
     refresh_all()
     refresh_stats("After Deletion")
     messagebox.showinfo("Done",f"Player {player_uid_raw} moved to guild {target_gid_raw}")
+def inject_slots():
+    global loaded_level_json,current_save_path
+    if not current_save_path or not loaded_level_json:return
+    pages=ask_string_with_icon(t("slotinjector.title"),t("slotinjector.ask_pages"),ICON_PATH)
+    slots=ask_string_with_icon(t("slotinjector.title"),t("slotinjector.ask_slots"),ICON_PATH)
+    try:pages=int(pages);slots=int(slots)
+    except:messagebox.showerror(t("error"),t("slotinjector.invalid_numbers"));return
+    if pages<1 or slots<1:messagebox.showerror(t("error"),t("slotinjector.must_be_positive"));return
+    new_value=pages*slots
+    container=loaded_level_json['properties']['worldSaveData']['value'].get('CharacterContainerSaveData',{}).get('value',[])
+    if not isinstance(container,list):messagebox.showerror(t("error"),t("slotinjector.invalid_container"));return
+    PLAYER_SLOT_THRESHOLD=960
+    targets=[]
+    for idx,entry in enumerate(container):
+        v=entry.get('value',{})
+        cur=v.get('SlotNum',{}).get('value',0)
+        if cur>=PLAYER_SLOT_THRESHOLD:targets.append((idx,cur,entry))
+    if not targets:messagebox.showinfo(t("info"),t("slotinjector.no_targets"));return
+    for idx,cur,entry in targets:
+        slotnum=entry.get('value',{}).get('SlotNum',{})
+        if slotnum.get('value')==cur:slotnum['value']=new_value
+    backup_whole_directory(current_save_path,"Backups/SlotInjector")
+    json_to_sav(loaded_level_json,os.path.join(current_save_path,"Level.sav"))
+    messagebox.showinfo(t("success"),t("slotinjector.success").format(count=len(targets),value=new_value))
+def restore_map_tool():
+    resources_file=os.path.join(os.path.dirname(os.path.abspath(__file__)),'resources','LocalData.sav')
+    if not os.path.exists(resources_file):
+        messagebox.showerror(t("error"),t("restoremap.notfound").format(file=resources_file));return
+    window=tk.Toplevel()
+    window.title(t("tool.restore_map"))
+    window.geometry("600x250")
+    window.config(bg="#2f2f2f")
+    try:window.iconbitmap(ICON_PATH)
+    except:pass
+    font_style=("Arial",10)
+    style=ttk.Style(window)
+    style.theme_use('clam')
+    for opt in[
+        ("TFrame",{"background":"#2f2f2f"}),
+        ("TLabel",{"background":"#2f2f2f","foreground":"white"}),
+        ("Dark.TButton",{"background":"#555555","foreground":"white","font":font_style,"padding":6})
+    ]:style.configure(opt[0],**opt[1])
+    style.map("Dark.TButton",background=[("active","#666666"),("!disabled","#555555")])
+    msg_frame=ttk.Frame(window,style="TFrame")
+    msg_frame.pack(fill='both',expand=True,padx=20,pady=20)
+    ttk.Label(msg_frame,text=t("restoremap.warn.1"),font=font_style,anchor='center',justify='center').pack(fill='x',pady=2)
+    ttk.Label(msg_frame,text=t("restoremap.warn.2"),font=font_style,anchor='center',justify='center').pack(fill='x',pady=2)
+    ttk.Label(msg_frame,text=t("restoremap.warn.3"),font=font_style,anchor='center',justify='center').pack(fill='x',pady=2)
+    button_frame=ttk.Frame(window,style="TFrame")
+    button_frame.pack(pady=20)
+    result_label=ttk.Label(window,text="",font=font_style,style="TLabel")
+    result_label.pack(pady=10)
+    def backup_local_data(subfolder_path):
+        ts=time.strftime('%Y-%m-%d_%H-%M-%S')
+        folder=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','Backups','Restore Map',ts,os.path.basename(subfolder_path))
+        os.makedirs(folder,exist_ok=True)
+        src=os.path.join(subfolder_path,'LocalData.sav')
+        if os.path.exists(src):shutil.copy(src,os.path.join(folder,'LocalData.sav'))
+    def copy_to_all_subfolders(src_file,file_size):
+        root=os.path.join(os.environ['LOCALAPPDATA'],'Pal','Saved','SaveGames')
+        count=0
+        for f in os.listdir(root):
+            fpath=os.path.join(root,f)
+            if os.path.isdir(fpath):
+                subs=[s for s in os.listdir(fpath) if os.path.isdir(os.path.join(fpath,s))]
+                for s in subs:
+                    spath=os.path.join(fpath,s)
+                    target=os.path.join(spath,'LocalData.sav')
+                    if target!=src_file:
+                        backup_local_data(spath)
+                        shutil.copy(src_file,target)
+                        count+=1
+        print(t("restoremap.done").format(count=count,size=file_size))
+    def on_yes():
+        fs=os.path.getsize(resources_file)
+        copy_to_all_subfolders(resources_file,fs)
+        result_label.config(text=t("restoremap.success"))
+        yes_button.config(state='disabled');no_button.config(state='disabled')
+        window.destroy()
+    def on_no():window.destroy()
+    yes_button=ttk.Button(button_frame,text=t("yes"),style="Dark.TButton",command=on_yes)
+    yes_button.pack(side='left',padx=10)
+    no_button=ttk.Button(button_frame,text=t("no"),style="Dark.TButton",command=on_no)
+    no_button.pack(side='left',padx=10)
+    center_window(window)
+    window.protocol("WM_DELETE_WINDOW",window.destroy)
+    window.grab_set()
+    return window
+def debug_players_from_json():
+    wsd=loaded_level_json['properties']['worldSaveData']['value']
+    groups=wsd['GroupSaveDataMap']['value']
+    print("GUILDS FOUND:", len(groups))
+    for g in groups:
+        gt=g['value']['GroupType']['value']['value']
+        print("GroupType:", gt)
+        if gt!="EPalGroupType::Guild": continue
+        raw=g['value']['RawData']['value']
+        print("Guild RawData keys:", raw.keys())
+        players=raw.get("players", [])
+        print("Players in guild:", len(players))
+        for p in players:
+            print("player_uid:", p.get("player_uid"))
+            print("player_info:", p.get("player_info"))
+def debug_guilds_on_load():
+    wsd=loaded_level_json['properties']['worldSaveData']['value']
+    groups=wsd['GroupSaveDataMap']['value']
+    print("ON LOAD:")
+    for g in groups:
+        gt=g['value']['GroupType']['value']['value']
+        if gt!="EPalGroupType::Guild":continue
+        keys=g['value']['RawData'].keys()
+        print("Guild RawData keys:", keys)
+def swap_two_players_action():
+    global loaded_level_json
+    sel=player_tree.selection()
+    if len(sel)!=2:
+        messagebox.showerror(t("error"),t("select.two.players"));return
+    uid1=player_tree.item(sel[0],"values")[0].replace("-","").split("_")[0].upper()
+    uid2=player_tree.item(sel[1],"values")[0].replace("-","").split("_")[0].upper()
+    if uid1==uid2:
+        messagebox.showerror(t("error"),t("select.two.players"));return
+    folder=current_save_path
+    level_path=os.path.join(folder,"Level.sav")
+    p1_path=os.path.join(folder,"Players",uid1+".sav")
+    p2_path=os.path.join(folder,"Players",uid2+".sav")
+    if not(os.path.exists(p1_path) and os.path.exists(p2_path)):
+        messagebox.showerror(t("error"),t("fixhost.missing"));return
+    lvl=loaded_level_json
+    p1=sav_to_json(p1_path)
+    p2=sav_to_json(p2_path)
+    u1f=f"{uid1[:8]}-{uid1[8:12]}-{uid1[12:16]}-{uid1[16:20]}-{uid1[20:]}".lower()
+    u2f=f"{uid2[:8]}-{uid2[8:12]}-{uid2[12:16]}-{uid2[16:20]}-{uid2[20:]}".lower()
+    p1_inst=p1['properties']['SaveData']['value']['IndividualId']['value']['InstanceId']['value']
+    p2_inst=p2['properties']['SaveData']['value']['IndividualId']['value']['InstanceId']['value']
+    p1['properties']['SaveData']['value']['PlayerUId']['value']=u2f
+    p1['properties']['SaveData']['value']['IndividualId']['value']['PlayerUId']['value']=u2f
+    p2['properties']['SaveData']['value']['PlayerUId']['value']=u1f
+    p2['properties']['SaveData']['value']['IndividualId']['value']['PlayerUId']['value']=u1f
+    csm=lvl['properties']['worldSaveData']['value']['CharacterSaveParameterMap']['value']
+    for entry in csm:
+        inst=entry['key']['InstanceId']['value']
+        if inst==p1_inst:entry['key']['PlayerUId']['value']=u2f
+        elif inst==p2_inst:entry['key']['PlayerUId']['value']=u1f
+    for g in lvl['properties']['worldSaveData']['value']['GroupSaveDataMap']['value']:
+        if g['value']['GroupType']['value']['value']!='EPalGroupType::Guild':continue
+        rawdata=g['value']['RawData']
+        raw=rawdata.get('value',rawdata.get('values',{}))
+        if 'players' in raw:
+            for pl in raw['players']:
+                pu=pl.get('player_uid')
+                if pu==u1f:pl['player_uid']=u2f
+                elif pu==u2f:pl['player_uid']=u1f
+        if 'admin_player_uid' in raw:
+            if raw['admin_player_uid']==u1f:raw['admin_player_uid']=u2f
+            elif raw['admin_player_uid']==u2f:raw['admin_player_uid']=u1f
+    backup_whole_directory(folder,"Backups/UIDSwap")
+    json_to_sav(lvl,level_path)
+    json_to_sav(p1,p1_path)
+    json_to_sav(p2,p2_path)
+    tmp=p1_path+'.tmp'
+    os.rename(p1_path,tmp)
+    os.rename(p2_path,p1_path)
+    os.rename(tmp,p2_path)
+    load_save(level_path)
+    messagebox.showinfo(t("success"),t("uidswap.success").format(u1=uid1,u2=uid2))
+class SlotNumUpdaterApp(tk.Toplevel):
+    def __init__(self,master):
+        super().__init__(master)
+        self.title(t("tool.slot_injector"))
+        self.geometry("600x180")
+        self.config(bg="#2f2f2f")
+        try:self.iconbitmap(ICON_PATH)
+        except:pass
+        fs=("Arial",10)
+        st=ttk.Style(self)
+        st.theme_use('clam')
+        st.configure("TFrame",background="#2f2f2f")
+        st.configure("TLabel",background="#2f2f2f",foreground="white",font=fs)
+        st.configure("TEntry",fieldbackground="#444444",foreground="white",font=fs)
+        st.configure("Dark.TButton",background="#555555",foreground="white",font=fs,padding=6)
+        st.map("Dark.TButton",background=[("active","#666666")])
+        f=ttk.Frame(self,style="TFrame")
+        f.pack(padx=20,pady=10,fill='x',expand=True)
+        r=0
+        ttk.Button(f,text=t("Browse"),command=self.browse_file,style="Dark.TButton").grid(row=r,column=0,sticky='w')
+        ttk.Label(f,text=t("Select Level.sav File:"),style="TLabel").grid(row=r,column=1,sticky='w',padx=(10,5))
+        self.file_entry=ttk.Entry(f,style="TEntry")
+        self.file_entry.grid(row=r,column=2,sticky='ew')
+        r+=1
+        ttk.Label(f,text=t("Total Pages:"),style="TLabel").grid(row=r,column=0,sticky='w',pady=5)
+        self.pages_entry=ttk.Entry(f,style="TEntry",width=10)
+        self.pages_entry.grid(row=r,column=1,sticky='w',pady=5)
+        r+=1
+        ttk.Label(f,text=t("Total Slots:"),style="TLabel").grid(row=r,column=0,sticky='w',pady=5)
+        self.slots_entry=ttk.Entry(f,style="TEntry",width=10)
+        self.slots_entry.grid(row=r,column=1,sticky='w',pady=5)
+        r+=1
+        ttk.Button(f,text=t("Apply Slot Injection"),command=self.apply_slotnum_update,style="Dark.TButton").grid(row=r,column=0,columnspan=3,pady=10)
+        f.columnconfigure(2,weight=1)
+    def browse_file(self):
+        p=filedialog.askopenfilename(title=t("Select Level.sav file"),filetypes=[("SAV files","Level.sav")])
+        if p:
+            self.file_entry.delete(0,tk.END)
+            self.file_entry.insert(0,p)
+    def apply_slotnum_update(self):
+        fp=self.file_entry.get()
+        if not fp or not os.path.isfile(fp) or not fp.endswith("Level.sav"):
+            print("Error: invalid file");return
+        try:
+            pages=int(self.pages_entry.get())
+            slots=int(self.slots_entry.get())
+            if pages<1 or slots<1:raise ValueError
+        except:
+            print("Error: invalid numbers");return
+        nv=pages*slots
+        j=sav_to_json(fp)
+        cont=j['properties']['worldSaveData']['value'].get('CharacterContainerSaveData',{}).get('value',[])
+        if not isinstance(cont,list):
+            print("Error: missing container");return
+        th=960
+        items=[entry for entry in cont if entry.get('value',{}).get('SlotNum',{}).get('value',0)>=th]
+        if not items:
+            print("Info: no editable entries");return
+        for e in items:
+            e['value']['SlotNum']['value']=nv
+        backup_whole_directory(os.path.dirname(fp),"Backups/Slot Injector")
+        json_to_sav(j,fp)
+        print("Success")
+def get_steam_id_from_local():
+    p=os.path.expandvars(r"%localappdata%\Pal\Saved\SaveGames")
+    if os.path.exists(p):
+        d=[x for x in os.listdir(p) if os.path.isdir(os.path.join(p,x))]
+        return d[0] if d else None
+    return None
+
+def convert_steam_id():
+    def do_convert(v=None):
+        v=e.get().strip() if v is None else v
+        if not v:
+            messagebox.showwarning(t("Warning"),t("steamid.warn.enter_id"));return
+        if "steamcommunity.com/profiles/" in v:
+            v=v.split("steamcommunity.com/profiles/")[1].split("/")[0]
+        elif v.startswith("steam_"):
+            v=v[6:]
+        try:
+            sid=int(v)
+            pal=steamIdToPlayerUid(sid)
+            noid=PlayerUid2NoSteam(int.from_bytes(toUUID(pal).raw_bytes[0:4],byteorder='little'))+"-0000-0000-0000-000000000000"
+            r.set(t("steamid.result",pal=str(pal).upper(),nosteam=noid.upper()))
+        except:
+            messagebox.showerror(t("Error"),t("steamid.err.invalid"))
+
+    l=get_steam_id_from_local()
+    w=tk.Toplevel()
+    w.title(t("steamid.title"))
+    w.geometry("600x250")
+    w.config(bg="#2f2f2f")
+    try:w.iconbitmap(ICON_PATH)
+    except:pass
+    fs=("Arial",10)
+    st=ttk.Style(w)
+    st.theme_use("clam")
+    st.configure("TLabel",background="#2f2f2f",foreground="white",font=fs)
+    st.configure("Dark.TButton",background="#555555",foreground="white",font=fs,padding=6)
+    st.map("Dark.TButton",background=[("active","#666666")])
+    ttk.Label(w,text=t("steamid.tip"),anchor="center",justify="center",style="TLabel").pack(fill="x",pady=(10,5))
+    ttk.Label(w,text=t("steamid.local_hint"),anchor="center",justify="center",style="TLabel").pack(fill="x",pady=(0,10))
+    e=ttk.Entry(w,width=40,font=fs)
+    e.pack(pady=5)
+    ttk.Button(w,text=t("steamid.btn.convert"),style="Dark.TButton",command=lambda:do_convert()).pack(pady=10)
+    r=tk.StringVar()
+    ttk.Label(w,textvariable=r,font=fs,style="TLabel").pack(pady=(10,0))
+    def cp():
+        w.clipboard_clear()
+        w.clipboard_append(r.get())
+    ttk.Button(w,text="📋",style="Dark.TButton",width=3,command=cp).pack(pady=(5,10))
+    if l:
+        try:
+            e.insert(0,l)
+            do_convert(l)
+        except:pass
+    center_window(w)
+    w.protocol("WM_DELETE_WINDOW",lambda:w.destroy())
+    w.grab_set()
+    return w
 def all_in_one_deletion():
     global window, stat_labels, guild_tree, base_tree, player_tree, guild_members_tree
     global guild_search_var, base_search_var, player_search_var, guild_members_search_var
     global guild_result, base_result, player_result
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    window = tk.Toplevel()
+    #window = tk.Toplevel()
+    window = tk.Tk()
     window.title(t("deletion.title"))
     window.geometry("1200x660")
     window.config(bg="#2f2f2f")
@@ -2560,8 +2915,21 @@ def all_in_one_deletion():
     exclusions_bases_tree.bind("<Button-3>", exclusions_bases_tree_menu)
     menubar = tk.Menu(window)
     file_menu = tk.Menu(menubar, tearoff=0)
-    file_menu.add_command(label=t("deletion.menu.load_level"), command=load_save)
-    file_menu.add_command(label=t("deletion.menu.save_changes"), command=save_changes)
+    file_menu.add_command(label=t("menu.file.load_save"), command=load_save)
+    file_menu.add_command(label=t("menu.file.save_changes"), command=save_changes)
+    file_menu.add_separator()
+    file_menu.add_command(label=t("menu.file.convert_sav_to_json"), command=open_convert_level_to_json)
+    file_menu.add_command(label=t("menu.file.convert_json_to_sav"), command=open_convert_json_to_level)
+    file_menu.add_command(label=t("menu.file.convert_players_to_json"), command=open_convert_players_to_json)
+    file_menu.add_command(label=t("menu.file.convert_players_to_sav"), command=open_convert_players_to_sav)
+    file_menu.add_separator()
+    file_menu.add_command(label=t("menu.file.gamepass_converter"), command=open_gamepass_converter)
+    file_menu.add_command(label=t("menu.file.id_converter"), command=open_id_converter)
+    file_menu.add_command(label=t("menu.file.slot_injector"), command=open_slot_injector)
+    file_menu.add_command(label=t("menu.file.modify_save"), command=open_modify_save)
+    file_menu.add_command(label=t("menu.file.character_transfer"), command=open_character_transfer)
+    file_menu.add_command(label=t("menu.file.fix_host_save"), command=open_fix_host_save)
+    file_menu.add_command(label=t("menu.file.restore_map"), command=open_restore_map)
     menubar.add_cascade(label=t("deletion.menu.file"), menu=file_menu)
     delete_menu = tk.Menu(menubar, tearoff=0)
     delete_menu.add_command(label=t("deletion.menu.delete_selected_guild"), command=delete_selected_guild)
@@ -2592,6 +2960,16 @@ def all_in_one_deletion():
     guild_menu = tk.Menu(menubar, tearoff=0)
     guild_menu.add_command(label=t("guild.menu.move_selected_player_to_selected_guild"), command=move_selected_player_to_selected_guild)
     menubar.add_cascade(label=t("guild.menu.title"), menu=guild_menu)
+    language_menu = tk.Menu(menubar, tearoff=0)
+    language_menu.add_command(label=t("lang.zh_CN"), command=lambda: change_language("zh_CN"))
+    language_menu.add_command(label=t("lang.en_US"), command=lambda: change_language("en_US"))
+    language_menu.add_command(label=t("lang.ru_RU"), command=lambda: change_language("ru_RU"))
+    language_menu.add_command(label=t("lang.fr_FR"), command=lambda: change_language("fr_FR"))
+    language_menu.add_command(label=t("lang.es_ES"), command=lambda: change_language("es_ES"))
+    language_menu.add_command(label=t("lang.de_DE"), command=lambda: change_language("de_DE"))
+    language_menu.add_command(label=t("lang.ja_JP"), command=lambda: change_language("ja_JP"))
+    language_menu.add_command(label=t("lang.ko_KR"), command=lambda: change_language("ko_KR"))
+    menubar.add_cascade(label=t("menu.language"), menu=language_menu)
     window.config(menu=menubar)
     def on_f5_press(event):
         folder = current_save_path
