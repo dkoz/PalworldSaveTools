@@ -71,7 +71,7 @@ def convert_save_files():
     for saveName in saveFolders:
         name=convert_sav_JSON(saveName)
         if name: saveList.append(name)
-    update_combobox(saveList)
+    window.after(0, lambda: update_combobox(saveList))
     print("Choose a save to convert:")
 def run_save_extractor():
     try:
