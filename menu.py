@@ -1,6 +1,4 @@
 import os, sys, shutil
-import warnings
-warnings.filterwarnings("ignore", category=UserWarning, module="pygame.pkgdata")
 from pathlib import Path
 import importlib.util
 import tkinter as tk
@@ -41,6 +39,11 @@ def get_assets_path():
         return os.path.join(os.path.dirname(sys.executable), "Assets")
     else:
         return os.path.join(os.path.dirname(__file__), "Assets")
+if getattr(sys,"frozen",False):
+    exe_dir=os.path.dirname(sys.executable)
+    assets_path=os.path.join(exe_dir,"Assets")
+    if assets_path not in sys.path:
+        sys.path.insert(0,assets_path)
 def setup_import_paths():
     assets_path = get_assets_path()
     if assets_path not in sys.path:
@@ -191,8 +194,9 @@ def run_tool(choice):
         category_index, tool_index = choice
         return tool_lists[category_index][tool_index]()
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print(f"Invalid choice or error running tool: {e}")
-        raise
 converting_tool_keys = [
     "tool.convert.level.to_json",
     "tool.convert.level.to_sav",

@@ -51,10 +51,16 @@ def build_with_cx_freeze():
         shutil.rmtree(lib_folder)
 
 def clean_build_artifacts():
-    for folder in ["build", "PalworldSaveTools.egg-info"]:
+    for folder in ["build","PalworldSaveTools.egg-info"]:
         if os.path.exists(folder):
             print(f"Removing {folder}...")
             shutil.rmtree(folder)
+    for root,dirs,files in os.walk(".",topdown=False):
+        for d in dirs:
+            if d=="__pycache__":
+                path=os.path.join(root,d)
+                print(f"Removing {path}...")
+                shutil.rmtree(path,ignore_errors=True)
 
 def main():
     print("=" * 40)

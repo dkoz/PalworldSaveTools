@@ -1,5 +1,6 @@
-import os
+import os, warnings
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT']='1'
+warnings.filterwarnings("ignore", category=UserWarning, module="pygame.pkgdata")
 import sys,argparse,code,collections,copy,ctypes,datetime,functools,gc,importlib.metadata,json,shutil,glob
 import logging,multiprocessing,platform,pprint,re,subprocess,tarfile,threading,pickle,zipfile,customtkinter,string,palworld_coord
 import time,traceback,uuid,io,pathlib,tkinter as tk,tkinter.font,csv,urllib.request,tempfile,random,pandas as pd

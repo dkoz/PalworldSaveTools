@@ -79,6 +79,12 @@ def backup_whole_directory(source_folder, backup_folder):
     backup_path = os.path.join(backup_folder, f"PalworldSave_backup_{timestamp}")
     shutil.copytree(source_folder, backup_path)
     print(f"Backup of {source_folder} created at: {backup_path}")
+try:
+    from menu import run_tool
+except ImportError:
+    import importlib
+    menu = importlib.import_module("menu")
+    run_tool = menu.run_tool
 def open_convert_level_to_json():
     run_tool((0, 0))
 def open_convert_json_to_level():
