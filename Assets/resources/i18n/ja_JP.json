@@ -12,7 +12,7 @@
 "tool.convert.players.to_sav": "Players を SAV に変換",
 "tool.convert.gamepass.steam": "GamePass ⇔ Steam 変換",
 "tool.convert.steamid": "SteamID 変換",
-"tool.deletion": "統合削除ツール",
+"tool.deletion": "オールインワンツール",
 "tool.slot_injector": "スロットインジェクター",
 "tool.modify_save": "セーブデータ編集",
 "tool.character_transfer": "キャラクター転送",

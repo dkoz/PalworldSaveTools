@@ -1,31 +1,24 @@
 from import_libs import *
-from menu import *
 try:
-    from i18n import t
+    from i18n import init_language, t, set_language, get_language, load_resources
 except Exception:
     def t(key, **fmt):
         return key.format(**fmt) if fmt else key
-import sys, os
-base_dir = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(__file__)
-sys.path.insert(0, os.path.join(base_dir, "palworld_save_tools", "commands"))
-from convert import main as convert_main
+GITHUB_RAW_URL = "https://raw.githubusercontent.com/deafdudecomputers/PalworldSaveTools/main/Assets/common.py"
 def check_for_update():
     try:
-        r = urllib.request.urlopen(GITHUB_RAW_URL, timeout=5)
-        content = r.read().decode("utf-8")
-        match = re.search(r'APP_VERSION\s*=\s*"([^"]+)"', content)
-        latest = match.group(1) if match else None
-        local, _ = get_versions()
+        r=urllib.request.urlopen(GITHUB_RAW_URL,timeout=5)
+        content=r.read().decode("utf-8")
+        match=re.search(r'APP_VERSION\s*=\s*"([^"]+)"',content)
+        latest=match.group(1) if match else None
+        local,_=get_versions()
         if not latest:
             return None
-        local_tuple = tuple(int(x) for x in local.split("."))
-        latest_tuple = tuple(int(x) for x in latest.split("."))
-        return {
-            "local": local,
-            "latest": latest,
-            "update_available": latest_tuple > local_tuple
-        }
-    except Exception:
+        local_tuple=tuple(int(x) for x in local.split("."))
+        latest_tuple=tuple(int(x) for x in latest.split("."))
+        return {"local":local,"latest":latest,"update_available":latest_tuple>local_tuple}
+    except Exception as e:
+        print("Update check error:",e)
         return None
 current_save_path = None
 loaded_level_json = None
@@ -48,8 +41,6 @@ def change_language(lang):
     set_language(lang)
     load_resources(lang)
     window.destroy()
-    new_win = all_in_one_deletion()
-    new_win.mainloop()
 def refresh_stats(section):
     stats = get_current_stats()
     section_keys = {
@@ -88,7 +79,6 @@ def backup_whole_directory(source_folder, backup_folder):
     backup_path = os.path.join(backup_folder, f"PalworldSave_backup_{timestamp}")
     shutil.copytree(source_folder, backup_path)
     print(f"Backup of {source_folder} created at: {backup_path}")
-from menu import run_tool
 def open_convert_level_to_json():
     run_tool((0, 0))
 def open_convert_json_to_level():
@@ -111,34 +101,6 @@ def open_fix_host_save():
     run_tool((1, 4))
 def open_restore_map():
     run_tool((1, 5))
-def convert_json_to_sav(input_file,output_file):
-    old_argv=sys.argv
-    try:
-        sys.argv=["convert",input_file,"--output",output_file]
-        convert_main()
-    finally:
-        sys.argv=old_argv
-def convert_sav_to_json(input_file,output_file):
-    old_argv=sys.argv
-    try:
-        sys.argv=["convert",input_file,"--output",output_file]
-        convert_main()
-    finally:
-        sys.argv=old_argv
-def import_json_to_sav():
-    p=filedialog.askopenfilename(title="Select Level.json",filetypes=[("Level.json","Level.json")])
-    if not p:return
-    out=filedialog.asksaveasfilename(title="Save as Level.sav",defaultextension=".sav",initialfile="Level.sav")
-    if not out:return
-    convert_json_to_sav(p,out)
-    messagebox.showinfo("Success","Converted Level.json to Level.sav")
-def export_current_save_to_json():
-    in_path=filedialog.askopenfilename(title="Select Level.sav",filetypes=[("Level.sav","Level.sav")])
-    if not in_path:return
-    out=filedialog.asksaveasfilename(title="Export to Level.json",defaultextension=".json",initialfile="Level.json")
-    if not out:return
-    convert_sav_to_json(in_path,out)
-    messagebox.showinfo("Success","Converted Level.sav to Level.json")
 def sav_to_json(path):
     with open(path,"rb") as f:
         data = f.read()
@@ -2456,34 +2418,29 @@ def all_in_one_deletion():
     global guild_search_var, base_search_var, player_search_var, guild_members_search_var
     global guild_result, base_result, player_result
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    #window = tk.Toplevel()
-    window = tk.Tk()
+    window = tk.Toplevel()
     import webbrowser
     info = check_for_update()
     if info:
-        latest = info["latest"]
-        local = info["local"]
+        latest, local = info["latest"], info["local"]
         update_available = info["update_available"]
-        version_text = f"Latest: {latest}  |  Current: {local}"
-        fg_color = "yellow" if update_available else "lightgreen"
-
-        version_label = tk.Label(window, text=version_text, bg="#2f2f2f",
-                                 fg=fg_color, font=("Consolas", 10, "bold"),
-                                 cursor="hand2")
-        version_label.place(x=650 + 250, y=10)
-        def open_latest(event):
-            webbrowser.open("https://github.com/deafdudecomputers/PalworldSaveTools/releases/latest")
-        version_label.bind("<Button-1>", open_latest)
+        version_frame = tk.Frame(window, bg="#2f2f2f")
+        version_frame.place(relx=1.0, x=-10, y=2, anchor="ne") 
+        latest_label = tk.Label(version_frame, text=f"Latest: {latest}", bg="#2f2f2f", fg="white",
+                                font=("Consolas", 8, "bold"), padx=4, pady=0)
+        latest_label.pack(anchor="e", pady=0)
+        separator = tk.Frame(version_frame, height=1, bg="#666", bd=0)
+        separator.pack(fill="x", pady=0)
+        current_label = tk.Label(version_frame, text=f"Current: {local}", bg="#2f2f2f", fg="lightgreen",
+                                 font=("Consolas", 8, "bold"), padx=4, pady=0, cursor="hand2")
+        current_label.pack(anchor="e", pady=0)
+        current_label.bind("<Button-1>", lambda e: webbrowser.open(
+            "https://github.com/deafdudecomputers/PalworldSaveTools/releases/latest"))
         if update_available:
-            glow_box = tk.Frame(window, bg="yellow", width= version_label.winfo_reqwidth()+10,
-                                height=version_label.winfo_reqheight()+6)
-            glow_box.place(x=650+245, y=7)
-            version_label.lift(glow_box)
-            def pulse():
-                current = glow_box["bg"]
-                glow_box["bg"] = "orange" if current=="yellow" else "yellow"
-                window.after(500, pulse)
-            pulse()
+            def pulse_current():
+                current_label["fg"] = "yellow" if current_label["fg"]=="lightgreen" else "lightgreen"
+                window.after(800, pulse_current)
+            pulse_current()
     window.title(t("deletion.title"))
     window.geometry("1200x660")
     window.config(bg="#2f2f2f")

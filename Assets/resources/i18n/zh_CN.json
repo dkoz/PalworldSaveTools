@@ -12,7 +12,7 @@
 "tool.convert.players.to_sav": "转换 Players 为 sav",
 "tool.convert.gamepass.steam": "GamePass ⇔ Steam 转换",
 "tool.convert.steamid": "SteamID 转换",
-"tool.deletion": "一体化删除工具",
+"tool.deletion": "多合一工具",
 "tool.slot_injector": "槽位注入器",
 "tool.modify_save": "修改存档",
 "tool.character_transfer": "角色转移",

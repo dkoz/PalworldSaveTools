@@ -279,6 +279,29 @@ class MenuGUI(tk.Tk):
             for line in logo_text.strip('\n').split('\n'):
                 ttk.Label(container, text=line, font=ascii_font, style="TLabel").pack(anchor="center")
         tools_version, game_version = get_versions()
+        import webbrowser
+        update_info = check_github_update(force_test=False)
+        if update_info:
+            has_update, latest_version = update_info
+            tools_version, _ = get_versions()
+            version_frame = tk.Frame(self, bg="#2f2f2f")
+            version_frame.place(x=10, y=10)
+            latest_label = tk.Label(version_frame, text=f"Latest: {latest_version}",
+                                    bg="#2f2f2f", fg="white", font=("Consolas", 8, "bold"))
+            latest_label.pack(anchor="w")
+            separator = tk.Frame(version_frame, height=1, bg="#666", bd=0)
+            separator.pack(fill="x", pady=1)
+            current_label = tk.Label(version_frame, text=f"Current: {tools_version}",
+                                     bg="#2f2f2f", fg="lightgreen", font=("Consolas", 8, "bold"),
+                                     cursor="hand2")
+            current_label.pack(anchor="w")
+            current_label.bind("<Button-1>", lambda e: webbrowser.open(
+                "https://github.com/deafdudecomputers/PalworldSaveTools/releases/latest"))
+            if not has_update:
+                def pulse_current():
+                    current_label["fg"] = "yellow" if current_label["fg"]=="lightgreen" else "lightgreen"
+                    current_label.after(700, pulse_current)
+                pulse_current()
         info_items = [
             ("app.subtitle", {"game_version": game_version}, "#6f9", ("Consolas", 10)),
             ("notice.backup", {}, "#f44", ("Consolas", 9, "bold")),
@@ -354,6 +377,7 @@ class MenuGUI(tk.Tk):
             if tool_window: tool_window.wait_window()
         except Exception:
             pass
+        self.refresh_texts()
         print(t('status.close', name=tool_name))
         self.deiconify()
     def on_language_change(self):
@@ -393,9 +417,5 @@ if __name__=="__main__":
     tv,gv=get_versions()
     set_console_title(f"PalworldSaveTools v{tv}")
     clear_console()
-    check_github_update(auto_download=True,download_folder="PST_update",force_test=False)
-    import tkinter as tk
-    tk._default_root=None
-    from Assets.all_in_one_deletion import all_in_one_deletion
-    window=all_in_one_deletion()
-    window.mainloop()
+    app = MenuGUI()
+    app.mainloop()

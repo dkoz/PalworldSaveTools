@@ -12,7 +12,7 @@
 "tool.convert.players.to_sav": "Конвертировать файлы игроков обратно в формат SAV",
 "tool.convert.gamepass.steam": "Конвертировать GamePass ←→ Steam",
 "tool.convert.steamid": "Конвертировать SteamID",
-"tool.deletion": "Все-в-одном инструмент удаления",
+"tool.deletion": "Инструменты «всё в одном»",
 "tool.slot_injector": "Инжектор слотов",
 "tool.modify_save": "Редактировать сохранение",
 "tool.character_transfer": "Перенос персонажей",
