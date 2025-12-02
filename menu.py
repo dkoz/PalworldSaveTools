@@ -418,8 +418,13 @@ def center_window(win):
     x, y = (ws - w) // 2, (hs - h) // 2
     win.geometry(f'{w}x{h}+{x}+{y}')
 def on_exit():
-    app.destroy()
-    sys.exit(0)
+    try:
+        app.quit()
+        app.destroy()
+    except:
+        pass
+    import os
+    os._exit(0)
 if __name__=="__main__":
     try:
         init_language("zh_CN")
@@ -429,4 +434,7 @@ if __name__=="__main__":
     set_console_title(f"PalworldSaveTools v{tv}")
     clear_console()
     app = MenuGUI()
-    app.mainloop()
+    try:
+        app.mainloop()
+    finally:
+        on_exit()
