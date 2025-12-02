@@ -257,16 +257,17 @@ def main(skip_msgbox=False):
     src_players_folder = os.path.join(os.path.dirname(level_sav_path), "Players")
     tgt_players_folder = os.path.join(os.path.dirname(t_level_sav_path), "Players")
     os.makedirs(tgt_players_folder, exist_ok=True)
-    if not transfer_guild(targ_lvl,targ_json,host_guid,targ_uid,source_guild_dict): print("[FAIL] Guild transfer"); return
-    print("[SUCCESS] Guild transfer")
     if not transfer_character_only(host_guid,targ_uid): print("[FAIL] Character + containers"); return
     print("[SUCCESS] Character + containers")
     if not transfer_tech_and_data(): print("[FAIL] Tech + data"); return
     print("[SUCCESS] Tech + data")
     if not transfer_inventory_only(): print("[FAIL] Inventory"); return
     print("[SUCCESS] Inventory")
+    if not transfer_guild(targ_lvl,targ_json,host_guid,targ_uid,source_guild_dict): print("[FAIL] Guild transfer"); return
+    print("[SUCCESS] Guild transfer")
     if not transfer_pals_only(): print("[FAIL] Pals"); return
     print("[SUCCESS] Pals")
+    gather_and_update_dynamic_containers()
     modified_target_players.add(selected_target_player)
     modified_targets_data[selected_target_player] = (fast_deepcopy(targ_json), targ_json_gvas)
     load_players(targ_lvl, is_source=False)
@@ -280,6 +281,18 @@ def main(skip_msgbox=False):
     target_player_list.selection_remove(target_player_list.selection())
     if not skip_msgbox:
         messagebox.showinfo("Transfer Successful", "Transfer successful in memory! Hit 'Save Changes' to save.")
+def gather_and_update_dynamic_containers():
+    global targ_lvl, dynamic_guids
+    src_containers = level_json['DynamicItemSaveData']['value']['values']
+    tgt_containers = targ_lvl['DynamicItemSaveData']['value']['values']
+    dynamic_guids = set()
+    tgt_dict = {dc['RawData']['value']['id']['local_id_in_created_world']: dc for dc in tgt_containers if dc['RawData']['value']['id']['local_id_in_created_world']}
+    for dc in src_containers:
+        lid = dc['RawData']['value']['id']['local_id_in_created_world']
+        if lid == b'\x00'*16: continue
+        dynamic_guids.add(lid)
+        tgt_dict[lid] = dc
+    targ_lvl['DynamicItemSaveData']['value']['values'] = list(tgt_dict.values())
 def transfer_character_only(host_guid, targ_uid):
     host_instance_id=host_json["SaveData"]["value"]["IndividualId"]["value"]["InstanceId"]["value"]
     exported_map=None
