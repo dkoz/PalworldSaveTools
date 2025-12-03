@@ -441,10 +441,24 @@ def transfer_pals_only():
     except:
         return False
     zero=UUID.from_str("00000000-0000-0000-0000-000000000000")
+    used_ids=set()
+    try:
+        for ch in level_json["CharacterSaveParameterMap"]["value"]:
+            try: used_ids.add(str(ch["key"]["InstanceId"]["value"]))
+            except: pass
+        for ch in targ_lvl["CharacterSaveParameterMap"]["value"]:
+            try: used_ids.add(str(ch["key"]["InstanceId"]["value"]))
+            except: pass
+    except:
+        pass
     def bump_guid_str(s):
-        s=str(s).lower()
-        trans=str.maketrans("0123456789abcdef","123456789abcdef0")
-        return s.translate(trans)
+        v=str(s).lower()
+        t=str.maketrans("0123456789abcdef","123456789abcdef0")
+        bumped=v.translate(t)
+        while bumped in used_ids:
+            bumped=bumped.translate(t)
+        used_ids.add(bumped)
+        return bumped
     targ_guild_id=None
     gmap_all=targ_lvl.get("GroupSaveDataMap",{}).get("value",[])
     for entry in gmap_all:
@@ -457,7 +471,8 @@ def transfer_pals_only():
                     targ_guild_id=gid
                     break
             if targ_guild_id: break
-        except: pass
+        except:
+            pass
     if not targ_guild_id: targ_guild_id=zero
     src_params=[]
     id_map={}
@@ -476,8 +491,8 @@ def transfer_pals_only():
         if not inst_field: continue
         old_inst=inst_field.get("value")
         if not old_inst: continue
-        new_inst_str=bump_guid_str(old_inst)
-        try: new_inst=UUID.from_str(new_inst_str)
+        bumped=bump_guid_str(old_inst)
+        try: new_inst=UUID.from_str(bumped)
         except: new_inst=old_inst
         id_map[str(old_inst)]=new_inst
         cp=fast_deepcopy(ch)
@@ -497,19 +512,20 @@ def transfer_pals_only():
                 if "TaskData" in spv2: spv2["TaskData"]["value"]={}
             except: pass
             try:
-                if "MapObjectConcreteInstanceIdAssignedToExpedition" in spv2:
-                    del spv2["MapObjectConcreteInstanceIdAssignedToExpedition"]
+                if "MapObjectConcreteInstanceIdAssignedToExpedition" in spv2: del spv2["MapObjectConcreteInstanceIdAssignedToExpedition"]
             except: pass
             try: del spv2["WorkSuitabilityOptionInfo"]
             except: pass
-        except: pass
+        except:
+            pass
         src_params.append(cp)
     try:
         s_pal_id=host_json["SaveData"]["value"]["PalStorageContainerId"]["value"]["ID"]["value"]
         s_oto_id=host_json["SaveData"]["value"]["OtomoCharacterContainerId"]["value"]["ID"]["value"]
         t_pal_id=targ_json["SaveData"]["value"]["PalStorageContainerId"]["value"]["ID"]["value"]
         t_oto_id=targ_json["SaveData"]["value"]["OtomoCharacterContainerId"]["value"]["ID"]["value"]
-    except: return False
+    except:
+        return False
     src_pal=src_oto=tgt_pal=tgt_oto=None
     for c in level_json["CharacterContainerSaveData"]["value"]:
         cid=c["key"]["ID"]["value"]
@@ -553,18 +569,12 @@ def transfer_pals_only():
         try:
             raw=entry["value"]["RawData"]["value"]
             gid=raw.get("group_id")
-            if gid!=targ_guild_id:
-                continue
+            if gid!=targ_guild_id: continue
             handles=raw.get("individual_character_handle_ids")
-            if handles is None:
-                continue
-            if not isinstance(handles, list):
-                continue
+            if handles is None: continue
+            if not isinstance(handles,list): continue
             for old_inst,new_inst in id_map.items():
-                handles.append({
-                    "guid": str(zero),
-                    "instance_id": new_inst
-                })
+                handles.append({"guid":str(zero),"instance_id":new_inst})
         except:
             pass
     return True

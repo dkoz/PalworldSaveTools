@@ -1,4 +1,5 @@
 from import_libs import *
+from character_transfer import *
 try:
     from i18n import init_language, t, set_language, get_language, load_resources
 except Exception:
@@ -452,32 +453,29 @@ def count_pals_found(data, player_pals_count, log_folder):
                     print(f"KeyError: {e}")
     character_save_param_map = data.get("CharacterSaveParameterMap", {}).get("value", [])
     for item in character_save_param_map:
-        raw_data = item.get("value", {}).get("RawData", {}).get("value", {}).get("object", {}).get("SaveParameter", {}).get("value", {})
+        raw_data_full = item.get("value", {}).get("RawData", {}).get("value", {})
+        raw_data = raw_data_full.get("object", {}).get("SaveParameter", {}).get("value", {})
         if not isinstance(raw_data, dict):
             continue
+        instance_id = item.get("key", {}).get("InstanceId", {}).get("value")
+        group_id = raw_data_full.get("group_id", "Unknown")
         player_uid = raw_data.get("OwnerPlayerUId", {}).get("value")
         character_id = raw_data.get("CharacterID", {}).get("value")
         level = extract_value(raw_data, "Level", 1)
         rank = extract_value(raw_data, "Rank", 1)
         base = raw_data.get("SlotId", {}).get("value", {}).get("ContainerId", {}).get("value", {}).get("ID", {}).get("value")
         gender_value = raw_data.get("Gender", {}).get("value", {}).get("value", "")
-        gender_info = {
-            "EPalGenderType::Male": "Male",
-            "EPalGenderType::Female": "Female"
-        }.get(gender_value, "Unknown")
-        passive_skills = [
-            PAL_PASSIVES.get(skill_id, {}).get("Name", skill_id)
-            for skill_id in raw_data.get("PassiveSkillList", {}).get("value", {}).get("values", [])
-        ]
+        gender_info = {"EPalGenderType::Male": "Male","EPalGenderType::Female": "Female"}.get(gender_value, "Unknown")
+        passive_skills = [PAL_PASSIVES.get(skill_id, {}).get("Name", skill_id) for skill_id in raw_data.get("PassiveSkillList", {}).get("value", {}).get("values", [])]
         passive_skills_str = ", Skills: " + ", ".join(passive_skills) if passive_skills else ""
         rank_hp = int(extract_value(raw_data, "Rank_HP", 0)) * 3
         rank_attack = int(extract_value(raw_data, "Rank_Attack", 0)) * 3
         rank_defense = int(extract_value(raw_data, "Rank_Defence", 0)) * 3
         rank_craft_speed = int(extract_value(raw_data, "Rank_CraftSpeed", 0)) * 3
         talents_str = (
-            f"HP IV: {extract_value(raw_data, 'Talent_HP', '0')}({rank_hp}%), "
-            f"ATK IV: {extract_value(raw_data, 'Talent_Shot', '0')}({rank_attack}%), "
-            f"DEF IV: {extract_value(raw_data, 'Talent_Defense', '0')}({rank_defense}%), "
+            f"HP IV: {extract_value(raw_data,'Talent_HP','0')}({rank_hp}%), "
+            f"ATK IV: {extract_value(raw_data,'Talent_Shot','0')}({rank_attack}%), "
+            f"DEF IV: {extract_value(raw_data,'Talent_Defense','0')}({rank_defense}%), "
             f"Work Speed: ({rank_craft_speed}%)"
         )
         pal_name = PAL_NAMES.get(character_id, character_id)
@@ -488,7 +486,7 @@ def count_pals_found(data, player_pals_count, log_folder):
         nickname_str = f", {pal_nickname}" if pal_nickname != "Unknown" else ""
         pal_info = (
             f"{pal_name}{nickname_str}, Level: {level}, Rank: {rank}, Gender: {gender_info}, "
-            f"{talents_str}{passive_skills_str}, ID: {base}"
+            f"{talents_str}{passive_skills_str}, ID: {base}, Instance: {instance_id}, Group: {group_id}"
         )
         base_count[base] += 1
         if not player_uid:
@@ -519,14 +517,12 @@ def count_pals_found(data, player_pals_count, log_folder):
         pals_by_base_id = defaultdict(list)
         for pal in pals_list:
             if "ID:" in pal:
-                base_id = pal.split("ID:")[1].strip()
+                base_id = pal.split("ID:")[1].split(",")[0].strip()
                 pals_by_base_id[base_id if base_id else "Unknown"].append(pal)
         player_name = owner_nicknames.get(player_uid, 'Unknown')
-        if player_name == 'Unknown':
-            print(f"No nickname found for {player_uid}")
-        sanitized_player_name = sanitize_filename(player_name.encode('utf-8', 'replace').decode('utf-8'))
+        sanitized_player_name = sanitize_filename(player_name.encode('utf-8','replace').decode('utf-8'))
         log_file = os.path.join(log_folder, f"({sanitized_player_name})({player_uid}).log")
-        logger_name = ''.join(c if c.isalnum() or c in ('_', '-') else '_' for c in f"logger_{player_uid}")
+        logger_name = ''.join(c if c.isalnum() or c in ('_','-') else '_' for c in f"logger_{player_uid}")
         owner_logger = logging.getLogger(logger_name)
         owner_logger.setLevel(logging.INFO)
         owner_logger.propagate = False
@@ -548,7 +544,7 @@ def count_pals_found(data, player_pals_count, log_folder):
             owner_logger.info("\n".join(sanitized_pals))
             owner_logger.info("----------------")
     for player_uid in owner_pals_info.keys():
-        logger_name = ''.join(c if c.isalnum() or c in ('_', '-') else '_' for c in f"logger_{player_uid}")
+        logger_name = ''.join(c if c.isalnum() or c in ('_','-') else '_' for c in f"logger_{player_uid}")
         owner_logger = logging.getLogger(logger_name)
         handlers = owner_logger.handlers[:]
         for handler in handlers:
@@ -639,7 +635,8 @@ def save_changes():
         try: os.remove(f_dps)
         except FileNotFoundError: pass
     files_to_delete.clear()
-    messagebox.showinfo("Saved", "Changes saved and files deleted!")
+    window.focus_force()
+    messagebox.showinfo("Saved", "Changes saved and files deleted!", parent=window)
 def format_duration(s):
     d,h = divmod(int(s),86400); hr, m = divmod(h,3600); mm, ss=divmod(m,60)
     return f"{d}d:{hr}h:{mm}m"
@@ -2461,10 +2458,176 @@ def move_selected_player_to_selected_guild():
     refresh_all()
     refresh_stats("After Deletion")
     messagebox.showinfo("Done",t("guild.move.moved").format(player=player_uid_raw,guild=target_gid_raw))
+def load_player_json(uid):
+    p=os.path.join(current_save_path,"Players",f"{uid}.sav")
+    if not os.path.isfile(p): return None
+    raw, _ = load_save_gvas_only(p)
+    if raw is None: return None
+    gvas = SkipGvasFile.read(raw)
+    return gvas.properties
+def load_save_gvas_only(path):
+    try:
+        with open(path,"rb") as f:
+            data=f.read()
+        raw_gvas, save_type = decompress_sav_to_gvas(data)
+        return raw_gvas, save_type
+    except:
+        return None, None
+def rebuild_all_players_pals():
+    global loaded_level_json,current_save_path
+    try:
+        wsd=loaded_level_json["properties"]["worldSaveData"]["value"]
+        cmap=wsd["CharacterSaveParameterMap"]["value"]
+        containers=wsd["CharacterContainerSaveData"]["value"]
+        gmap=wsd["GroupSaveDataMap"]["value"]
+    except:
+        return False
+    zero=UUID.from_str("00000000-0000-0000-0000-000000000000")
+    used_ids=set()
+    for ch in cmap:
+        try: used_ids.add(str(ch["key"]["InstanceId"]["value"]))
+        except: pass
+    def bump_guid_str(s):
+        v=str(s).lower()
+        t=str.maketrans("0123456789abcdef","123456789abcdef0")
+        bumped=v.translate(t)
+        while bumped in used_ids:
+            bumped=bumped.translate(t)
+        used_ids.add(bumped)
+        return bumped
+    players_folder=os.path.normpath(os.path.join(current_save_path,"Players"))
+    if not os.path.isdir(players_folder):
+        return False
+    def load_player_file(uid):
+        try:
+            fname=str(uid).replace("-","").upper()+".sav"
+            full=os.path.join(players_folder,fname)
+            if not os.path.isfile(full): return None
+            with open(full,"rb") as f: raw=f.read()
+            gvas,_=decompress_sav_to_gvas(raw)
+            return SkipGvasFile.read(gvas).properties
+        except:
+            return None
+    real_players=set()
+    for g in gmap:
+        try:
+            raw=g["value"]["RawData"]["value"]
+            for p in raw.get("players",[]): 
+                uid=p.get("player_uid")
+                if uid: real_players.add(uid)
+        except:
+            pass
+    final_new_params=[]
+    removed_total=0
+    for uid in real_players:
+        pdata=load_player_file(uid)
+        if pdata is None: continue
+        try:
+            pal_id=pdata["SaveData"]["value"]["PalStorageContainerId"]["value"]["ID"]["value"]
+            oto_id=pdata["SaveData"]["value"]["OtomoCharacterContainerId"]["value"]["ID"]["value"]
+        except:
+            continue
+        pal_cont=None
+        oto_cont=None
+        for c in containers:
+            try:
+                cid=c["key"]["ID"]["value"]
+                if cid==pal_id: pal_cont=c
+                if cid==oto_id: oto_cont=c
+            except:
+                pass
+        try: cur_pal_slots=pal_cont["value"]["Slots"]["value"].get("values",[]) if pal_cont else []
+        except: cur_pal_slots=[]
+        try: cur_oto_slots=oto_cont["value"]["Slots"]["value"].get("values",[]) if oto_cont else []
+        except: cur_oto_slots=[]
+        gid=zero
+        for g in gmap:
+            try:
+                raw=g["value"]["RawData"]["value"]
+                for p in raw.get("players",[]):
+                    if p.get("player_uid")==uid:
+                        gid=raw.get("group_id",zero)
+                        break
+            except:
+                pass
+        id_map={}
+        new_params=[]
+        removed_count=0
+        for ch in cmap:
+            try:
+                raw=ch["value"]["RawData"]["value"]
+                sp=raw["object"]["SaveParameter"]["value"]
+                owner=sp["OwnerPlayerUId"]["value"]
+            except:
+                continue
+            if owner!=uid: continue
+            removed_count+=1
+            cp=fast_deepcopy(ch)
+            old_inst=cp["key"]["InstanceId"]["value"]
+            bumped=bump_guid_str(old_inst)
+            new_inst=UUID.from_str(bumped)
+            id_map[str(old_inst)]=new_inst
+            cp["key"]["InstanceId"]["value"]=new_inst
+            raw2=cp["value"]["RawData"]["value"]
+            sp2=raw2["object"]["SaveParameter"]["value"]
+            sp2["OwnerPlayerUId"]["value"]=uid
+            raw2["group_id"]=gid
+            try: sp2["WorkRegion"]["group_id"]["value"]=zero
+            except: pass
+            try: sp2["WorkerID"]["value"]=zero
+            except: pass
+            try:
+                if "TaskData" in sp2: sp2["TaskData"]["value"]={}
+            except: pass
+            try:
+                if "MapObjectConcreteInstanceIdAssignedToExpedition" in sp2: del sp2["MapObjectConcreteInstanceIdAssignedToExpedition"]
+            except: pass
+            try: del sp2["WorkSuitabilityOptionInfo"]
+            except: pass
+            new_params.append(cp)
+        if pal_cont:
+            newslots=fast_deepcopy(cur_pal_slots)
+            for s in newslots:
+                raw=s.get("RawData",{}).get("value",{})
+                inst=raw.get("instance_id")
+                if inst and str(inst) in id_map: raw["instance_id"]=id_map[str(inst)]
+            pal_cont["value"]["Slots"]["value"]["values"]=newslots
+        if oto_cont:
+            newslots=fast_deepcopy(cur_oto_slots)
+            for s in newslots:
+                raw=s.get("RawData",{}).get("value",{})
+                inst=raw.get("instance_id")
+                if inst and str(inst) in id_map: raw["instance_id"]=id_map[str(inst)]
+            oto_cont["value"]["Slots"]["value"]["values"]=newslots
+        for g in gmap:
+            try:
+                raw=g["value"]["RawData"]["value"]
+                if raw.get("group_id")!=gid: continue
+                handles=raw.get("individual_character_handle_ids")
+                if not isinstance(handles,list): continue
+                for o,n in id_map.items():
+                    handles.append({"guid":str(zero),"instance_id":n})
+            except:
+                pass
+        final_new_params.extend(new_params)
+        removed_total+=removed_count
+    final_cmap=[]
+    for ch in cmap:
+        try:
+            raw=ch["value"]["RawData"]["value"]
+            sp=raw["object"]["SaveParameter"]["value"]
+            if sp["OwnerPlayerUId"]["value"] in real_players: continue
+        except:
+            pass
+        final_cmap.append(ch)
+    final_cmap+=final_new_params
+    wsd["CharacterSaveParameterMap"]["value"]=final_cmap
+    return True
 def rebuild_all_guilds():
     if not current_save_path or not loaded_level_json:
         messagebox.showerror("Error", t("guild.rebuild.no_save"))
         return
+    rebuild_all_players_pals()
     wsd=loaded_level_json['properties']['worldSaveData']['value']
     def nu(x): return str(x).replace('-','').lower()
     zero=UUID.from_str("00000000-0000-0000-0000-000000000000")
@@ -2496,6 +2659,7 @@ def rebuild_all_guilds():
     for ginfo in guilds.values():
         gid=ginfo["gid"]
         handles=ginfo["handles"]
+        handles.clear()
         existing=set()
         for h in handles:
             try:
@@ -2719,6 +2883,7 @@ def all_in_one_tools():
             menu.add_command(label=t("deletion.ctx.add_exclusion"), command=lambda: add_exclusion(guild_tree, "guilds"))
             menu.add_command(label=t("deletion.ctx.remove_exclusion"), command=lambda: remove_selected_from_regular(guild_tree, "guilds"))
             menu.add_command(label=t("deletion.ctx.delete_guild"), command=delete_selected_guild)
+            menu.add_command(label=t("guild.menu.move_selected_player_to_selected_guild"), command=move_selected_player_to_selected_guild)
             menu.tk_popup(event.x_root, event.y_root)
     def base_tree_menu(event):
         iid = base_tree.identify_row(event.y)
@@ -2737,6 +2902,7 @@ def all_in_one_tools():
             menu.add_command(label=t("deletion.ctx.add_exclusion"), command=lambda: add_exclusion(player_tree, "players"))
             menu.add_command(label=t("deletion.ctx.remove_exclusion"), command=lambda: remove_selected_from_regular(player_tree, "players"))
             menu.add_command(label=t("deletion.ctx.delete_player"), command=delete_selected_player)
+            menu.add_command(label=t("guild.menu.move_selected_player_to_selected_guild"), command=move_selected_player_to_selected_guild)
             menu.tk_popup(event.x_root, event.y_root)
     def guild_members_tree_menu(event):
         iid = guild_members_tree.identify_row(event.y)
