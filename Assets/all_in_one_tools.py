@@ -440,128 +440,128 @@ def safe_str(s):
 def sanitize_filename(name):
     return ''.join(c if c.isalnum() or c in (' ', '_', '-', '(', ')') else '_' for c in name)
 def count_pals_found(data, player_pals_count, log_folder):
-    owner_pals_info = defaultdict(list)
-    non_owner_pals_info = []
-    non_owner_pals_info_with_base = []
-    owner_nicknames = {}
-    base_id_groups = defaultdict(list)
-    base_count = defaultdict(int)
-    for key, value in data.items():
-        if key == "CharacterSaveParameterMap":
-            raw_data_value_list = value.get("value", [])
-            for raw_data_value_item in raw_data_value_list:
-                raw_data_value_key = raw_data_value_item.get("key", {})
-                raw_data_value_value = raw_data_value_item.get("value", {}).get("RawData", {})
-                try:
-                    if ("custom_type" in raw_data_value_value and
-                        raw_data_value_value["custom_type"] == ".worldSaveData.CharacterSaveParameterMap.Value.RawData" and
-                        "IsPlayer" in raw_data_value_value["value"]["object"]["SaveParameter"]["value"]):
-                        player_uid = raw_data_value_key.get("PlayerUId", {}).get("value") if isinstance(raw_data_value_key, dict) else None
-                        nickname = raw_data_value_value["value"]["object"]["SaveParameter"]["value"].get("NickName", {}).get("value", "Unknown")
-                        if player_uid:
-                            owner_nicknames[player_uid] = nickname
-                except KeyError as e:
-                    print(f"KeyError: {e}")
-    character_save_param_map = data.get("CharacterSaveParameterMap", {}).get("value", [])
-    for item in character_save_param_map:
-        raw_data_full = item.get("value", {}).get("RawData", {}).get("value", {})
-        raw_data = raw_data_full.get("object", {}).get("SaveParameter", {}).get("value", {})
-        if not isinstance(raw_data, dict):
-            continue
-        instance_id = item.get("key", {}).get("InstanceId", {}).get("value")
-        group_id = raw_data_full.get("group_id", "Unknown")
-        player_uid = raw_data.get("OwnerPlayerUId", {}).get("value")
-        character_id = raw_data.get("CharacterID", {}).get("value")
-        level = extract_value(raw_data, "Level", 1)
-        rank = extract_value(raw_data, "Rank", 1)
-        base = raw_data.get("SlotId", {}).get("value", {}).get("ContainerId", {}).get("value", {}).get("ID", {}).get("value")
-        gender_value = raw_data.get("Gender", {}).get("value", {}).get("value", "")
-        gender_info = {"EPalGenderType::Male": "Male","EPalGenderType::Female": "Female"}.get(gender_value, "Unknown")
-        passive_skills = [PAL_PASSIVES.get(skill_id, {}).get("Name", skill_id) for skill_id in raw_data.get("PassiveSkillList", {}).get("value", {}).get("values", [])]
-        passive_skills_str = ", Skills: " + ", ".join(passive_skills) if passive_skills else ""
-        rank_hp = int(extract_value(raw_data, "Rank_HP", 0)) * 3
-        rank_attack = int(extract_value(raw_data, "Rank_Attack", 0)) * 3
-        rank_defense = int(extract_value(raw_data, "Rank_Defence", 0)) * 3
-        rank_craft_speed = int(extract_value(raw_data, "Rank_CraftSpeed", 0)) * 3
-        talents_str = (
-            f"HP IV: {extract_value(raw_data,'Talent_HP','0')}({rank_hp}%), "
-            f"ATK IV: {extract_value(raw_data,'Talent_Shot','0')}({rank_attack}%), "
-            f"DEF IV: {extract_value(raw_data,'Talent_Defense','0')}({rank_defense}%), "
-            f"Work Speed: ({rank_craft_speed}%)"
-        )
-        pal_name = PAL_NAMES.get(character_id, character_id)
-        if pal_name and pal_name.lower().startswith("boss_"):
-            base_name = PAL_NAMES.get(pal_name[5:], pal_name[5:])
-            pal_name = f"Alpha {base_name.capitalize()}"
-        pal_nickname = raw_data.get("NickName", {}).get("value", "Unknown")
-        nickname_str = f", {pal_nickname}" if pal_nickname != "Unknown" else ""
-        pal_info = (
-            f"{pal_name}{nickname_str}, Level: {level}, Rank: {rank}, Gender: {gender_info}, "
-            f"{talents_str}{passive_skills_str}, ID: {base}, Instance: {instance_id}, Group: {group_id}"
-        )
-        base_count[base] += 1
-        if not player_uid:
-            pal_name_only = pal_info.split(",")[0].strip()
-            if pal_name_only != "None":
-                non_owner_pals_info.append(pal_info)
-                non_owner_pals_info_with_base.append(f"{pal_info} (ID: {base})")
-                base_id_groups[base].append(pal_info)
-                continue
-        owner_pals_info[player_uid].append(pal_info)
-        player_pals_count[player_uid] = player_pals_count.get(player_uid, 0) + 1
-    if non_owner_pals_info:
-        filtered_non_owner_pals = non_owner_pals_info_with_base
-        total_non_owner_pals = len(filtered_non_owner_pals)
-        non_owner_log_file = os.path.join(log_folder, "non_owner_pals.log")
+    import os,json,logging
+    from collections import defaultdict
+    base_dir=os.path.dirname(os.path.abspath(__file__))
+    def load_map(fname,key):
         try:
-            with open(non_owner_log_file, 'w', encoding='utf-8', errors='replace') as non_owner_file:
-                non_owner_file.write(f"{total_non_owner_pals} Non-Owner Pals\n")
-                non_owner_file.write("-" * (len(str(total_non_owner_pals)) + len(" Non-Owner Pals")) + "\n")
-                for base_id, pals in base_id_groups.items():
-                    count = len(pals)
-                    non_owner_file.write(f"ID: {base_id} (Count: {count})\n")
-                    non_owner_file.write("-" * (len(f"ID: {base_id} (Count: {count})")) + "\n")
-                    non_owner_file.write("\n".join(pals) + "\n\n")
-        except Exception as e:
-            print(f"Failed to write non-owner log: {non_owner_log_file}\n{e}")
-    for player_uid, pals_list in owner_pals_info.items():
-        pals_by_base_id = defaultdict(list)
-        for pal in pals_list:
-            if "ID:" in pal:
-                base_id = pal.split("ID:")[1].split(",")[0].strip()
-                pals_by_base_id[base_id if base_id else "Unknown"].append(pal)
-        player_name = owner_nicknames.get(player_uid, 'Unknown')
-        sanitized_player_name = sanitize_filename(player_name.encode('utf-8','replace').decode('utf-8'))
-        log_file = os.path.join(log_folder, f"({sanitized_player_name})({player_uid}).log")
-        logger_name = ''.join(c if c.isalnum() or c in ('_','-') else '_' for c in f"logger_{player_uid}")
-        owner_logger = logging.getLogger(logger_name)
-        owner_logger.setLevel(logging.INFO)
-        owner_logger.propagate = False
-        if not owner_logger.hasHandlers():
-            try:
-                owner_file_handler = logging.FileHandler(log_file, mode='w', encoding='utf-8', errors='replace')
-                owner_file_handler.setFormatter(logging.Formatter('%(message)s'))
-                owner_logger.addHandler(owner_file_handler)
-            except Exception as e:
-                print(f"Failed to create logger for {log_file}\n{e}")
+            fp=os.path.join(base_dir,"resources","game_data",fname)
+            with open(fp,"r",encoding="utf-8") as f:
+                js=json.load(f)
+                return {x["asset"].lower():x["name"] for x in js.get(key,[])}
+        except:
+            return {}
+    PALMAP=load_map("paldata.json","pals")
+    NPCMAP=load_map("npcdata.json","npcs")
+    PASSMAP=load_map("passivedata.json","passives")
+    NAMEMAP={**PALMAP,**NPCMAP}
+    PASSIVE_NAMES=PASSMAP
+    owner_pals_info=defaultdict(list)
+    non_owner_pals_info=[]
+    non_owner_pals_info_with_base=[]
+    owner_nicknames={}
+    base_id_groups=defaultdict(list)
+    base_count=defaultdict(int)
+    for key,value in data.items():
+        if key=="CharacterSaveParameterMap":
+            raw_list=value.get("value",[])
+            for itm in raw_list:
+                rdv=itm.get("value",{}).get("RawData",{})
+                try:
+                    if "custom_type" in rdv and rdv["custom_type"]==".worldSaveData.CharacterSaveParameterMap.Value.RawData" and "IsPlayer" in rdv["value"]["object"]["SaveParameter"]["value"]:
+                        uid=itm.get("key",{}).get("PlayerUId",{}).get("value")
+                        nn=rdv["value"]["object"]["SaveParameter"]["value"].get("NickName",{}).get("value","Unknown")
+                        if uid: owner_nicknames[uid]=nn
+                except:
+                    pass
+    cmap=data.get("CharacterSaveParameterMap",{}).get("value",[])
+    for item in cmap:
+        rawf=item.get("value",{}).get("RawData",{}).get("value",{})
+        raw=rawf.get("object",{}).get("SaveParameter",{}).get("value",{})
+        if not isinstance(raw,dict): continue
+        inst=item.get("key",{}).get("InstanceId",{}).get("value")
+        gid=rawf.get("group_id","Unknown")
+        uid=raw.get("OwnerPlayerUId",{}).get("value")
+        cid=raw.get("CharacterID",{}).get("value","")
+        name=NAMEMAP.get(cid.lower(),cid)
+        lvl=extract_value(raw,"Level",1)
+        rk=extract_value(raw,"Rank",1)
+        base=raw.get("SlotId",{}).get("value",{}).get("ContainerId",{}).get("value",{}).get("ID",{}).get("value")
+        gv=raw.get("Gender",{}).get("value",{}).get("value","")
+        ginfo={"EPalGenderType::Male":"Male","EPalGenderType::Female":"Female"}.get(gv,"Unknown")
+        pskills=[]
+        for s in raw.get("PassiveSkillList",{}).get("value",{}).get("values",[]):
+            ps=s.lower()
+            pskills.append(PASSIVE_NAMES.get(ps,s))
+        pstr=", Skills: "+", ".join(pskills) if pskills else ""
+        rh=int(extract_value(raw,"Rank_HP",0))*3
+        ra=int(extract_value(raw,"Rank_Attack",0))*3
+        rd=int(extract_value(raw,"Rank_Defence",0))*3
+        rc=int(extract_value(raw,"Rank_CraftSpeed",0))*3
+        tstr=f"HP IV: {extract_value(raw,'Talent_HP','0')}({rh}%), ATK IV: {extract_value(raw,'Talent_Shot','0')}({ra}%), DEF IV: {extract_value(raw,'Talent_Defense','0')}({rd}%), Work Speed: ({rc}%)"
+        nick=raw.get("NickName",{}).get("value","Unknown")
+        nickstr=f", {nick}" if nick!="Unknown" else ""
+        info=f"{name}{nickstr}, Level: {lvl}, Rank: {rk}, Gender: {ginfo}, {tstr}{pstr}, ID: {base}, Instance: {inst}, Group: {gid}"
+        base_count[base]+=1
+        if not uid:
+            na=info.split(",")[0].strip()
+            if na!="None":
+                non_owner_pals_info.append(info)
+                non_owner_pals_info_with_base.append(f"{info} (ID: {base})")
+                base_id_groups[base].append(info)
                 continue
-        pals_count = sum(len(pals) for pals in pals_by_base_id.values())
-        owner_logger.info(f"{player_name}'s {pals_count} Pals")
-        owner_logger.info("-" * (len(player_name) + len(f"'s {pals_count} Pals")))
-        for base_id, pals in pals_by_base_id.items():
-            owner_logger.info(f"ID: {base_id}")
-            owner_logger.info("----------------")
-            sanitized_pals = [safe_str(pal) for pal in sorted(pals)]
-            owner_logger.info("\n".join(sanitized_pals))
-            owner_logger.info("----------------")
-    for player_uid in owner_pals_info.keys():
-        logger_name = ''.join(c if c.isalnum() or c in ('_','-') else '_' for c in f"logger_{player_uid}")
-        owner_logger = logging.getLogger(logger_name)
-        handlers = owner_logger.handlers[:]
-        for handler in handlers:
-            handler.flush()
-            handler.close()
-            owner_logger.removeHandler(handler)
+        owner_pals_info[uid].append(info)
+        player_pals_count[uid]=player_pals_count.get(uid,0)+1
+    if non_owner_pals_info:
+        nf=os.path.join(log_folder,"non_owner_pals.log")
+        try:
+            with open(nf,'w',encoding='utf-8',errors='replace') as f:
+                tot=len(non_owner_pals_info_with_base)
+                f.write(f"{tot} Non-Owner Pals\n")
+                f.write("-"*(len(str(tot))+len(" Non-Owner Pals"))+"\n")
+                for bid,pals in base_id_groups.items():
+                    cnt=len(pals)
+                    f.write(f"ID: {bid} (Count: {cnt})\n")
+                    f.write("-"*(len(f"ID: {bid} (Count: {cnt})"))+"\n")
+                    f.write("\n".join(pals)+"\n\n")
+        except:
+            pass
+    for uid,pals in owner_pals_info.items():
+        pb=defaultdict(list)
+        for p in pals:
+            if "ID:" in p:
+                bid=p.split("ID:")[1].split(",")[0].strip()
+                pb[bid if bid else "Unknown"].append(p)
+        pname=owner_nicknames.get(uid,'Unknown')
+        sname=sanitize_filename(pname.encode('utf-8','replace').decode('utf-8'))
+        lf=os.path.join(log_folder,f"({sname})({uid}).log")
+        lname=''.join(c if c.isalnum() or c in ('_','-') else '_' for c in f"logger_{uid}")
+        lg=logging.getLogger(lname)
+        lg.setLevel(logging.INFO)
+        lg.propagate=False
+        if not lg.hasHandlers():
+            try:
+                h=logging.FileHandler(lf,mode='w',encoding='utf-8',errors='replace')
+                h.setFormatter(logging.Formatter('%(message)s'))
+                lg.addHandler(h)
+            except:
+                continue
+        cnt=sum(len(x) for x in pb.values())
+        lg.info(f"{pname}'s {cnt} Pals")
+        lg.info("-"*(len(pname)+len(f"'s {cnt} Pals")))
+        for bid,pp in pb.items():
+            lg.info(f"ID: {bid}")
+            lg.info("----------------")
+            sp=[safe_str(x) for x in sorted(pp)]
+            lg.info("\n".join(sp))
+            lg.info("----------------")
+    for uid in owner_pals_info.keys():
+        lname=''.join(c if c.isalnum() or c in ('_','-') else '_' for c in f"logger_{uid}")
+        lg=logging.getLogger(lname)
+        for h in lg.handlers[:]:
+            h.flush()
+            h.close()
+            lg.removeHandler(h)
 def process_dps_save(player_uid, nickname, dps_file_path, log_folder):
     try:
         with open(dps_file_path, "rb") as f:
@@ -2219,91 +2219,157 @@ def unlock_all_private_chests():
     print(msg)
     messagebox.showinfo("Unlocked", msg)
     refresh_all()
-def get_valid_items_map_from_json():
-    try:
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(script_dir, "itemdata.json")
-        with open(file_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            return {item["asset"].lower(): item["name"] for item in data.get("items", [])}
-    except Exception as e:
-        print(f"[AutoItemCleaner] Failed to load itemdata.json: {e}")
-        return {}
 def remove_invalid_items_from_save():
-    folder_path = current_save_path
+    import json,os
+    folder_path=current_save_path
     if not folder_path:
-        messagebox.showerror("Error", "No save loaded!")
+        messagebox.showerror("Error","No save loaded!")
         return
     global loaded_level_json
     try:
-        wsd = loaded_level_json["properties"]["worldSaveData"]["value"]
-    except KeyError:
-        messagebox.showerror("Error", "Invalid Level.sav structure!")
+        wsd=loaded_level_json["properties"]["worldSaveData"]["value"]
+    except:
+        messagebox.showerror("Error","Invalid Level.sav structure!")
         return
-    valid_items = get_valid_items_map_from_json()
-    removed = 0
-    def count_items(data):
-        total = 0
-        if isinstance(data, dict):
-            if data.get("prop_name") == "Slots" and "value" in data and isinstance(data["value"], dict):
-                for slot in data["value"].get("values", []):
-                    raw = slot.get("RawData", {})
-                    val = raw.get("value", {})
-                    if isinstance(val, dict):
-                        item = val.get("item")
-                        if isinstance(item, dict) and val.get("count", 0) > 0:
-                            total += 1
-            elif "RawData" in data and isinstance(data["RawData"], dict):
-                val = data["RawData"].get("value", {})
-                if isinstance(val, dict):
-                    item = val.get("item")
-                    if isinstance(item, dict) and val.get("count", 0) > 0:
-                        total += 1
-            for v in data.values():
-                total += count_items(v)
-        elif isinstance(data, list):
-            for item in data:
-                total += count_items(item)
-        return total
-    total_before = count_items(wsd)
-    def deep_clean(data):
+    valid_items=set()
+    try:
+        base_dir=os.path.dirname(os.path.abspath(__file__))
+        fp=os.path.join(base_dir,"resources","game_data","itemdata.json")
+        with open(fp,"r",encoding="utf-8") as f:
+            js=json.load(f)
+            for x in js.get("items",[]):
+                aid=x.get("asset")
+                if isinstance(aid,str):
+                    valid_items.add(aid.lower())
+    except:
+        pass
+    removed=0
+    def count_items(x):
+        t=0
+        if isinstance(x,dict):
+            if x.get("prop_name")=="Slots" and isinstance(x.get("value"),dict):
+                for s in x["value"].get("values",[]):
+                    if not isinstance(s,dict): continue
+                    raw=s.get("RawData",{})
+                    val=raw.get("value",{})
+                    if isinstance(val,dict):
+                        item=val.get("item")
+                        if isinstance(item,dict) and val.get("count",0)>0:
+                            t+=1
+            elif "RawData" in x and isinstance(x["RawData"],dict):
+                val=x["RawData"].get("value",{})
+                if isinstance(val,dict):
+                    item=val.get("item")
+                    if isinstance(item,dict) and val.get("count",0)>0:
+                        t+=1
+            for v in x.values():
+                if isinstance(v,(dict,list)):
+                    t+=count_items(v)
+        elif isinstance(x,list):
+            for v in x:
+                if isinstance(v,(dict,list)):
+                    t+=count_items(v)
+        return t
+    total_before=count_items(wsd)
+    def deep_clean(x):
         nonlocal removed
-        if isinstance(data, dict):
-            if data.get("prop_name") == "Slots" and "value" in data and isinstance(data["value"], dict):
-                for slot in data["value"].get("values", []):
-                    raw = slot.get("RawData", {})
-                    val = raw.get("value", {})
-                    if isinstance(val, dict):
-                        item = val.get("item")
-                        if isinstance(item, dict) and val.get("count", 0) > 0:
-                            static_id = item.get("static_id")
-                            if static_id and static_id.lower() not in valid_items:
-                                val["count"] = 0
-                                removed += 1
-                                print(f"[AutoItemCleaner] Removed invalid item: {static_id}")
-            elif "RawData" in data and isinstance(data["RawData"], dict):
-                val = data["RawData"].get("value", {})
-                if isinstance(val, dict):
-                    item = val.get("item")
-                    if isinstance(item, dict) and val.get("count", 0) > 0:
-                        static_id = item.get("static_id")
-                        if static_id and static_id.lower() not in valid_items:
-                            val["count"] = 0
-                            removed += 1
-                            print(f"[AutoItemCleaner] Removed invalid item: {static_id}")
-            for v in data.values():
-                deep_clean(v)
-        elif isinstance(data, list):
-            for item in data:
-                deep_clean(item)
+        if isinstance(x,dict):
+            if x.get("prop_name")=="Slots" and isinstance(x.get("value"),dict):
+                for s in x["value"].get("values",[]):
+                    if not isinstance(s,dict): continue
+                    raw=s.get("RawData",{})
+                    val=raw.get("value",{})
+                    if isinstance(val,dict):
+                        item=val.get("item")
+                        if isinstance(item,dict) and val.get("count",0)>0:
+                            sid=item.get("static_id")
+                            if isinstance(sid,str) and sid.lower() not in valid_items:
+                                val["count"]=0
+                                removed+=1
+                                print(f"[AutoItemCleaner] Removed invalid item: {sid}")
+            elif "RawData" in x and isinstance(x["RawData"],dict):
+                val=x["RawData"].get("value",{})
+                if isinstance(val,dict):
+                    item=val.get("item")
+                    if isinstance(item,dict) and val.get("count",0)>0:
+                        sid=item.get("static_id")
+                        if isinstance(sid,str) and sid.lower() not in valid_items:
+                            val["count"]=0
+                            removed+=1
+                            print(f"[AutoItemCleaner] Removed invalid item: {sid}")
+            for v in x.values():
+                if isinstance(v,(dict,list)):
+                    deep_clean(v)
+        elif isinstance(x,list):
+            for v in x:
+                if isinstance(v,(dict,list)):
+                    deep_clean(v)
     deep_clean(wsd)
-    total_after = count_items(wsd)
-    msg = (f"Total items before cleaning: {total_before}\n"
-           f"Invalid items removed: {removed}\n"
-           f"Total items after cleaning: {total_after}")
+    total_after=count_items(wsd)
+    msg=f"Total items before cleaning: {total_before}\nInvalid items removed: {removed}\nTotal items after cleaning: {total_after}"
     print(msg)
-    messagebox.showinfo("AutoItemCleaner", msg)
+    messagebox.showinfo("AutoItemCleaner",msg)
     refresh_all()
+def remove_invalid_pals_from_save():
+    def load_assets(fname,key):
+        try:
+            base_dir=os.path.dirname(os.path.abspath(__file__))
+            fp=os.path.join(base_dir,"resources","game_data",fname)
+            with open(fp,"r",encoding="utf-8") as f:
+                data=json.load(f)
+                return set(x["asset"].lower() for x in data.get(key,[]))
+        except:
+            return set()
+    valid_pals=load_assets("paldata.json","pals")
+    valid_npcs=load_assets("npcdata.json","npcs")
+    valid_all=valid_pals|valid_npcs
+    folder_path=current_save_path
+    if not folder_path:
+        messagebox.showerror("Error","No save loaded!")
+        return
+    global loaded_level_json
+    try:
+        wsd=loaded_level_json["properties"]["worldSaveData"]["value"]
+    except:
+        messagebox.showerror("Error","Invalid Level.sav structure!")
+        return
+    cmap=wsd.get("CharacterSaveParameterMap",{}).get("value",[])
+    removed_ids=set()
+    removed=0
+    def get_char_id(e):
+        try:
+            return e["value"]["RawData"]["value"]["object"]["SaveParameter"]["value"]["CharacterID"]["value"]
+        except:
+            return None
+    filtered=[]
+    for entry in cmap:
+        cid=get_char_id(entry)
+        if cid and cid.lower() not in valid_all:
+            inst=str(entry["key"]["InstanceId"]["value"])
+            removed_ids.add(inst)
+            removed+=1
+            print(f"[AutoCleaner] Removed invalid: {cid}")
+            continue
+        filtered.append(entry)
+    wsd["CharacterSaveParameterMap"]["value"]=filtered
+    containers=wsd.get("CharacterContainerSaveData",{}).get("value",[])
+    for cont in containers:
+        try:
+            slots=cont["value"]["Slots"]["value"]["values"]
+        except:
+            continue
+        newslots=[]
+        for s in slots:
+            inst=s.get("RawData",{}).get("value",{}).get("instance_id")
+            if inst and str(inst) in removed_ids:
+                continue
+            newslots.append(s)
+        cont["value"]["Slots"]["value"]["values"]=newslots
+    msg=f"Invalid pals removed: {removed}"
+    refresh_all()
+    refresh_stats("After Deletion")
+    print(msg)
+    messagebox.showinfo("AutoCleaner",msg)
 def fix_missions():
     folder_path = current_save_path
     if not folder_path:
@@ -2988,6 +3054,7 @@ def all_in_one_tools():
     delete_menu.add_command(label=t("deletion.menu.reset_anti_air"), command=reset_anti_air_turrets)
     delete_menu.add_command(label=t("deletion.menu.unlock_private_chests"), command=unlock_all_private_chests)
     delete_menu.add_command(label=t("deletion.menu.remove_invalid_items"), command=remove_invalid_items_from_save)
+    delete_menu.add_command(label=t("deletion.menu.remove_invalid_pals"), command=remove_invalid_pals_from_save)
     delete_menu.add_command(label=t("deletion.menu.reset_missions"), command=fix_missions)
     menubar.add_cascade(label=t("deletion.menu.delete"), menu=delete_menu)
     view_menu = tk.Menu(menubar, tearoff=0)

@@ -1,0 +1,1288 @@
+{
+    "passives": [
+        {
+            "name": "Health Up Lv. 1",
+            "asset": "HP_ACC_up1"
+        },
+        {
+            "name": "Health Up Lv. 2",
+            "asset": "HP_ACC_up2"
+        },
+        {
+            "name": "Health Up Lv. 3",
+            "asset": "HP_ACC_up3"
+        },
+        {
+            "name": "Attack Up Lv. 1",
+            "asset": "Attack_ACC_up1"
+        },
+        {
+            "name": "Attack Up Lv. 2",
+            "asset": "Attack_ACC_up2"
+        },
+        {
+            "name": "Attack Up Lv. 3",
+            "asset": "Attack_ACC_up3"
+        },
+        {
+            "name": "Defense Up Lv. 1",
+            "asset": "defense_ACC_up1"
+        },
+        {
+            "name": "Defense Up Lv. 2",
+            "asset": "defense_ACC_up2"
+        },
+        {
+            "name": "Defense Up Lv. 3",
+            "asset": "defense_ACC_up3"
+        },
+        {
+            "name": "Speedy Worker Lv. 1",
+            "asset": "WorkSpeed_ACC_up1"
+        },
+        {
+            "name": "Speedy Worker Lv. 2",
+            "asset": "WorkSpeed_ACC_up2"
+        },
+        {
+            "name": "Speedy Worker Lv. 3",
+            "asset": "WorkSpeed_ACC_up3"
+        },
+        {
+            "name": "Remarkable Craftsmanship",
+            "asset": "CraftSpeed_up3"
+        },
+        {
+            "name": "Artisan",
+            "asset": "CraftSpeed_up2"
+        },
+        {
+            "name": "Serious",
+            "asset": "CraftSpeed_up1"
+        },
+        {
+            "name": "Clumsy",
+            "asset": "CraftSpeed_down1"
+        },
+        {
+            "name": "Slacker",
+            "asset": "CraftSpeed_down2"
+        },
+        {
+            "name": "Diamond Body",
+            "asset": "Deffence_up3"
+        },
+        {
+            "name": "Burly Body",
+            "asset": "Deffence_up2"
+        },
+        {
+            "name": "Hard Skin",
+            "asset": "Deffence_up1"
+        },
+        {
+            "name": "Downtrodden",
+            "asset": "Deffence_down1"
+        },
+        {
+            "name": "Brittle",
+            "asset": "Deffence_down2"
+        },
+        {
+            "name": "Musclehead",
+            "asset": "Noukin"
+        },
+        {
+            "name": "Egg Layer",
+            "asset": "CollectItem_Egg"
+        },
+        {
+            "name": "Milk Maker",
+            "asset": "CollectItem_Milk"
+        },
+        {
+            "name": "Berry Picker",
+            "asset": "CollectItem_Berries"
+        },
+        {
+            "name": "Confectioner",
+            "asset": "CollectItem_Sweets"
+        },
+        {
+            "name": "Gold Digger",
+            "asset": "CollectItem_Money"
+        },
+        {
+            "name": "Wool Maker",
+            "asset": "CollectItem_Wool_Alpaca"
+        },
+        {
+            "name": "Wool Maker",
+            "asset": "CollectItem_Wool_SheepBall"
+        },
+        {
+            "name": "Silk Spinner",
+            "asset": "CollectItem_Wool_WhiteMoth"
+        },
+        {
+            "name": "Heat Resistant Lv. 1",
+            "asset": "TemperatureResist_Heat1"
+        },
+        {
+            "name": "Heat Resistant Lv. 2",
+            "asset": "TemperatureResist_Heat2"
+        },
+        {
+            "name": "Heat Resistant Lv. 3",
+            "asset": "TemperatureResist_Heat3"
+        },
+        {
+            "name": "Cold Resistant Lv. 1",
+            "asset": "TemperatureResist_Cold1"
+        },
+        {
+            "name": "Cold Resistant Lv. 2",
+            "asset": "TemperatureResist_Cold2"
+        },
+        {
+            "name": "Cold Resistant Lv. 3",
+            "asset": "TemperatureResist_Cold3"
+        },
+        {
+            "name": "Heat Resistant Lv. 1 / Cold Resistant Lv. 1",
+            "asset": "TemperatureResist_Heat1Cold1"
+        },
+        {
+            "name": "Heat Resistant Lv. 2 / Cold Resistant Lv. 2",
+            "asset": "TemperatureResist_Heat2Cold2"
+        },
+        {
+            "name": "Heat Resistant Lv. 3 / Cold Resistant Lv. 3",
+            "asset": "TemperatureResist_Heat3Cold3"
+        },
+        {
+            "name": "Lucky",
+            "asset": "Rare"
+        },
+        {
+            "name": "Legend",
+            "asset": "Legend"
+        },
+        {
+            "name": "Siren of the Void",
+            "asset": "Witch"
+        },
+        {
+            "name": "Eternal Flame",
+            "asset": "EternalFlame"
+        },
+        {
+            "name": "Invader",
+            "asset": "Invader"
+        },
+        {
+            "name": "Max Carrying Capacity Lv. 1",
+            "asset": "MaxInventoryWeight_up"
+        },
+        {
+            "name": "Max Carrying Capacity Lv. 2",
+            "asset": "MaxInventoryWeight_up2"
+        },
+        {
+            "name": "Max Carrying Capacity Lv. 3",
+            "asset": "MaxInventoryWeight_up3"
+        },
+        {
+            "name": "Demon God",
+            "asset": "PAL_ALLAttack_up3"
+        },
+        {
+            "name": "Ferocious",
+            "asset": "PAL_ALLAttack_up2"
+        },
+        {
+            "name": "Brave",
+            "asset": "PAL_ALLAttack_up1"
+        },
+        {
+            "name": "Coward",
+            "asset": "PAL_ALLAttack_down1"
+        },
+        {
+            "name": "Pacifist",
+            "asset": "PAL_ALLAttack_down2"
+        },
+        {
+            "name": "Hooligan",
+            "asset": "PAL_rude"
+        },
+        {
+            "name": "Conceited",
+            "asset": "PAL_conceited"
+        },
+        {
+            "name": "Mentally unstable",
+            "asset": "PAL_SpiritualInst"
+        },
+        {
+            "name": "Sadist",
+            "asset": "PAL_sadist"
+        },
+        {
+            "name": "Masochist",
+            "asset": "PAL_masochist"
+        },
+        {
+            "name": "Work Slave",
+            "asset": "PAL_CorporateSlave"
+        },
+        {
+            "name": "Aggressive",
+            "asset": "PAL_oraora"
+        },
+        {
+            "name": "Neutral Damage Reduction Lv. 1",
+            "asset": "ElementResist_Normal_1"
+        },
+        {
+            "name": "Fire Damage Reduction Lv. 1",
+            "asset": "ElementResist_Fire_1"
+        },
+        {
+            "name": "Water Damage Reduction Lv. 1",
+            "asset": "ElementResist_Aqua_1"
+        },
+        {
+            "name": "Electric Damage Reduction Lv. 1",
+            "asset": "ElementResist_Thunder_1"
+        },
+        {
+            "name": "Grass Damage Reduction Lv. 1",
+            "asset": "ElementResist_Leaf_1"
+        },
+        {
+            "name": "Ice Damage Reduction Lv. 1",
+            "asset": "ElementResist_Ice_1"
+        },
+        {
+            "name": "Earth Damage Reduction Lv. 1",
+            "asset": "ElementResist_Earth_1"
+        },
+        {
+            "name": "Dark Damage Reduction Lv. 1",
+            "asset": "ElementResist_Dark_1"
+        },
+        {
+            "name": "Dragon Damage Reduction Lv. 1",
+            "asset": "ElementResist_Dragon_1"
+        },
+        {
+            "name": "Neutral Damage Reduction Lv. 2",
+            "asset": "ElementResist_Normal_2"
+        },
+        {
+            "name": "Fire Damage Reduction Lv. 2",
+            "asset": "ElementResist_Fire_2"
+        },
+        {
+            "name": "Water Damage Reduction Lv. 2",
+            "asset": "ElementResist_Aqua_2"
+        },
+        {
+            "name": "Electric Damage Reduction Lv. 2",
+            "asset": "ElementResist_Thunder_2"
+        },
+        {
+            "name": "Grass Damage Reduction Lv. 2",
+            "asset": "ElementResist_Leaf_2"
+        },
+        {
+            "name": "Ice Damage Reduction Lv. 2",
+            "asset": "ElementResist_Ice_2"
+        },
+        {
+            "name": "Earth Damage Reduction Lv. 2",
+            "asset": "ElementResist_Earth_2"
+        },
+        {
+            "name": "Dark Damage Reduction Lv. 2",
+            "asset": "ElementResist_Dark_2"
+        },
+        {
+            "name": "Dragon Damage Reduction Lv. 2",
+            "asset": "ElementResist_Dragon_2"
+        },
+        {
+            "name": "Neutral Damage Reduction Lv. 3",
+            "asset": "ElementResist_Normal_3"
+        },
+        {
+            "name": "Fire Damage Reduction Lv. 3",
+            "asset": "ElementResist_Fire_3"
+        },
+        {
+            "name": "Water Damage Reduction Lv. 3",
+            "asset": "ElementResist_Aqua_3"
+        },
+        {
+            "name": "Electric Damage Reduction Lv. 3",
+            "asset": "ElementResist_Thunder_3"
+        },
+        {
+            "name": "Grass Damage Reduction Lv. 3",
+            "asset": "ElementResist_Leaf_3"
+        },
+        {
+            "name": "Ice Damage Reduction Lv. 3",
+            "asset": "ElementResist_Ice_3"
+        },
+        {
+            "name": "Earth Damage Reduction Lv. 3",
+            "asset": "ElementResist_Earth_3"
+        },
+        {
+            "name": "Dark Damage Reduction Lv. 3",
+            "asset": "ElementResist_Dark_3"
+        },
+        {
+            "name": "Dragon Damage Reduction Lv. 3",
+            "asset": "ElementResist_Dragon_3"
+        },
+        {
+            "name": "Vanguard",
+            "asset": "TrainerATK_UP_1"
+        },
+        {
+            "name": "Stronghold Strategist",
+            "asset": "TrainerDEF_UP_1"
+        },
+        {
+            "name": "Motivational Leader",
+            "asset": "TrainerWorkSpeed_UP_1"
+        },
+        {
+            "name": "Mine Foreman",
+            "asset": "TrainerMining_up1"
+        },
+        {
+            "name": "Logging Foreman",
+            "asset": "TrainerLogging_up1"
+        },
+        {
+            "name": "Abnormal",
+            "asset": "ElementResist_Normal_1_PAL"
+        },
+        {
+            "name": "Suntan Lover",
+            "asset": "ElementResist_Fire_1_PAL"
+        },
+        {
+            "name": "Waterproof",
+            "asset": "ElementResist_Aqua_1_PAL"
+        },
+        {
+            "name": "Insulated Body",
+            "asset": "ElementResist_Thunder_1_PAL"
+        },
+        {
+            "name": "Botanical Barrier",
+            "asset": "ElementResist_Leaf_1_PAL"
+        },
+        {
+            "name": "Heated Body",
+            "asset": "ElementResist_Ice_1_PAL"
+        },
+        {
+            "name": "Earthquake Resistant",
+            "asset": "ElementResist_Earth_1_PAL"
+        },
+        {
+            "name": "Cheery",
+            "asset": "ElementResist_Dark_1_PAL"
+        },
+        {
+            "name": "Dragonkiller",
+            "asset": "ElementResist_Dragon_1_PAL"
+        },
+        {
+            "name": "Zen Mind",
+            "asset": "ElementBoost_Normal_1_PAL"
+        },
+        {
+            "name": "Pyromaniac",
+            "asset": "ElementBoost_Fire_1_PAL"
+        },
+        {
+            "name": "Hydromaniac",
+            "asset": "ElementBoost_Aqua_1_PAL"
+        },
+        {
+            "name": "Capacitor",
+            "asset": "ElementBoost_Thunder_1_PAL"
+        },
+        {
+            "name": "Fragrant Foliage",
+            "asset": "ElementBoost_Leaf_1_PAL"
+        },
+        {
+            "name": "Coldblooded",
+            "asset": "ElementBoost_Ice_1_PAL"
+        },
+        {
+            "name": "Power of Gaia",
+            "asset": "ElementBoost_Earth_1_PAL"
+        },
+        {
+            "name": "Veil of Darkness",
+            "asset": "ElementBoost_Dark_1_PAL"
+        },
+        {
+            "name": "Blood of the Dragon",
+            "asset": "ElementBoost_Dragon_1_PAL"
+        },
+        {
+            "name": "Glutton",
+            "asset": "PAL_FullStomach_Up_1"
+        },
+        {
+            "name": "Bottomless Stomach",
+            "asset": "PAL_FullStomach_Up_2"
+        },
+        {
+            "name": "Dainty Eater",
+            "asset": "PAL_FullStomach_Down_1"
+        },
+        {
+            "name": "Diet Lover",
+            "asset": "PAL_FullStomach_Down_2"
+        },
+        {
+            "name": "Mastery of Fasting",
+            "asset": "PAL_FullStomach_Down_3"
+        },
+        {
+            "name": "Unstable",
+            "asset": "PAL_Sanity_Up_1"
+        },
+        {
+            "name": "Destructive",
+            "asset": "PAL_Sanity_Up_2"
+        },
+        {
+            "name": "Positive Thinker",
+            "asset": "PAL_Sanity_Down_1"
+        },
+        {
+            "name": "Workaholic",
+            "asset": "PAL_Sanity_Down_2"
+        },
+        {
+            "name": "Heart of the Immovable King",
+            "asset": "PAL_Sanity_Down_3"
+        },
+        {
+            "name": "Celestial Emperor",
+            "asset": "ElementBoost_Normal_2_PAL"
+        },
+        {
+            "name": "Flame Emperor",
+            "asset": "ElementBoost_Fire_2_PAL"
+        },
+        {
+            "name": "Lord of the Sea",
+            "asset": "ElementBoost_Aqua_2_PAL"
+        },
+        {
+            "name": "Lord of Lightning",
+            "asset": "ElementBoost_Thunder_2_PAL"
+        },
+        {
+            "name": "Spirit Emperor",
+            "asset": "ElementBoost_Leaf_2_PAL"
+        },
+        {
+            "name": "Ice Emperor",
+            "asset": "ElementBoost_Ice_2_PAL"
+        },
+        {
+            "name": "Earth Emperor",
+            "asset": "ElementBoost_Earth_2_PAL"
+        },
+        {
+            "name": "Lord of the Underworld",
+            "asset": "ElementBoost_Dark_2_PAL"
+        },
+        {
+            "name": "Divine Dragon",
+            "asset": "ElementBoost_Dragon_2_PAL"
+        },
+        {
+            "name": "Nimble",
+            "asset": "MoveSpeed_up_1"
+        },
+        {
+            "name": "Runner",
+            "asset": "MoveSpeed_up_2"
+        },
+        {
+            "name": "Swift",
+            "asset": "MoveSpeed_up_3"
+        },
+        {
+            "name": "Mercy Hit",
+            "asset": "NonKilling"
+        },
+        {
+            "name": "Max Carrying Capacity Lv. 1",
+            "asset": "MaxInventoryWeight_up_Equip_1"
+        },
+        {
+            "name": "Max Carrying Capacity Lv. 2",
+            "asset": "MaxInventoryWeight_up_Equip_2"
+        },
+        {
+            "name": "Max Carrying Capacity Lv. 3",
+            "asset": "MaxInventoryWeight_up_Equip_3"
+        },
+        {
+            "name": "Nocturnal",
+            "asset": "Nocturnal"
+        },
+        {
+            "name": "Philanthropist",
+            "asset": "Test_PalEgg_HatchingSpeed_Up"
+        },
+        {
+            "name": "Serenity",
+            "asset": "CoolTimeReduction_Up_1"
+        },
+        {
+            "name": "Impatient",
+            "asset": "CoolTimeReduction_Up_2"
+        },
+        {
+            "name": "Tempest Fury",
+            "asset": "CoolTimeReduction_Up_3"
+        },
+        {
+            "name": "Easygoing",
+            "asset": "CoolTimeReduction_Down_1"
+        },
+        {
+            "name": "Infinite Stamina",
+            "asset": "Stamina_Up_1"
+        },
+        {
+            "name": "Fit as a Fiddle",
+            "asset": "Stamina_Up_2"
+        },
+        {
+            "name": "Eternal Engine",
+            "asset": "Stamina_Up_3"
+        },
+        {
+            "name": "Sickly",
+            "asset": "Stamina_Down_1"
+        },
+        {
+            "name": "Noble",
+            "asset": "SalePrice_Up_1"
+        },
+        {
+            "name": "Fine Furs",
+            "asset": "SalePrice_Up_2"
+        },
+        {
+            "name": "Shabby",
+            "asset": "SalePrice_Down_1"
+        },
+        {
+            "name": "Otherworldly Cells",
+            "asset": "Alien"
+        },
+        {
+            "name": "Vampiric",
+            "asset": "Vampire"
+        },
+        {
+            "name": "Neutral Damage Enhancement (Small)",
+            "asset": "ElementBoost_Normal_1_BossDefeat"
+        },
+        {
+            "name": "Fire Damage Enhancement (Small)",
+            "asset": "ElementBoost_Fire_1_BossDefeat"
+        },
+        {
+            "name": "Water Damage Enhancement (Small)",
+            "asset": "ElementBoost_Water_1_BossDefeat"
+        },
+        {
+            "name": "Electric Damage Enhancement (Small)",
+            "asset": "ElementBoost_Electricity_1_BossDefeat"
+        },
+        {
+            "name": "Grass Damage Enhancement (Small)",
+            "asset": "ElementBoost_Leaf_1_BossDefeat"
+        },
+        {
+            "name": "Ice Damage Enhancement (Small)",
+            "asset": "ElementBoost_Ice_1_BossDefeat"
+        },
+        {
+            "name": "Ground Damage Enhancement (Small)",
+            "asset": "ElementBoost_Earth_1_BossDefeat"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "ElementBoost_Dark_1_BossDefeat"
+        },
+        {
+            "name": "Dragon Damage Enhancement (Small)",
+            "asset": "ElementBoost_Dragon_1_BossDefeat"
+        },
+        {
+            "name": "Neutral Damage Enhancement (Medium)",
+            "asset": "ElementBoost_Normal_2_BossDefeat"
+        },
+        {
+            "name": "Fire Damage Enhancement (Medium)",
+            "asset": "ElementBoost_Fire_2_BossDefeat"
+        },
+        {
+            "name": "Water Damage Enhancement (Medium)",
+            "asset": "ElementBoost_Water_2_BossDefeat"
+        },
+        {
+            "name": "Electric Damage Enhancement (Medium)",
+            "asset": "ElementBoost_Electricity_2_BossDefeat"
+        },
+        {
+            "name": "Grass Damage Enhancement (Medium)",
+            "asset": "ElementBoost_Leaf_2_BossDefeat"
+        },
+        {
+            "name": "Ice Damage Enhancement (Medium)",
+            "asset": "ElementBoost_Ice_2_BossDefeat"
+        },
+        {
+            "name": "Ground Damage Enhancement (Medium)",
+            "asset": "ElementBoost_Earth_2_BossDefeat"
+        },
+        {
+            "name": "Dark Damage Enhancement (Medium)",
+            "asset": "ElementBoost_Dark_2_BossDefeat"
+        },
+        {
+            "name": "Dragon Damage Enhancement (Medium)",
+            "asset": "ElementBoost_Dragon_2_BossDefeat"
+        },
+        {
+            "name": "Neutral Damage Enhancement (Large)",
+            "asset": "ElementBoost_Normal_3_BossDefeat"
+        },
+        {
+            "name": "Fire Damage Enhancement (Large)",
+            "asset": "ElementBoost_Fire_3_BossDefeat"
+        },
+        {
+            "name": "Water Damage Enhancement (Large)",
+            "asset": "ElementBoost_Water_3_BossDefeat"
+        },
+        {
+            "name": "Electric Damage Enhancement (Large)",
+            "asset": "ElementBoost_Electricity_3_BossDefeat"
+        },
+        {
+            "name": "Grass Damage Enhancement (Large)",
+            "asset": "ElementBoost_Leaf_3_BossDefeat"
+        },
+        {
+            "name": "Ice Damage Enhancement (Large)",
+            "asset": "ElementBoost_Ice_3_BossDefeat"
+        },
+        {
+            "name": "Ground Damage Enhancement (Large)",
+            "asset": "ElementBoost_Earth_3_BossDefeat"
+        },
+        {
+            "name": "Dark Damage Enhancement (Large)",
+            "asset": "ElementBoost_Dark_3_BossDefeat"
+        },
+        {
+            "name": "Dragon Damage Enhancement (Large)",
+            "asset": "ElementBoost_Dragon_3_BossDefeat"
+        },
+        {
+            "name": "Sphere Weight +1",
+            "asset": "SphereModule_Heavy"
+        },
+        {
+            "name": "Sphere Curve +1",
+            "asset": "SphereModule_Curve"
+        },
+        {
+            "name": "Sphere Range +1",
+            "asset": "SphereModule_Sniper"
+        },
+        {
+            "name": "Sphere Slider",
+            "asset": "SphereModule_Curve2"
+        },
+        {
+            "name": "Sphere Range +2",
+            "asset": "SphereModule_Sniper2"
+        },
+        {
+            "name": "Sphere Homing",
+            "asset": "SphereModule_Homing"
+        },
+        {
+            "name": "Capture Strength +1",
+            "asset": "CaptureLevel_Up_1"
+        },
+        {
+            "name": "Capture Strength +2",
+            "asset": "CaptureLevel_Up_2"
+        },
+        {
+            "name": "Capture Strength +3",
+            "asset": "CaptureLevel_Up_3"
+        },
+        {
+            "name": "Capture Strength +4",
+            "asset": "CaptureLevel_Up_4"
+        },
+        {
+            "name": "Capture Strength +5",
+            "asset": "CaptureLevel_Up_5"
+        },
+        {
+            "name": "Capture Strength +6",
+            "asset": "CaptureLevel_Up_6"
+        },
+        {
+            "name": "Jump Power Boost",
+            "asset": "JumpPower_Increase"
+        },
+        {
+            "name": "Jump Count Increase +1",
+            "asset": "JumpCount_Increase1"
+        },
+        {
+            "name": "Jump Count Increase +2",
+            "asset": "JumpCount_Increase2"
+        },
+        {
+            "name": "Jump Count Increase +3",
+            "asset": "JumpCount_Increase3"
+        },
+        {
+            "name": "Aerial Dash +1",
+            "asset": "AirDash_1"
+        },
+        {
+            "name": "Aerial Dash +2",
+            "asset": "AirDash_2"
+        },
+        {
+            "name": "Aerial Dash +3",
+            "asset": "AirDash_3"
+        },
+        {
+            "name": "Aerial Dash +4",
+            "asset": "AirDash_4"
+        },
+        {
+            "name": "Ice Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_WeaselDragon"
+        },
+        {
+            "name": "Ice Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_MopKing"
+        },
+        {
+            "name": "Ground Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_PlantSlime"
+        },
+        {
+            "name": "Ground Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_LazyCatfish"
+        },
+        {
+            "name": "Water Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_CaptainPenguin"
+        },
+        {
+            "name": "Water Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_BlueDragon"
+        },
+        {
+            "name": "Neutral Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_NaughtyCat"
+        },
+        {
+            "name": "Neutral Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_HawkBird"
+        },
+        {
+            "name": "Dragon Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_SkyDragon"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_CatVampire"
+        },
+        {
+            "name": "Neutral Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_KingAlpaca"
+        },
+        {
+            "name": "Grass Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_SakuraSaurus"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_CatMage"
+        },
+        {
+            "name": "Fire Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_Ronin"
+        },
+        {
+            "name": "Neutral Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_FengyunDeeper"
+        },
+        {
+            "name": "Grass Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_FlowerDoll"
+        },
+        {
+            "name": "Electric Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_ThunderBird"
+        },
+        {
+            "name": "Ground Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_HerculesBeetle"
+        },
+        {
+            "name": "Water Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_SakuraSaurus_Water"
+        },
+        {
+            "name": "Dragon Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_FairyDragon"
+        },
+        {
+            "name": "Dragon Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_LazyDragon_Electric"
+        },
+        {
+            "name": "Electric Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_Kirin"
+        },
+        {
+            "name": "Grass Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_QueenBee"
+        },
+        {
+            "name": "Electric Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_GrassPanda_Electric"
+        },
+        {
+            "name": "Neutral Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_Mutant"
+        },
+        {
+            "name": "Grass Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_GrassRabbitMan"
+        },
+        {
+            "name": "Grass Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_Yeti_Grass"
+        },
+        {
+            "name": "Grass Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_GrassMammoth"
+        },
+        {
+            "name": "Grass Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_VioletFairy"
+        },
+        {
+            "name": "Ice Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_WhiteMoth"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_DarkScorpion"
+        },
+        {
+            "name": "Fire Damage Enhancement (Large)",
+            "asset": "BossDefeatReward_Suzaku"
+        },
+        {
+            "name": "Water Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_Umihebi"
+        },
+        {
+            "name": "Ice Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_KingAlpaca_Ice"
+        },
+        {
+            "name": "Electric Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_FlowerDinosaur_Electric"
+        },
+        {
+            "name": "Ground Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_Anubis"
+        },
+        {
+            "name": "Dragon Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_BlackMetalDragon"
+        },
+        {
+            "name": "Fire Damage Enhancement (Large)",
+            "asset": "BossDefeatReward_KingBahamut"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_LilyQueen_Dark"
+        },
+        {
+            "name": "Ground Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_DarkScorpion_Ground"
+        },
+        {
+            "name": "Ground Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_WingGolem"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_GrimGirl"
+        },
+        {
+            "name": "Electric Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_BlueThunderHorse"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_AmaterasuWolf_Dark"
+        },
+        {
+            "name": "Electric Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_FengyunDeeper_Electric"
+        },
+        {
+            "name": "Neutral Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_WhiteDeer"
+        },
+        {
+            "name": "Dragon Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_WhiteShieldDragon"
+        },
+        {
+            "name": "Water Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_Horus_Water"
+        },
+        {
+            "name": "Dragon Damage Enhancement (Large)",
+            "asset": "BossDefeatReward_JetDragon"
+        },
+        {
+            "name": "Ice Damage Enhancement (Large)",
+            "asset": "BossDefeatReward_IceHorse"
+        },
+        {
+            "name": "Neutral Damage Enhancement (Large)",
+            "asset": "BossDefeatReward_SaintCentaur_1"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_SaintCentaur_2"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_BlackPuppy"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_GhostRabbit"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_NightBlueHorse"
+        },
+        {
+            "name": "Grass Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_BlueberryFairy"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_BadCatgirl"
+        },
+        {
+            "name": "Ground Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_GoldenHorse"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_MysteryMask"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_PurpleSpider"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_IceHorse_Dark"
+        },
+        {
+            "name": "Ice Damage Enhancement (Large)",
+            "asset": "BossDefeatReward_Kitsunebi_Ice"
+        },
+        {
+            "name": "Dark Damage Enhancement (Small)",
+            "asset": "BossDefeatReward_RaijinDaughter_Water"
+        },
+        {
+            "name": "Ground Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_WhiteTiger_Ground"
+        },
+        {
+            "name": "Grass Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_BerryGoat_Dark"
+        },
+        {
+            "name": "Ice Damage Enhancement (Large)",
+            "asset": "BossDefeatReward_Werewolf_Ice"
+        },
+        {
+            "name": "Grass Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_PinkRabbit_Grass"
+        },
+        {
+            "name": "Ground Damage Enhancement (Medium)",
+            "asset": "BossDefeatReward_HerculesBeetle_Ground"
+        },
+        {
+            "name": "Ice Damage Enhancement (Large)",
+            "asset": "BossDefeatReward_IceNarwhal"
+        },
+        {
+            "name": "Fire Damage Enhancement (Large)",
+            "asset": "BossDefeatReward_IceNarwhal_Fire"
+        },
+        {
+            "name": "Water Damage Enhancement (Large)",
+            "asset": "BossDefeatReward_PoseidonOrca"
+        },
+        {
+            "name": "Pal Neutral Damage Enhancement Lv. 1",
+            "asset": "ElementBoost_Normal_1_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Fire Damage Enhancement Lv. 1",
+            "asset": "ElementBoost_Fire_1_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Water Damage Enhancement Lv. 1",
+            "asset": "ElementBoost_Water_1_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Electric Damage Enhancement Lv. 1",
+            "asset": "ElementBoost_Electricity_1_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Grass Damage Enhancement Lv. 1",
+            "asset": "ElementBoost_Leaf_1_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Ice Damage Enhancement Lv. 1",
+            "asset": "ElementBoost_Ice_1_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Ground Damage Enhancement Lv. 1",
+            "asset": "ElementBoost_Earth_1_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Dark Damage Enhancement Lv. 1",
+            "asset": "ElementBoost_Dark_1_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Dragon Damage Enhancement Lv. 1",
+            "asset": "ElementBoost_Dragon_1_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Neutral Damage Enhancement Lv. 2",
+            "asset": "ElementBoost_Normal_2_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Fire Damage Enhancement Lv. 2",
+            "asset": "ElementBoost_Fire_2_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Water Damage Enhancement Lv. 2",
+            "asset": "ElementBoost_Water_2_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Electric Damage Enhancement Lv. 2",
+            "asset": "ElementBoost_Electricity_2_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Grass Damage Enhancement Lv. 2",
+            "asset": "ElementBoost_Leaf_2_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Ice Damage Enhancement Lv. 2",
+            "asset": "ElementBoost_Ice_2_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Ground Damage Enhancement Lv. 2",
+            "asset": "ElementBoost_Earth_2_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Dark Damage Enhancement Lv. 2",
+            "asset": "ElementBoost_Dark_2_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Dragon Damage Enhancement Lv. 2",
+            "asset": "ElementBoost_Dragon_2_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Neutral Damage Enhancement Lv. 3",
+            "asset": "ElementBoost_Normal_3_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Fire Damage Enhancement Lv. 3",
+            "asset": "ElementBoost_Fire_3_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Water Damage Enhancement Lv. 3",
+            "asset": "ElementBoost_Water_3_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Electric Damage Enhancement Lv. 3",
+            "asset": "ElementBoost_Electricity_3_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Grass Damage Enhancement Lv. 3",
+            "asset": "ElementBoost_Leaf_3_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Ice Damage Enhancement Lv. 3",
+            "asset": "ElementBoost_Ice_3_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Ground Damage Enhancement Lv. 3",
+            "asset": "ElementBoost_Earth_3_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Dark Damage Enhancement Lv. 3",
+            "asset": "ElementBoost_Dark_3_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Dragon Damage Enhancement Lv. 3",
+            "asset": "ElementBoost_Dragon_3_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Attack Up Lv. 1",
+            "asset": "Attack_ACC_up1_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Attack Up Lv. 2",
+            "asset": "Attack_ACC_up2_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Attack Up Lv. 3",
+            "asset": "Attack_ACC_up3_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Defense Up Lv. 1",
+            "asset": "Defense_ACC_up1_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Defense Up Lv. 2",
+            "asset": "Defense_ACC_up2_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal Defense Up Lv. 3",
+            "asset": "Defense_ACC_up3_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal EXP Up Lv. 1",
+            "asset": "PalExp_Increase_1_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal EXP Up Lv. 2",
+            "asset": "PalExp_Increase_2_Otomo_Only_Equip"
+        },
+        {
+            "name": "Pal EXP Up Lv. 3",
+            "asset": "PalExp_Increase_3_Otomo_Only_Equip"
+        },
+        {
+            "name": "Lunker",
+            "asset": "Nushi"
+        },
+        {
+            "name": "Sleek Stroke",
+            "asset": "SwimSpeed_up_1"
+        },
+        {
+            "name": "Ace Swimmer",
+            "asset": "SwimSpeed_up_2"
+        },
+        {
+            "name": "King of the Waves",
+            "asset": "SwimSpeed_up_3"
+        },
+        {
+            "name": "Hallowed Guard",
+            "asset": "YakushimaProtection_Equip"
+        },
+        {
+            "name": "Hallowed Power: Close Range",
+            "asset": "YakushimaDagameBoost_Melee_Equip"
+        },
+        {
+            "name": "Hallowed Power: Ranged",
+            "asset": "YakushimaDagameBoost_Ranged_Equip"
+        },
+        {
+            "name": "Hallowed Power: Magic",
+            "asset": "YakushimaDagameBoost_Magic_Equip"
+        },
+        {
+            "name": "Hallowed Power: Summon",
+            "asset": "YakushimaDagameBoost_Summon_Equip"
+        },
+        {
+            "name": "Rayne Syndicate Officer",
+            "asset": "GYM_NAME_Meadow"
+        },
+        {
+            "name": "Free Pal Alliance Founder",
+            "asset": "GYM_NAME_Forest"
+        },
+        {
+            "name": "PIDF Officer",
+            "asset": "GYM_NAME_Desert"
+        },
+        {
+            "name": "Brothers of the Eternal Pyre Soul Leader",
+            "asset": "GYM_NAME_Volcano"
+        },
+        {
+            "name": "PAL Genetic Research Unit Commander",
+            "asset": "GYM_NAME_Snow"
+        },
+        {
+            "name": "Leader of the Moonflowers",
+            "asset": "GYM_NAME_Sakurajima"
+        },
+        {
+            "name": "Jarl of Feybreak",
+            "asset": "GYM_NAME_Viking"
+        }
+    ]
+}

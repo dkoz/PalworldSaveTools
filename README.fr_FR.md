@@ -39,7 +39,7 @@
   - Supprimer les données non référencées  
   - Réinitialiser les missions  
   - Déverrouiller les coffres privés  
-  - Supprimer les objets invalides/moddés  
+  - Supprimer les objets/pals invalides ou moddés 
   - Système d’exclusions pour joueurs/guildes/bases protégés  
   - Déplacer un joueur entre guildes  
   - Nommer un joueur chef de guilde  

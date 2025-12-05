@@ -39,7 +39,7 @@
   - Nicht referenzierte Daten löschen  
   - Missionen zurücksetzen  
   - Private Truhen entsperren  
-  - Ungültige/modifizierte Items entfernen  
+  - Ungültige/modifizierte Items / Pals entfernen 
   - Ausschlusssystem für geschützte Spieler/Gilden/Basen  
   - Spieler zwischen Gilden verschieben  
   - Spieler zum Gildenleiter machen  

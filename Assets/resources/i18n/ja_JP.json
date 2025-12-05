@@ -134,6 +134,7 @@
 "deletion.menu.reset_anti_air": "対空砲リセット",
 "deletion.menu.unlock_private_chests": "すべての個人チェストを解放",
 "deletion.menu.remove_invalid_items": "すべての無効アイテムを削除",
+"deletion.menu.remove_invalid_pals": "無効なパルを削除",
 "deletion.menu.reset_missions": "ミッションをリセット",
 "deletion.menu.view": "表示",
 "deletion.menu.show_map": "基地マップを表示",

@@ -134,6 +134,7 @@
 "deletion.menu.reset_anti_air": "Flugabwehr zurücksetzen",
 "deletion.menu.unlock_private_chests": "Alle privaten Truhen freischalten",
 "deletion.menu.remove_invalid_items": "Alle ungültigen Gegenstände entfernen",
+"deletion.menu.remove_invalid_pals": "Ungültige Pals entfernen",
 "deletion.menu.reset_missions": "Missionen zurücksetzen",
 "deletion.menu.view": "Ansicht",
 "deletion.menu.show_map": "Basenkarte anzeigen",

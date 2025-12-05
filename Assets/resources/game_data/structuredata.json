@@ -1,0 +1,1784 @@
+{
+    "structures": [
+        {
+            "name": "Tree",
+            "asset": "DummyFoliage"
+        },
+        {
+            "name": "DroppedCharacter",
+            "asset": "DroppedCharacter"
+        },
+        {
+            "name": "Primitive Furnace",
+            "asset": "BlastFurnace"
+        },
+        {
+            "name": "Improved Furnace",
+            "asset": "BlastFurnace2"
+        },
+        {
+            "name": "Electric Furnace",
+            "asset": "BlastFurnace3"
+        },
+        {
+            "name": "Gigantic Furnace",
+            "asset": "BlastFurnace4"
+        },
+        {
+            "name": "Campfire",
+            "asset": "CampFire"
+        },
+        {
+            "name": "Pal Essence Condenser",
+            "asset": "CharacterRankUp"
+        },
+        {
+            "name": "CommonDropItem3D",
+            "asset": "CommonDropItem3D"
+        },
+        {
+            "name": "CommonDropItem3D_SK",
+            "asset": "CommonDropItem3D_SK"
+        },
+        {
+            "name": "Cooking Pot",
+            "asset": "CookingStove"
+        },
+        {
+            "name": "DamagableRock_PV",
+            "asset": "DamagableRock_PV"
+        },
+        {
+            "name": "Rock",
+            "asset": "DamagableRock0001"
+        },
+        {
+            "name": "Copper Ore",
+            "asset": "DamagableRock0002"
+        },
+        {
+            "name": "Pure Quartz",
+            "asset": "DamagableRock0003"
+        },
+        {
+            "name": "Coal",
+            "asset": "DamagableRock0004"
+        },
+        {
+            "name": "Paldium Ore",
+            "asset": "DamagableRock0005"
+        },
+        {
+            "name": "DamagableRock0017",
+            "asset": "DamagableRock0017"
+        },
+        {
+            "name": "Sulfur",
+            "asset": "DamagableRock0006"
+        },
+        {
+            "name": "Rock",
+            "asset": "DamagableRock0007"
+        },
+        {
+            "name": "Rock",
+            "asset": "DamagableRock0008"
+        },
+        {
+            "name": "Rock",
+            "asset": "DamagableRock0009"
+        },
+        {
+            "name": "Rock",
+            "asset": "DamagableRock0010"
+        },
+        {
+            "name": "Rock",
+            "asset": "DamagableRock0011"
+        },
+        {
+            "name": "Rock",
+            "asset": "DamagableRock0012"
+        },
+        {
+            "name": "SandStone",
+            "asset": "DamagableRock0013"
+        },
+        {
+            "name": "Rock",
+            "asset": "DamagableRock0014"
+        },
+        {
+            "name": "Rock",
+            "asset": "DamagableRock0015"
+        },
+        {
+            "name": "Rock",
+            "asset": "DamagableRock0016"
+        },
+        {
+            "name": "Death Chest",
+            "asset": "DeathPenaltyChest"
+        },
+        {
+            "name": "Mounted Machine Gun",
+            "asset": "DefenseMachinegun"
+        },
+        {
+            "name": "Mounted Crossbow",
+            "asset": "DefenseBowGun"
+        },
+        {
+            "name": "Mounted Missile Launcher",
+            "asset": "DefenseMissile"
+        },
+        {
+            "name": "Sandbag",
+            "asset": "DefenseWait"
+        },
+        {
+            "name": "Power Generator",
+            "asset": "ElectricGenerator"
+        },
+        {
+            "name": "Electric Kitchen",
+            "asset": "ElectricKitchen"
+        },
+        {
+            "name": "Large-Scale Stone Oven",
+            "asset": "HugeKitchen"
+        },
+        {
+            "name": "High-Quality Workbench",
+            "asset": "Factory_Hard_01"
+        },
+        {
+            "name": "Production Assembly Line",
+            "asset": "Factory_Hard_02"
+        },
+        {
+            "name": "Production Assembly Line II",
+            "asset": "Factory_Hard_03"
+        },
+        {
+            "name": "Advanced Workshop",
+            "asset": "Factory_Hard_04"
+        },
+        {
+            "name": "Wheat Plantation",
+            "asset": "FarmBlockV2_wheet"
+        },
+        {
+            "name": "Tomato Plantation",
+            "asset": "FarmBlockV2_tomato"
+        },
+        {
+            "name": "Lettuce Plantation",
+            "asset": "FarmBlockV2_Lettuce"
+        },
+        {
+            "name": "Berry Plantation",
+            "asset": "FarmBlockV2_Berries"
+        },
+        {
+            "name": "Wooden Chest",
+            "asset": "ItemChest"
+        },
+        {
+            "name": "Metal Chest",
+            "asset": "ItemChest_02"
+        },
+        {
+            "name": "Refined Metal Chest",
+            "asset": "ItemChest_03"
+        },
+        {
+            "name": "Straw Pal Bed",
+            "asset": "MedicalPalBed_02"
+        },
+        {
+            "name": "Fluffy Pal Bed",
+            "asset": "MedicalPalBed_03"
+        },
+        {
+            "name": "Large Pal Bed",
+            "asset": "MedicalPalBed_04"
+        },
+        {
+            "name": "Medieval Medicine Workbench",
+            "asset": "MedicineFacility_01"
+        },
+        {
+            "name": "Electric Medicine Workbench",
+            "asset": "MedicineFacility_02"
+        },
+        {
+            "name": "Advanced Medicine Workbench",
+            "asset": "MedicineFacility_03"
+        },
+        {
+            "name": "Feed Box",
+            "asset": "PalFoodBox"
+        },
+        {
+            "name": "Palbox",
+            "asset": "PalBoxV2"
+        },
+        {
+            "name": "Viewing Cage",
+            "asset": "DisplayCharacter"
+        },
+        {
+            "name": "Flint Stone",
+            "asset": "PickupItem_Flint"
+        },
+        {
+            "name": "Lumber",
+            "asset": "PickupItem_Log"
+        },
+        {
+            "name": "Red Berry",
+            "asset": "PickupItem_RedBerry"
+        },
+        {
+            "name": "Small Rock",
+            "asset": "PickupItem_Stone"
+        },
+        {
+            "name": "Potato",
+            "asset": "PickupItem_Potato"
+        },
+        {
+            "name": "Beautiful Flower",
+            "asset": "PickupItem_Poppy"
+        },
+        {
+            "name": "Nightstar Sand",
+            "asset": "PickupItem_NightStone"
+        },
+        {
+            "name": "PickupItem_YakushimaMushroom_01",
+            "asset": "PickupItem_YakushimaMushroom_01"
+        },
+        {
+            "name": "PickupItem_YakushimaMushroom_02",
+            "asset": "PickupItem_YakushimaMushroom_02"
+        },
+        {
+            "name": "PickupItem_YakushimaMushroom_03",
+            "asset": "PickupItem_YakushimaMushroom_03"
+        },
+        {
+            "name": "Shoddy Bed",
+            "asset": "PlayerBed_02"
+        },
+        {
+            "name": "Fine Bed",
+            "asset": "PlayerBed_03"
+        },
+        {
+            "name": "Sphere Workbench",
+            "asset": "SphereFactory_Black_01"
+        },
+        {
+            "name": "Sphere Assembly Line",
+            "asset": "SphereFactory_Black_02"
+        },
+        {
+            "name": "Sphere Assembly Line II",
+            "asset": "SphereFactory_Black_03"
+        },
+        {
+            "name": "Advanced Sphere Assembly Line",
+            "asset": "SphereFactory_Black_04"
+        },
+        {
+            "name": "Stone Pit",
+            "asset": "StonePit"
+        },
+        {
+            "name": "Weapon Workbench",
+            "asset": "WeaponFactory_Dirty_01"
+        },
+        {
+            "name": "Weapon Assembly Line",
+            "asset": "WeaponFactory_Dirty_02"
+        },
+        {
+            "name": "Weapon Assembly Line II",
+            "asset": "WeaponFactory_Dirty_03"
+        },
+        {
+            "name": "Advanced Weapon Assembly Line",
+            "asset": "WeaponFactory_Dirty_04"
+        },
+        {
+            "name": "Primitive Workbench",
+            "asset": "WorkBench"
+        },
+        {
+            "name": "Pal Egg",
+            "asset": "PalEgg"
+        },
+        {
+            "name": "Pal Egg",
+            "asset": "PalEgg_Fire"
+        },
+        {
+            "name": "Pal Egg",
+            "asset": "PalEgg_Water"
+        },
+        {
+            "name": "Pal Egg",
+            "asset": "PalEgg_Leaf"
+        },
+        {
+            "name": "Pal Egg",
+            "asset": "PalEgg_Electricity"
+        },
+        {
+            "name": "Pal Egg",
+            "asset": "PalEgg_Ice"
+        },
+        {
+            "name": "Pal Egg",
+            "asset": "PalEgg_Earth"
+        },
+        {
+            "name": "Pal Egg",
+            "asset": "PalEgg_Dark"
+        },
+        {
+            "name": "Pal Egg",
+            "asset": "PalEgg_Dragon"
+        },
+        {
+            "name": "Egg Incubator",
+            "asset": "HatchingPalEgg"
+        },
+        {
+            "name": "TreasureBox",
+            "asset": "TreasureBox"
+        },
+        {
+            "name": "TreasureBox_VisibleContent",
+            "asset": "TreasureBox_VisibleContent"
+        },
+        {
+            "name": "TreasureBox_VisibleContent_SkillFruits",
+            "asset": "TreasureBox_VisibleContent_SkillFruits"
+        },
+        {
+            "name": "Logging Site",
+            "asset": "StationDeforest2"
+        },
+        {
+            "name": "Pal Gear Workbench",
+            "asset": "WorkBench_SkillUnlock"
+        },
+        {
+            "name": "Wooden Foundation",
+            "asset": "Wooden_foundation"
+        },
+        {
+            "name": "Wooden Wall",
+            "asset": "Wooden_wall"
+        },
+        {
+            "name": "Wooden Roof",
+            "asset": "Wooden_roof"
+        },
+        {
+            "name": "Wooden Stairs",
+            "asset": "Wooden_stair"
+        },
+        {
+            "name": "Wooden Door",
+            "asset": "Wooden_DoorWall"
+        },
+        {
+            "name": "Stone Foundation",
+            "asset": "Stone_foundation"
+        },
+        {
+            "name": "Stone Wall",
+            "asset": "Stone_wall"
+        },
+        {
+            "name": "Stone Roof",
+            "asset": "Stone_roof"
+        },
+        {
+            "name": "Stone Stairs",
+            "asset": "Stone_stair"
+        },
+        {
+            "name": "Stone Door",
+            "asset": "Stone_DoorWall"
+        },
+        {
+            "name": "Metal Foundation",
+            "asset": "Metal_foundation"
+        },
+        {
+            "name": "Metal Wall",
+            "asset": "Metal_wall"
+        },
+        {
+            "name": "Metal Roof",
+            "asset": "Metal_roof"
+        },
+        {
+            "name": "Metal Stairs",
+            "asset": "Metal_stair"
+        },
+        {
+            "name": "Metal Door",
+            "asset": "Metal_DoorWall"
+        },
+        {
+            "name": "Statue of Power",
+            "asset": "BuildableGoddessStatue"
+        },
+        {
+            "name": "Hot Spring",
+            "asset": "Spa"
+        },
+        {
+            "name": "High Quality Hot Spring",
+            "asset": "Spa2"
+        },
+        {
+            "name": "Mushroom",
+            "asset": "PickupItem_Mushroom"
+        },
+        {
+            "name": "Wooden Defensive Wall",
+            "asset": "DefenseWall_Wood"
+        },
+        {
+            "name": "Stone Defensive Wall",
+            "asset": "DefenseWall"
+        },
+        {
+            "name": "Metal Defensive Wall",
+            "asset": "DefenseWall_Metal"
+        },
+        {
+            "name": "Heater",
+            "asset": "Heater"
+        },
+        {
+            "name": "Electric Heater",
+            "asset": "ElectricHeater"
+        },
+        {
+            "name": "Cooler",
+            "asset": "Cooler"
+        },
+        {
+            "name": "Electric Cooler",
+            "asset": "ElectricCooler"
+        },
+        {
+            "name": "Mounted Torch",
+            "asset": "Torch"
+        },
+        {
+            "name": "Wall Torch",
+            "asset": "WallTorch"
+        },
+        {
+            "name": "Lamp",
+            "asset": "Lamp"
+        },
+        {
+            "name": "Ceiling Lamp",
+            "asset": "CeilingLamp"
+        },
+        {
+            "name": "Large Mounted Lamp",
+            "asset": "LargeLamp"
+        },
+        {
+            "name": "Large Ceiling Lamp",
+            "asset": "LargeCeilingLamp"
+        },
+        {
+            "name": "Crusher",
+            "asset": "Crusher"
+        },
+        {
+            "name": "Mill",
+            "asset": "FlourMill"
+        },
+        {
+            "name": "Bear Trap (Small)",
+            "asset": "Trap_LegHold"
+        },
+        {
+            "name": "Bear Trap (Large)",
+            "asset": "Trap_LegHold_Big"
+        },
+        {
+            "name": "Hanging Trap",
+            "asset": "Trap_Noose"
+        },
+        {
+            "name": "Electric Mine",
+            "asset": "Trap_MineElecShock"
+        },
+        {
+            "name": "Ice Mine",
+            "asset": "Trap_MineFreeze"
+        },
+        {
+            "name": "Mine",
+            "asset": "Trap_MineAttack"
+        },
+        {
+            "name": "Breeding Farm",
+            "asset": "BreedFarm"
+        },
+        {
+            "name": "Wooden Gate",
+            "asset": "Wood_Gate"
+        },
+        {
+            "name": "Stone Gate",
+            "asset": "Stone_Gate"
+        },
+        {
+            "name": "Iron Gate",
+            "asset": "Metal_Gate"
+        },
+        {
+            "name": "Repair Bench",
+            "asset": "RepairBench"
+        },
+        {
+            "name": "SkillFruit_Test",
+            "asset": "SkillFruit_Test"
+        },
+        {
+            "name": "Large Toolbox",
+            "asset": "ToolBoxV1"
+        },
+        {
+            "name": "Water Fountain",
+            "asset": "Fountain"
+        },
+        {
+            "name": "Silo",
+            "asset": "Silo"
+        },
+        {
+            "name": "Electric Pylon",
+            "asset": "TransmissionTower"
+        },
+        {
+            "name": "Flower Bed",
+            "asset": "FlowerBed"
+        },
+        {
+            "name": "Stump and Axe",
+            "asset": "Stump"
+        },
+        {
+            "name": "Mining Cart",
+            "asset": "MiningTool"
+        },
+        {
+            "name": "Witch Cauldron",
+            "asset": "Cauldron"
+        },
+        {
+            "name": "Snowman",
+            "asset": "Snowman"
+        },
+        {
+            "name": "Flame Cauldron",
+            "asset": "OlympicCauldron"
+        },
+        {
+            "name": "Monitoring Stand",
+            "asset": "BaseCampWorkHard"
+        },
+        {
+            "name": "Cooler Box",
+            "asset": "CoolerBox"
+        },
+        {
+            "name": "Refrigerator",
+            "asset": "Refrigerator"
+        },
+        {
+            "name": "Training Dummy",
+            "asset": "DamagedScarecrow"
+        },
+        {
+            "name": "Sign",
+            "asset": "Signboard"
+        },
+        {
+            "name": "Alarm Bell",
+            "asset": "BaseCampBattleDirector"
+        },
+        {
+            "name": "Ranch",
+            "asset": "MonsterFarm"
+        },
+        {
+            "name": "Wooden Wall and Window",
+            "asset": "Wood_WindowWall"
+        },
+        {
+            "name": "Stone Wall and Window",
+            "asset": "Stone_WindowWall"
+        },
+        {
+            "name": "Metal Wall and Window",
+            "asset": "Metal_WindowWall"
+        },
+        {
+            "name": "Wooden Triangular Wall",
+            "asset": "Wood_TriangleWall"
+        },
+        {
+            "name": "Stone Triangular Wall",
+            "asset": "Stone_TriangleWall"
+        },
+        {
+            "name": "Metal Triangular Wall",
+            "asset": "Metal_TriangleWall"
+        },
+        {
+            "name": "Wooden Slanted Roof",
+            "asset": "Wood_SlantedRoof"
+        },
+        {
+            "name": "Stone Slanted Roof",
+            "asset": "Stone_SlantedRoof"
+        },
+        {
+            "name": "Metal Slanted Roof",
+            "asset": "Metal_SlantedRoof"
+        },
+        {
+            "name": "Wooden Barrel",
+            "asset": "Barrel_Wood"
+        },
+        {
+            "name": "Wooden Box",
+            "asset": "Box_Wood"
+        },
+        {
+            "name": "Small Container",
+            "asset": "Box01_Iron"
+        },
+        {
+            "name": "Cloth Covered Container",
+            "asset": "Box02_Iron"
+        },
+        {
+            "name": "Wooden Shelf",
+            "asset": "Shelf_Wood"
+        },
+        {
+            "name": "Wooden Barrel Shelf",
+            "asset": "Shelf_Cask_Wood"
+        },
+        {
+            "name": "Wooden Wall Shelf",
+            "asset": "Shelf_Hang01_Wood"
+        },
+        {
+            "name": "Iron Shelf",
+            "asset": "Shelf01_Iron"
+        },
+        {
+            "name": "Long Iron Shelf",
+            "asset": "Shelf02_Iron"
+        },
+        {
+            "name": "Orange Locker",
+            "asset": "Shelf03_Iron"
+        },
+        {
+            "name": "Locker",
+            "asset": "Shelf04_Iron"
+        },
+        {
+            "name": "Antique Cabinet",
+            "asset": "Shelf05_Stone"
+        },
+        {
+            "name": "Antique Long Cabinet",
+            "asset": "Shelf06_Stone"
+        },
+        {
+            "name": "Large Antique Cabinet",
+            "asset": "Shelf07_Stone"
+        },
+        {
+            "name": "Antique Wall Cabinet",
+            "asset": "Shelf01_Wall_Stone"
+        },
+        {
+            "name": "Iron Wall Shelf",
+            "asset": "Shelf01_Wall_Iron"
+        },
+        {
+            "name": "Antique Bookshelf",
+            "asset": "Shelf01_Stone"
+        },
+        {
+            "name": "Antique Wardrobe",
+            "asset": "Shelf02_Stone"
+        },
+        {
+            "name": "Antique Chest",
+            "asset": "Shelf03_Stone"
+        },
+        {
+            "name": "Antique Side Chest",
+            "asset": "Shelf04_Stone"
+        },
+        {
+            "name": "Large Container",
+            "asset": "Container01_Iron"
+        },
+        {
+            "name": "Square Table",
+            "asset": "TableSquare_Wood"
+        },
+        {
+            "name": "Round Table",
+            "asset": "TableCircular_Wood"
+        },
+        {
+            "name": "Wooden Bench",
+            "asset": "Bench_Wood"
+        },
+        {
+            "name": "Wooden Stool",
+            "asset": "Stool_Wood"
+        },
+        {
+            "name": "Wooden Bar Stool",
+            "asset": "Stool_High_Wood"
+        },
+        {
+            "name": "Wooden Counter",
+            "asset": "Counter_Wood"
+        },
+        {
+            "name": "Wooden Decorative Wall Shelf",
+            "asset": "Shelf_Hang02_Wood"
+        },
+        {
+            "name": "Big Wall Ivy",
+            "asset": "Ivy01"
+        },
+        {
+            "name": "Small Wall Ivy",
+            "asset": "Ivy02"
+        },
+        {
+            "name": "Horizontal Wall Ivy",
+            "asset": "Ivy03"
+        },
+        {
+            "name": "Wooden Chair",
+            "asset": "Chair01_Wood"
+        },
+        {
+            "name": "Antique Braided Basket",
+            "asset": "Box01_Stone"
+        },
+        {
+            "name": "Red Metal Barrel",
+            "asset": "Barrel01_Iron"
+        },
+        {
+            "name": "Blue Metal Barrel",
+            "asset": "Barrel02_Iron"
+        },
+        {
+            "name": "Green Metal Barrel",
+            "asset": "Barrel03_Iron"
+        },
+        {
+            "name": "Cable Reel",
+            "asset": "CableCoil01_Iron"
+        },
+        {
+            "name": "Leather Chair",
+            "asset": "Chair01_Iron"
+        },
+        {
+            "name": "Iron Chair",
+            "asset": "Chair02_Iron"
+        },
+        {
+            "name": "Wall Clock",
+            "asset": "Clock01_Wall_Iron"
+        },
+        {
+            "name": "Garbage Bag",
+            "asset": "GarbageBag_Iron"
+        },
+        {
+            "name": "Soccer Goal",
+            "asset": "GoalSoccer_Iron"
+        },
+        {
+            "name": "Claw Crane",
+            "asset": "MachineGame01_Iron"
+        },
+        {
+            "name": "Cola Vending Machine",
+            "asset": "MachineVending01_Iron"
+        },
+        {
+            "name": "Earthen Pipe",
+            "asset": "PipeClay01_Iron"
+        },
+        {
+            "name": "Emergency Exit Ceiling Sign",
+            "asset": "SignExit_Ceiling_Iron"
+        },
+        {
+            "name": "Emergency Exit Wall Sign",
+            "asset": "SignExit_Wall_Iron"
+        },
+        {
+            "name": "Leather Armchair",
+            "asset": "Sofa01_Iron"
+        },
+        {
+            "name": "Leather Couch",
+            "asset": "Sofa02_Iron"
+        },
+        {
+            "name": "Iron Stool",
+            "asset": "Stool01_Iron"
+        },
+        {
+            "name": "Round Iron Table",
+            "asset": "TableCircular01_Iron"
+        },
+        {
+            "name": "Ironwood Side Table",
+            "asset": "TableSide01_Iron"
+        },
+        {
+            "name": "Ironwood Table",
+            "asset": "TableSquare01_Iron"
+        },
+        {
+            "name": "Ironwood Low Table",
+            "asset": "TableSquare02_Iron"
+        },
+        {
+            "name": "Tire",
+            "asset": "Tire01_Iron"
+        },
+        {
+            "name": "Barricade",
+            "asset": "TrafficBarricade01_Iron"
+        },
+        {
+            "name": "Orange Barricade",
+            "asset": "TrafficBarricade02_Iron"
+        },
+        {
+            "name": "Red Iron Barricade",
+            "asset": "TrafficBarricade03_Iron"
+        },
+        {
+            "name": "White Iron Barricade",
+            "asset": "TrafficBarricade04_Iron"
+        },
+        {
+            "name": "Iron Fence",
+            "asset": "TrafficBarricade05_Iron"
+        },
+        {
+            "name": "Traffic Cone",
+            "asset": "TrafficCone01_Iron"
+        },
+        {
+            "name": "Fat Traffic Cone",
+            "asset": "TrafficCone02_Iron"
+        },
+        {
+            "name": "Skinny Traffic Cone",
+            "asset": "TrafficCone03_Iron"
+        },
+        {
+            "name": "Traffic Light",
+            "asset": "TrafficLight01_Iron"
+        },
+        {
+            "name": "Antique Bathtub",
+            "asset": "BathTub_Stone"
+        },
+        {
+            "name": "Antique Wooden Chair",
+            "asset": "Chair01_Stone"
+        },
+        {
+            "name": "Antique Green Wooden Chair",
+            "asset": "Chair02_Stone"
+        },
+        {
+            "name": "Antique Grandfather Clock",
+            "asset": "Clock01_Stone"
+        },
+        {
+            "name": "Antique Curtain",
+            "asset": "Curtain01_Wall_Stone"
+        },
+        {
+            "name": "Antique Desk",
+            "asset": "Desk01_Stone"
+        },
+        {
+            "name": "Antique Globe",
+            "asset": "Globe01_Stone"
+        },
+        {
+            "name": "Antique Oval Mirror",
+            "asset": "Mirror01_Stone"
+        },
+        {
+            "name": "Antique Mirror",
+            "asset": "Mirror02_Stone"
+        },
+        {
+            "name": "Antique Wall Mirror",
+            "asset": "Mirror01_Wall_Stone"
+        },
+        {
+            "name": "Antique Partition",
+            "asset": "Partition_Stone"
+        },
+        {
+            "name": "Grand Piano",
+            "asset": "Piano01_Stone"
+        },
+        {
+            "name": "Upright Piano",
+            "asset": "Piano02_Stone"
+        },
+        {
+            "name": "Antique Carpet",
+            "asset": "Rug01_Stone"
+        },
+        {
+            "name": "Antique Red Carpet",
+            "asset": "Rug02_Stone"
+        },
+        {
+            "name": "Antique Green Carpet",
+            "asset": "Rug03_Stone"
+        },
+        {
+            "name": "Antique Long Carpet",
+            "asset": "Rug04_Stone"
+        },
+        {
+            "name": "Antique Armchair",
+            "asset": "Sofa01_Stone"
+        },
+        {
+            "name": "Antique Couch",
+            "asset": "Sofa02_Stone"
+        },
+        {
+            "name": "Antique Ottoman",
+            "asset": "Sofa03_Stone"
+        },
+        {
+            "name": "Antique Stool",
+            "asset": "Stool01_Stone"
+        },
+        {
+            "name": "Antique Stove",
+            "asset": "Stove01_Stone"
+        },
+        {
+            "name": "Antique Round Table",
+            "asset": "TableCircular01_Stone"
+        },
+        {
+            "name": "Antique Dresser",
+            "asset": "TableDresser01_Stone"
+        },
+        {
+            "name": "Antique Washstand",
+            "asset": "TableSink01_Stone"
+        },
+        {
+            "name": "Antique Toilet",
+            "asset": "Toilet01_Stone"
+        },
+        {
+            "name": "Antique Toilet Paper Holder",
+            "asset": "ToiletHolder01_Stone"
+        },
+        {
+            "name": "Antique Towel Rack",
+            "asset": "TowlRack01_Stone"
+        },
+        {
+            "name": "Houseplant",
+            "asset": "Plant01_Plant"
+        },
+        {
+            "name": "Houseplant and Chair",
+            "asset": "Plant02_Plant"
+        },
+        {
+            "name": "Tabletop Houseplant",
+            "asset": "Plant03_Plant"
+        },
+        {
+            "name": "Potted Houseplant",
+            "asset": "Plant04_Plant"
+        },
+        {
+            "name": "Antique Brown Floor Lamp",
+            "asset": "Light_FloorLamp01"
+        },
+        {
+            "name": "Antique Red Floor Lamp",
+            "asset": "Light_FloorLamp02"
+        },
+        {
+            "name": "Simple Street Lamp",
+            "asset": "Light_LightPole01"
+        },
+        {
+            "name": "Double Street Lamp",
+            "asset": "Light_LightPole02"
+        },
+        {
+            "name": "Retro Street Lamp",
+            "asset": "Light_LightPole03"
+        },
+        {
+            "name": "Stylish Street Lamp",
+            "asset": "Light_LightPole04"
+        },
+        {
+            "name": "Brick Fireplace",
+            "asset": "Light_FirePlace01"
+        },
+        {
+            "name": "Fireplace",
+            "asset": "Light_FirePlace02"
+        },
+        {
+            "name": "Chandelier",
+            "asset": "Light_CandleSticks_Top"
+        },
+        {
+            "name": "Wall Lamp",
+            "asset": "Light_CandleSticks_Wall"
+        },
+        {
+            "name": "Old TV",
+            "asset": "Television01_Iron"
+        },
+        {
+            "name": "Iron Desk",
+            "asset": "Desk01_Iron"
+        },
+        {
+            "name": "No Pals Beyond Sign",
+            "asset": "TrafficSign01_Iron"
+        },
+        {
+            "name": "Stop Sign",
+            "asset": "TrafficSign02_Iron"
+        },
+        {
+            "name": "Beware of Eikthyrdeer Sign",
+            "asset": "TrafficSign03_Iron"
+        },
+        {
+            "name": "Beware of Mammorest Sign",
+            "asset": "TrafficSign04_Iron"
+        },
+        {
+            "name": "Frog Chair",
+            "asset": "Chair01_Pal"
+        },
+        {
+            "name": "Summoning Altar",
+            "asset": "Altar"
+        },
+        {
+            "name": "Ore Mining Site",
+            "asset": "CopperPit"
+        },
+        {
+            "name": "Ore Mining Site II",
+            "asset": "CopperPit_2"
+        },
+        {
+            "name": "Electric Egg Incubator",
+            "asset": "ElectricHatchingPalEgg"
+        },
+        {
+            "name": "Grotto Mushroom",
+            "asset": "PickupItem_CaveMushroom"
+        },
+        {
+            "name": "Cold Food Box",
+            "asset": "CoolerPalFoodBox"
+        },
+        {
+            "name": "-",
+            "asset": "AntiAircraft_LaserTower"
+        },
+        {
+            "name": "-",
+            "asset": "AntiAircraft_MachineGun"
+        },
+        {
+            "name": "-",
+            "asset": "TreasureBox_Oilrig"
+        },
+        {
+            "name": "-",
+            "asset": "OilRig"
+        },
+        {
+            "name": "Sulfur Mine",
+            "asset": "SulfurPit"
+        },
+        {
+            "name": "Coal Mine",
+            "asset": "CoalPit"
+        },
+        {
+            "name": "Refrigerated Crusher",
+            "asset": "IceCrusher"
+        },
+        {
+            "name": "Pal Disassembly Conveyor",
+            "asset": "DismantlingConveyor"
+        },
+        {
+            "name": "Wall-Mounted Sign",
+            "asset": "WallSignboard"
+        },
+        {
+            "name": "Elemental Treasure Chest (Electric)",
+            "asset": "TreasureBox_Electric"
+        },
+        {
+            "name": "Elemental Treasure Chest (Fire)",
+            "asset": "TreasureBox_Fire"
+        },
+        {
+            "name": "Elemental Treasure Chest (Water)",
+            "asset": "TreasureBox_Water"
+        },
+        {
+            "name": "Glass Foundation",
+            "asset": "Glass_foundation"
+        },
+        {
+            "name": "Glass Wall",
+            "asset": "Glass_wall"
+        },
+        {
+            "name": "Glass Roof",
+            "asset": "Glass_roof"
+        },
+        {
+            "name": "Glass Stairs",
+            "asset": "Glass_stair"
+        },
+        {
+            "name": "Glass Wall and Door",
+            "asset": "Glass_DoorWall"
+        },
+        {
+            "name": "Glass Triangular Wall",
+            "asset": "Glass_TriangleWall"
+        },
+        {
+            "name": "Glass Slanted Roof",
+            "asset": "Glass_SlantedRoof"
+        },
+        {
+            "name": "Glass Wall and Window",
+            "asset": "Glass_WindowWall"
+        },
+        {
+            "name": "Wooden Pillar",
+            "asset": "Wooden_Pillar"
+        },
+        {
+            "name": "Stone Pillar",
+            "asset": "Stone_Pillar"
+        },
+        {
+            "name": "Metal Pillar",
+            "asset": "Metal_Pillars"
+        },
+        {
+            "name": "Glass Pillar",
+            "asset": "Glass_Pillars"
+        },
+        {
+            "name": "Meteorite",
+            "asset": "MeteorDrop_pickup"
+        },
+        {
+            "name": "Supplies",
+            "asset": "SupplyDrop"
+        },
+        {
+            "name": "Meteorite",
+            "asset": "MeteorDrop_Damagable"
+        },
+        {
+            "name": "Large Power Generator",
+            "asset": "ElectricGenerator_Large"
+        },
+        {
+            "name": "Junk (Hold to collect)",
+            "asset": "TreasureBox_RequiredLongHold"
+        },
+        {
+            "name": "Crude Oil Extractor",
+            "asset": "OilPump"
+        },
+        {
+            "name": "Power Lotus (Small)",
+            "asset": "PickupItem_Lotus_Attack_01"
+        },
+        {
+            "name": "Power Lotus (Large)",
+            "asset": "PickupItem_Lotus_Attack_02"
+        },
+        {
+            "name": "Life Lotus (Small)",
+            "asset": "PickupItem_Lotus_HP_01"
+        },
+        {
+            "name": "Life Lotus (Large)",
+            "asset": "PickupItem_Lotus_HP_02"
+        },
+        {
+            "name": "Stamina Lotus (Small)",
+            "asset": "PickupItem_Lotus_Stamina_01"
+        },
+        {
+            "name": "Stamina Lotus (Large)",
+            "asset": "PickupItem_Lotus_Stamina_02"
+        },
+        {
+            "name": "Speed ​​Lotus (Small)",
+            "asset": "PickupItem_Lotus_Workspeed_01"
+        },
+        {
+            "name": "Speed ​​Lotus (Large)",
+            "asset": "PickupItem_Lotus_Workspeed_02"
+        },
+        {
+            "name": "Carry Lotus (Small)",
+            "asset": "PickupItem_Lotus_Weight_01"
+        },
+        {
+            "name": "Carry Lotus (Large)",
+            "asset": "PickupItem_Lotus_Weight_02"
+        },
+        {
+            "name": "Pal Dressing Facility",
+            "asset": "SkinChange"
+        },
+        {
+            "name": "Dog Coin",
+            "asset": "PickupItem_DogCoin"
+        },
+        {
+            "name": "Japanese-Style Wall",
+            "asset": "JapaneseStyle_wall_01"
+        },
+        {
+            "name": "Japanese-Style Door A",
+            "asset": "JapaneseStyle_DoorWall_01"
+        },
+        {
+            "name": "Japanese-Style Door B",
+            "asset": "JapaneseStyle_DoorWall_02"
+        },
+        {
+            "name": "Japanese-Style Roof A",
+            "asset": "JapaneseStyle_roof_01"
+        },
+        {
+            "name": "Japanese-Style Roof B",
+            "asset": "JapaneseStyle_roof_02"
+        },
+        {
+            "name": "Japanese-Style Slanted Roof",
+            "asset": "JapaneseStyle_SlantedRoof"
+        },
+        {
+            "name": "Japanese-Style Triangular Wall",
+            "asset": "JapaneseStyle_TriangleWall"
+        },
+        {
+            "name": "Japanese-Style Wall and Window",
+            "asset": "JapaneseStyle_WindowWall"
+        },
+        {
+            "name": "Japanese-Style Foundation",
+            "asset": "JapaneseStyle_foundation"
+        },
+        {
+            "name": "Japanese-Style Stairs",
+            "asset": "JapaneseStyle_stair"
+        },
+        {
+            "name": "Japanese-Style Pillar",
+            "asset": "JapaneseStyle_Pillar"
+        },
+        {
+            "name": "Alpha Wave Generator",
+            "asset": "SanityDecrease1"
+        },
+        {
+            "name": "Beta Wave Generator",
+            "asset": "WorkSpeedIncrease1"
+        },
+        {
+            "name": "Pure Quartz Mine",
+            "asset": "QuartzPit"
+        },
+        {
+            "name": "Gold Coin Assembly Line",
+            "asset": "Factory_Money"
+        },
+        {
+            "name": "Advanced Chest",
+            "asset": "ItemChest_04"
+        },
+        {
+            "name": "Pal Pod",
+            "asset": "MedicalPalBed_05"
+        },
+        {
+            "name": "Carrot Plantation",
+            "asset": "FarmBlockV2_Carrot"
+        },
+        {
+            "name": "Onion Plantation",
+            "asset": "FarmBlockV2_Onion"
+        },
+        {
+            "name": "Potato Plantation",
+            "asset": "FarmBlockV2_Potato"
+        },
+        {
+            "name": "Item Retrieval Machine",
+            "asset": "BaseCampItemDispenser"
+        },
+        {
+            "name": "Guild Chest",
+            "asset": "GuildChest"
+        },
+        {
+            "name": "Pal Expedition Station",
+            "asset": "Expedition"
+        },
+        {
+            "name": "Flea Market (Items)",
+            "asset": "ItemBooth"
+        },
+        {
+            "name": "Pal Labor Research Laboratory",
+            "asset": "Lab"
+        },
+        {
+            "name": "Flea Market (Pals)",
+            "asset": "PalBooth"
+        },
+        {
+            "name": "Large-Scale Electric Egg Incubator",
+            "asset": "MultiElectricHatchingPalEgg"
+        },
+        {
+            "name": "Pal Surgery Table",
+            "asset": "OperatingTable"
+        },
+        {
+            "name": "Human-Powered Generator",
+            "asset": "ManualElectricGenerator"
+        },
+        {
+            "name": "Skillfruit Orchard",
+            "asset": "Farm_SkillFruits"
+        },
+        {
+            "name": "Ladder",
+            "asset": "Wooden_ladder"
+        },
+        {
+            "name": "Medicine Rack",
+            "asset": "PalMedicineBox"
+        },
+        {
+            "name": "Accumulator",
+            "asset": "EnergyStorage_Electric"
+        },
+        {
+            "name": "DamagableRock0018",
+            "asset": "DamagableRock0018"
+        },
+        {
+            "name": "AntiAirCamp",
+            "asset": "AntiAirCamp"
+        },
+        {
+            "name": "AntiAirMissileLauncher",
+            "asset": "AntiAirMissileLauncher"
+        },
+        {
+            "name": "Tombstone",
+            "asset": "Headstone"
+        },
+        {
+            "name": "Japanese-Style Door C",
+            "asset": "JapaneseStyle_DoorWall_03"
+        },
+        {
+            "name": "Hexolite Quartz",
+            "asset": "DamagableRock0019"
+        },
+        {
+            "name": "Folding Screen",
+            "asset": "Byobu"
+        },
+        {
+            "name": "Hanging Scroll",
+            "asset": "Kakejiku"
+        },
+        {
+            "name": "Japanese Floor Chair",
+            "asset": "Zaisu"
+        },
+        {
+            "name": "Japanese Floor Cushion",
+            "asset": "Zabuton"
+        },
+        {
+            "name": "Japanese Hearth",
+            "asset": "Irori"
+        },
+        {
+            "name": "Stone Lantern",
+            "asset": "Toro"
+        },
+        {
+            "name": "Japanese Paper Lantern",
+            "asset": "Andon"
+        },
+        {
+            "name": "Deer Scare",
+            "asset": "Shishiodoshi"
+        },
+        {
+            "name": "Bonsai",
+            "asset": "Bonsai"
+        },
+        {
+            "name": "Incense Burner",
+            "asset": "Koro"
+        },
+        {
+            "name": "Flower Arrangement",
+            "asset": "Seika"
+        },
+        {
+            "name": "Japanese-Style Chest",
+            "asset": "Tansu"
+        },
+        {
+            "name": "Japanese Writing Table",
+            "asset": "Fudukue"
+        },
+        {
+            "name": "Drafting Table",
+            "asset": "CompositeDesk"
+        },
+        {
+            "name": "Global Palbox",
+            "asset": "GlobalPalStorage"
+        },
+        {
+            "name": "Dimensional Pal Storage",
+            "asset": "DimensionPalStorage"
+        },
+        {
+            "name": "Wire Fence",
+            "asset": "Wire_Fence"
+        },
+        {
+            "name": "Clean Foundation",
+            "asset": "SF_foundation"
+        },
+        {
+            "name": "Clean Wall",
+            "asset": "SF_wall"
+        },
+        {
+            "name": "Clean Roof",
+            "asset": "SF_roof"
+        },
+        {
+            "name": "Clean Stairs",
+            "asset": "SF_stair"
+        },
+        {
+            "name": "Clean Wall and Door",
+            "asset": "SF_DoorWall"
+        },
+        {
+            "name": "Clean Triangular Wall",
+            "asset": "SF_TriangleWall"
+        },
+        {
+            "name": "Clean Slanted Roof",
+            "asset": "SF_SlantedRoof"
+        },
+        {
+            "name": "Clean Wall and Window",
+            "asset": "SF_WindowWall"
+        },
+        {
+            "name": "Clean Pillar",
+            "asset": "SF_Pillars"
+        },
+        {
+            "name": "Lyleen Statue",
+            "asset": "LilyQueenStatue"
+        },
+        {
+            "name": "Free Pal Alliance Flag",
+            "asset": "ConservationGroupBannerA"
+        },
+        {
+            "name": "Free Pal Alliance Horizontal Banner",
+            "asset": "ConservationGroupBannerB"
+        },
+        {
+            "name": "Rayne Syndicate Flag",
+            "asset": "Hunter_GangFlag"
+        },
+        {
+            "name": "TreasureBox_EnemyCampGoal",
+            "asset": "TreasureBox_EnemyCampGoal"
+        },
+        {
+            "name": "TreasureBox_EnemyCamp",
+            "asset": "TreasureBox_EnemyCamp"
+        },
+        {
+            "name": "Wooden Barricade",
+            "asset": "WoodenBarricade"
+        },
+        {
+            "name": "Majestic Wall Torch",
+            "asset": "WallTorch02"
+        },
+        {
+            "name": "Majestic Candlestick",
+            "asset": "CandleStand"
+        },
+        {
+            "name": "Ceremonial Candlestick",
+            "asset": "FireStand"
+        },
+        {
+            "name": "Wooden Fence",
+            "asset": "Wood_Fence"
+        },
+        {
+            "name": "Stone Fence",
+            "asset": "Stone_Fence"
+        },
+        {
+            "name": "Metal Fence",
+            "asset": "Iron_Fence"
+        },
+        {
+            "name": "Glass Fence",
+            "asset": "Glass_Fence"
+        },
+        {
+            "name": "Japanese-Style Fence",
+            "asset": "JapaneseStyle_Fence"
+        },
+        {
+            "name": "Clean Fence",
+            "asset": "SF_Fence"
+        },
+        {
+            "name": "DestroyableWall_Rock01",
+            "asset": "DestroyableWall_Rock01"
+        },
+        {
+            "name": "DestroyableWall_Rock02",
+            "asset": "DestroyableWall_Rock02"
+        },
+        {
+            "name": "PickupItem_AffectionFruit",
+            "asset": "PickupItem_AffectionFruit"
+        },
+        {
+            "name": "Hexolite Quartz Mine",
+            "asset": "CrystalPit"
+        },
+        {
+            "name": "Japanese-Style Hot Spring",
+            "asset": "Spa3"
+        },
+        {
+            "name": "Large Incubator",
+            "asset": "MultiHatchingPalEgg"
+        },
+        {
+            "name": "PalStorage_Terminal",
+            "asset": "PalStorage_Terminal"
+        },
+        {
+            "name": "TreasureBox_FishingJunk_RequiredLongHold",
+            "asset": "TreasureBox_FishingJunk_RequiredLongHold"
+        },
+        {
+            "name": "TreasureBox_FishingJunk_RequiredLongHold2",
+            "asset": "TreasureBox_FishingJunk_RequiredLongHold2"
+        },
+        {
+            "name": "Fishing Pond",
+            "asset": "FishingPond1"
+        },
+        {
+            "name": "Large Fishing Pond",
+            "asset": "FishingPond2"
+        },
+        {
+            "name": "Palbox Control Device",
+            "asset": "BaseCampWorkerExtraStation"
+        },
+        {
+            "name": "Laboratory Desk",
+            "asset": "SF_Desk"
+        },
+        {
+            "name": "Laboratory Chair",
+            "asset": "SF_Chair"
+        },
+        {
+            "name": "DamagableTree_Yakushima001",
+            "asset": "DamagableTree_Yakushima001"
+        },
+        {
+            "name": "DamagableTree_Yakushima002",
+            "asset": "DamagableTree_Yakushima002"
+        },
+        {
+            "name": "DamagableTree_Yakushima003",
+            "asset": "DamagableTree_Yakushima003"
+        },
+        {
+            "name": "Paper Lantern",
+            "asset": "LanternTop"
+        },
+        {
+            "name": "Red Wooden Lantern",
+            "asset": "Shrine_Lantern"
+        },
+        {
+            "name": "Yakumo Statue",
+            "asset": "GuardianDogStatue"
+        },
+        {
+            "name": "Yakushima_Crystal",
+            "asset": "Yakushima_Crystal"
+        },
+        {
+            "name": "Yakushima_Pot",
+            "asset": "Yakushima_Pot"
+        },
+        {
+            "name": "Rayne Syndicate Standard",
+            "asset": "Hunter_Flag"
+        },
+        {
+            "name": "Rayne Syndicate Vertical Banner",
+            "asset": "Hunter_Banner"
+        },
+        {
+            "name": "Free Pal Alliance Standard",
+            "asset": "Believer_Flag"
+        },
+        {
+            "name": "Free Pal Alliance Vertical Banner",
+            "asset": "Believer_Banner"
+        },
+        {
+            "name": "Brothers of the Eternal Pyre Standard",
+            "asset": "FireCult_Flag"
+        },
+        {
+            "name": "Brothers of the Eternal Pyre Vertical Banner",
+            "asset": "FireCult_Banner"
+        },
+        {
+            "name": "PIDF Standard",
+            "asset": "Police_Flag"
+        },
+        {
+            "name": "PIDF Vertical Banner",
+            "asset": "Police_Banner"
+        },
+        {
+            "name": "PAL Genetic Research Unit Standard",
+            "asset": "Scientist_Flag"
+        },
+        {
+            "name": "PAL Genetic Research Unit Vertical Banner",
+            "asset": "Scientist_Banner"
+        },
+        {
+            "name": "Moonflower Standard",
+            "asset": "Ninja_Flag"
+        },
+        {
+            "name": "Moonflower Vertical Banner",
+            "asset": "Ninja_Banner"
+        },
+        {
+            "name": "TreasureBox_Yakushima",
+            "asset": "TreasureBox_Yakushima"
+        },
+        {
+            "name": "Yakushima_HealHeart",
+            "asset": "Yakushima_HealHeart"
+        },
+        {
+            "name": "Moon Lord Statue",
+            "asset": "YakushimaBoss002_Relic"
+        }
+    ]
+}

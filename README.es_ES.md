@@ -39,7 +39,7 @@
   - Eliminar datos no referenciados  
   - Restablecer misiones  
   - Desbloquear cofres privados  
-  - Eliminar ítems inválidos o modificados  
+  - Eliminar objetos/pals no válidos o modificados 
   - Sistema de exclusiones para jugadores/gremios/bases protegidos  
   - Mover jugadores entre gremios  
   - Convertir un jugador en líder del gremio  

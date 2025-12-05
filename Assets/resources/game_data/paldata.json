@@ -1,0 +1,2416 @@
+{
+    "pals": [
+        {
+            "name": "Anubis",
+            "asset": "Anubis"
+        },
+        {
+            "name": "Anubis (Boss)",
+            "asset": "Boss_Anubis"
+        },
+        {
+            "name": "Arsox",
+            "asset": "FlameBuffalo"
+        },
+        {
+            "name": "Arsox (Boss)",
+            "asset": "BOSS_FlameBuffalo"
+        },
+        {
+            "name": "Astegon",
+            "asset": "BlackMetalDragon"
+        },
+        {
+            "name": "Astegon (Boss)",
+            "asset": "BOSS_BlackMetalDragon"
+        },
+        {
+            "name": "Azurmane",
+            "asset": "BlueThunderHorse"
+        },
+        {
+            "name": "Azurmane (Boss)",
+            "asset": "BOSS_BlueThunderHorse"
+        },
+        {
+            "name": "Azurobe",
+            "asset": "BlueDragon"
+        },
+        {
+            "name": "Azurobe (Boss)",
+            "asset": "BOSS_BlueDragon"
+        },
+        {
+            "name": "Azurobe Cryst",
+            "asset": "BlueDragon_Ice"
+        },
+        {
+            "name": "BOSS_BlueDragon_Ice (Boss)",
+            "asset": "BOSS_BlueDragon_Ice"
+        },
+        {
+            "name": "BOSS_BluePlatypus_Fire (Boss)",
+            "asset": "BOSS_BluePlatypus_Fire"
+        },
+        {
+            "name": "BOSS_CactusDoll (Boss)",
+            "asset": "BOSS_CactusDoll"
+        },
+        {
+            "name": "BOSS_CaptainPenguin_Black (Boss)",
+            "asset": "BOSS_CaptainPenguin_Black"
+        },
+        {
+            "name": "BOSS_CloverFairy (Boss)",
+            "asset": "BOSS_CloverFairy"
+        },
+        {
+            "name": "BOSS_ClownRabbit (Boss)",
+            "asset": "BOSS_ClownRabbit"
+        },
+        {
+            "name": "BOSS_ElecLizard (Boss)",
+            "asset": "BOSS_ElecLizard"
+        },
+        {
+            "name": "BOSS_ElecPomeranian (Boss)",
+            "asset": "BOSS_ElecPomeranian"
+        },
+        {
+            "name": "BOSS_ElecSnail (Boss)",
+            "asset": "BOSS_ElecSnail"
+        },
+        {
+            "name": "BOSS_FlyingManta_Thunder (Boss)",
+            "asset": "BOSS_FlyingManta_Thunder"
+        },
+        {
+            "name": "BOSS_FoxExorcist (Boss)",
+            "asset": "BOSS_FoxExorcist"
+        },
+        {
+            "name": "BOSS_GhostAnglerfish_Fire (Boss)",
+            "asset": "BOSS_GhostAnglerfish_Fire"
+        },
+        {
+            "name": "BOSS_GhostBlackCat (Boss)",
+            "asset": "BOSS_GhostBlackCat"
+        },
+        {
+            "name": "BOSS_GrassGolem (Boss)",
+            "asset": "BOSS_GrassGolem"
+        },
+        {
+            "name": "BOSS_HoodGhost (Boss)",
+            "asset": "BOSS_HoodGhost"
+        },
+        {
+            "name": "BOSS_IceNarwhal_Fire (Boss)",
+            "asset": "BOSS_IceNarwhal_Fire"
+        },
+        {
+            "name": "BOSS_KingCrab (Boss)",
+            "asset": "BOSS_KingCrab"
+        },
+        {
+            "name": "BOSS_KingSunfish (Boss)",
+            "asset": "BOSS_KingSunfish"
+        },
+        {
+            "name": "BOSS_KingWhale (Boss)",
+            "asset": "BOSS_KingWhale"
+        },
+        {
+            "name": "BOSS_LanternButler (Boss)",
+            "asset": "BOSS_LanternButler"
+        },
+        {
+            "name": "BOSS_LazyCatfish_Gold (Boss)",
+            "asset": "BOSS_LazyCatfish_Gold"
+        },
+        {
+            "name": "BOSS_LongCat (Boss)",
+            "asset": "BOSS_LongCat"
+        },
+        {
+            "name": "BOSS_MonochromeQueen (Boss)",
+            "asset": "BOSS_MonochromeQueen"
+        },
+        {
+            "name": "BOSS_MoonChild (Boss)",
+            "asset": "BOSS_MoonChild"
+        },
+        {
+            "name": "BOSS_MummyPal (Boss)",
+            "asset": "BOSS_MummyPal"
+        },
+        {
+            "name": "BOSS_MushroomLady (Boss)",
+            "asset": "BOSS_MushroomLady"
+        },
+        {
+            "name": "BOSS_NegativeOctopus_Neutral (Boss)",
+            "asset": "BOSS_NegativeOctopus_Neutral"
+        },
+        {
+            "name": "BOSS_OniGhostGirl (Boss)",
+            "asset": "BOSS_OniGhostGirl"
+        },
+        {
+            "name": "BOSS_Penguin_Electric (Boss)",
+            "asset": "BOSS_Penguin_Electric"
+        },
+        {
+            "name": "BOSS_PyramidTurtle (Boss)",
+            "asset": "BOSS_PyramidTurtle"
+        },
+        {
+            "name": "BOSS_RockBeast (Boss)",
+            "asset": "BOSS_RockBeast"
+        },
+        {
+            "name": "BOSS_SamuraiDog (Boss)",
+            "asset": "BOSS_SamuraiDog"
+        },
+        {
+            "name": "BOSS_Sekhmet (Boss)",
+            "asset": "BOSS_Sekhmet"
+        },
+        {
+            "name": "BOSS_SmallYeti (Boss)",
+            "asset": "BOSS_SmallYeti"
+        },
+        {
+            "name": "BOSS_SnakeGirl (Boss)",
+            "asset": "BOSS_SnakeGirl"
+        },
+        {
+            "name": "BOSS_StuffedShark_Fire (Boss)",
+            "asset": "BOSS_StuffedShark_Fire"
+        },
+        {
+            "name": "BOSS_SumoDog (Boss)",
+            "asset": "BOSS_SumoDog"
+        },
+        {
+            "name": "BOSS_SwordCutlassfish (Boss)",
+            "asset": "BOSS_SwordCutlassfish"
+        },
+        {
+            "name": "BOSS_TentacleTurtle_Ground (Boss)",
+            "asset": "BOSS_TentacleTurtle_Ground"
+        },
+        {
+            "name": "BOSS_ThiefBird (Boss)",
+            "asset": "BOSS_ThiefBird"
+        },
+        {
+            "name": "BOSS_ThunderFluffyBird (Boss)",
+            "asset": "BOSS_ThunderFluffyBird"
+        },
+        {
+            "name": "BOSS_VenusFlytrap (Boss)",
+            "asset": "BOSS_VenusFlytrap"
+        },
+        {
+            "name": "Bastigor",
+            "asset": "SnowTigerBeastman"
+        },
+        {
+            "name": "Bastigor (Boss)",
+            "asset": "BOSS_SnowTigerBeastman"
+        },
+        {
+            "name": "Bastigor (Gym)",
+            "asset": "GYM_SnowTigerBeastman"
+        },
+        {
+            "name": "Bastigor (Gym)",
+            "asset": "GYM_SnowTigerBeastman_2"
+        },
+        {
+            "name": "Beakon",
+            "asset": "ThunderBird"
+        },
+        {
+            "name": "Beakon (Boss)",
+            "asset": "BOSS_ThunderBird"
+        },
+        {
+            "name": "Beegarde",
+            "asset": "SoldierBee"
+        },
+        {
+            "name": "Beegarde (Boss)",
+            "asset": "BOSS_SoldierBee"
+        },
+        {
+            "name": "Bellanoir",
+            "asset": "NightLady"
+        },
+        {
+            "name": "Bellanoir (Boss)",
+            "asset": "BOSS_NightLady"
+        },
+        {
+            "name": "Bellanoir (Raid)",
+            "asset": "RAID_NightLady"
+        },
+        {
+            "name": "Bellanoir Libero",
+            "asset": "NightLady_Dark"
+        },
+        {
+            "name": "Bellanoir Libero (Boss)",
+            "asset": "BOSS_NightLady_Dark"
+        },
+        {
+            "name": "Bellanoir Libero (Raid)",
+            "asset": "RAID_NightLady_Dark"
+        },
+        {
+            "name": "Bellanoir Libero (Raid)",
+            "asset": "RAID_NightLady_Dark_2"
+        },
+        {
+            "name": "Blazamut",
+            "asset": "KingBahamut"
+        },
+        {
+            "name": "Blazamut (Boss)",
+            "asset": "BOSS_KingBahamut"
+        },
+        {
+            "name": "Blazamut Ryu",
+            "asset": "KingBahamut_Dragon"
+        },
+        {
+            "name": "Blazamut Ryu (Boss)",
+            "asset": "BOSS_KingBahamut_Dragon"
+        },
+        {
+            "name": "Blazamut Ryu (Raid)",
+            "asset": "RAID_KingBahamut_Dragon"
+        },
+        {
+            "name": "Blazamut Ryu (Raid)",
+            "asset": "RAID_KingBahamut_Dragon_2"
+        },
+        {
+            "name": "Blazehowl",
+            "asset": "Manticore"
+        },
+        {
+            "name": "Blazehowl (Boss)",
+            "asset": "BOSS_Manticore"
+        },
+        {
+            "name": "Blazehowl Noct",
+            "asset": "Manticore_Dark"
+        },
+        {
+            "name": "Blazehowl Noct (Boss)",
+            "asset": "BOSS_Manticore_Dark"
+        },
+        {
+            "name": "Blazehowl Noct (Predator)",
+            "asset": "PREDATOR_Manticore_Dark"
+        },
+        {
+            "name": "Blue Slime",
+            "asset": "YakushimaMonster001_Blue"
+        },
+        {
+            "name": "Boltmane",
+            "asset": "ElecLion"
+        },
+        {
+            "name": "Boltmane (Boss)",
+            "asset": "BOSS_ElecLion"
+        },
+        {
+            "name": "Braloha",
+            "asset": "Plesiosaur"
+        },
+        {
+            "name": "Braloha (Boss)",
+            "asset": "BOSS_Plesiosaur"
+        },
+        {
+            "name": "Bristla",
+            "asset": "LittleBriarRose"
+        },
+        {
+            "name": "Bristla (Boss)",
+            "asset": "BOSS_LittleBriarRose"
+        },
+        {
+            "name": "Broncherry",
+            "asset": "SakuraSaurus"
+        },
+        {
+            "name": "Broncherry (Boss)",
+            "asset": "BOSS_SakuraSaurus"
+        },
+        {
+            "name": "Broncherry Aqua",
+            "asset": "SakuraSaurus_Water"
+        },
+        {
+            "name": "Broncherry Aqua (Boss)",
+            "asset": "BOSS_SakuraSaurus_Water"
+        },
+        {
+            "name": "Bushi",
+            "asset": "Ronin"
+        },
+        {
+            "name": "Bushi (Boss)",
+            "asset": "BOSS_Ronin"
+        },
+        {
+            "name": "Bushi Noct",
+            "asset": "Ronin_Dark"
+        },
+        {
+            "name": "Bushi Noct (Boss)",
+            "asset": "BOSS_Ronin_Dark"
+        },
+        {
+            "name": "Bushi Noct (Predator)",
+            "asset": "PREDATOR_Ronin_Dark"
+        },
+        {
+            "name": "CactusDoll",
+            "asset": "CactusDoll"
+        },
+        {
+            "name": "Caprity",
+            "asset": "BerryGoat"
+        },
+        {
+            "name": "Caprity (Boss)",
+            "asset": "BOSS_BerryGoat"
+        },
+        {
+            "name": "Caprity Noct",
+            "asset": "BerryGoat_Dark"
+        },
+        {
+            "name": "Caprity Noct (Boss)",
+            "asset": "BOSS_BerryGoat_Dark"
+        },
+        {
+            "name": "Cattiva",
+            "asset": "PinkCat"
+        },
+        {
+            "name": "Cattiva",
+            "asset": "Quest_Farmer03_PinkCat"
+        },
+        {
+            "name": "Cattiva (Boss)",
+            "asset": "BOSS_PinkCat"
+        },
+        {
+            "name": "Cave Bat",
+            "asset": "YakushimaMonster003"
+        },
+        {
+            "name": "Cawgnito",
+            "asset": "DarkCrow"
+        },
+        {
+            "name": "Cawgnito (Boss)",
+            "asset": "BOSS_DarkCrow"
+        },
+        {
+            "name": "Celaray",
+            "asset": "FlyingManta"
+        },
+        {
+            "name": "Celaray (Boss)",
+            "asset": "BOSS_FlyingManta"
+        },
+        {
+            "name": "Celaray Lux",
+            "asset": "FlyingManta_Thunder"
+        },
+        {
+            "name": "Celesdir",
+            "asset": "WhiteDeer"
+        },
+        {
+            "name": "Celesdir (Boss)",
+            "asset": "BOSS_WhiteDeer"
+        },
+        {
+            "name": "Chikipi",
+            "asset": "ChickenPal"
+        },
+        {
+            "name": "Chikipi (Boss)",
+            "asset": "BOSS_ChickenPal"
+        },
+        {
+            "name": "Chillet",
+            "asset": "WeaselDragon"
+        },
+        {
+            "name": "Chillet (Boss)",
+            "asset": "BOSS_WeaselDragon"
+        },
+        {
+            "name": "Chillet Ignis",
+            "asset": "WeaselDragon_Fire"
+        },
+        {
+            "name": "Chillet Ignis (Boss)",
+            "asset": "BOSS_WeaselDragon_Fire"
+        },
+        {
+            "name": "Cinnamoth",
+            "asset": "CuteButterfly"
+        },
+        {
+            "name": "Cinnamoth (Boss)",
+            "asset": "BOSS_CuteButterfly"
+        },
+        {
+            "name": "CloverFairy",
+            "asset": "CloverFairy"
+        },
+        {
+            "name": "ClownRabbit",
+            "asset": "ClownRabbit"
+        },
+        {
+            "name": "Cremis",
+            "asset": "WoolFox"
+        },
+        {
+            "name": "Cremis (Boss)",
+            "asset": "BOSS_WoolFox"
+        },
+        {
+            "name": "Croajiro",
+            "asset": "KendoFrog"
+        },
+        {
+            "name": "Croajiro (Boss)",
+            "asset": "BOSS_KendoFrog"
+        },
+        {
+            "name": "Croajiro Noct",
+            "asset": "KendoFrog_Dark"
+        },
+        {
+            "name": "Croajiro Noct (Boss)",
+            "asset": "BOSS_KendoFrog_Dark"
+        },
+        {
+            "name": "Cryolinx",
+            "asset": "WhiteTiger"
+        },
+        {
+            "name": "Cryolinx (Boss)",
+            "asset": "BOSS_WhiteTiger"
+        },
+        {
+            "name": "Cryolinx Terra",
+            "asset": "WhiteTiger_Ground"
+        },
+        {
+            "name": "Cryolinx Terra (Boss)",
+            "asset": "BOSS_WhiteTiger_Ground"
+        },
+        {
+            "name": "Cryolinx Terra (Predator)",
+            "asset": "PREDATOR_WhiteTiger_Ground"
+        },
+        {
+            "name": "Daedream",
+            "asset": "DreamDemon"
+        },
+        {
+            "name": "Daedream (Boss)",
+            "asset": "BOSS_DreamDemon"
+        },
+        {
+            "name": "Dazemu",
+            "asset": "FeatherOstrich"
+        },
+        {
+            "name": "Dazemu (Boss)",
+            "asset": "BOSS_FeatherOstrich"
+        },
+        {
+            "name": "Dazemu (Predator)",
+            "asset": "PREDATOR_FeatherOstrich"
+        },
+        {
+            "name": "Dazzi",
+            "asset": "RaijinDaughter"
+        },
+        {
+            "name": "Dazzi (Boss)",
+            "asset": "BOSS_RaijinDaughter"
+        },
+        {
+            "name": "Dazzi Noct",
+            "asset": "RaijinDaughter_Water"
+        },
+        {
+            "name": "Dazzi Noct (Boss)",
+            "asset": "BOSS_RaijinDaughter_Water"
+        },
+        {
+            "name": "Demon Eye",
+            "asset": "YakushimaBoss001_Small"
+        },
+        {
+            "name": "Depresso",
+            "asset": "NegativeKoala"
+        },
+        {
+            "name": "Depresso (Boss)",
+            "asset": "BOSS_NegativeKoala"
+        },
+        {
+            "name": "Digtoise",
+            "asset": "DrillGame"
+        },
+        {
+            "name": "Digtoise (Boss)",
+            "asset": "BOSS_DrillGame"
+        },
+        {
+            "name": "Digtoise (Predator)",
+            "asset": "PREDATOR_DrillGame"
+        },
+        {
+            "name": "Dinossom",
+            "asset": "FlowerDinosaur"
+        },
+        {
+            "name": "Dinossom (Boss)",
+            "asset": "BOSS_FlowerDinosaur"
+        },
+        {
+            "name": "Dinossom (Predator)",
+            "asset": "PREDATOR_FlowerDinosaur"
+        },
+        {
+            "name": "Dinossom Lux",
+            "asset": "FlowerDinosaur_Electric"
+        },
+        {
+            "name": "Dinossom Lux (Boss)",
+            "asset": "BOSS_FlowerDinosaur_Electric"
+        },
+        {
+            "name": "Direhowl",
+            "asset": "Garm"
+        },
+        {
+            "name": "Direhowl (Boss)",
+            "asset": "BOSS_Garm"
+        },
+        {
+            "name": "Direhowl (Predator)",
+            "asset": "PREDATOR_Garm"
+        },
+        {
+            "name": "Dogen",
+            "asset": "SifuDog"
+        },
+        {
+            "name": "Dogen (Boss)",
+            "asset": "BOSS_SifuDog"
+        },
+        {
+            "name": "Dogen (Predator)",
+            "asset": "PREDATOR_SifuDog"
+        },
+        {
+            "name": "Dragostrophe",
+            "asset": "BlackFurDragon"
+        },
+        {
+            "name": "Dragostrophe (Boss)",
+            "asset": "BOSS_BlackFurDragon"
+        },
+        {
+            "name": "Dumud",
+            "asset": "LazyCatfish"
+        },
+        {
+            "name": "Dumud (Boss)",
+            "asset": "BOSS_LazyCatfish"
+        },
+        {
+            "name": "Dumud Gild",
+            "asset": "LazyCatfish_Gold"
+        },
+        {
+            "name": "Eikthyrdeer",
+            "asset": "Deer"
+        },
+        {
+            "name": "Eikthyrdeer (Boss)",
+            "asset": "BOSS_Deer"
+        },
+        {
+            "name": "Eikthyrdeer Terra",
+            "asset": "Deer_Ground"
+        },
+        {
+            "name": "Eikthyrdeer Terra (Boss)",
+            "asset": "BOSS_Deer_Ground"
+        },
+        {
+            "name": "ElecLizard",
+            "asset": "ElecLizard"
+        },
+        {
+            "name": "ElecPomeranian",
+            "asset": "ElecPomeranian"
+        },
+        {
+            "name": "ElecSnail",
+            "asset": "ElecSnail"
+        },
+        {
+            "name": "Elizabee",
+            "asset": "QueenBee"
+        },
+        {
+            "name": "Elizabee (Boss)",
+            "asset": "BOSS_QueenBee"
+        },
+        {
+            "name": "Elphidran",
+            "asset": "FairyDragon"
+        },
+        {
+            "name": "Elphidran (Boss)",
+            "asset": "BOSS_FairyDragon"
+        },
+        {
+            "name": "Elphidran (Predator)",
+            "asset": "PREDATOR_FairyDragon"
+        },
+        {
+            "name": "Elphidran Aqua",
+            "asset": "FairyDragon_Water"
+        },
+        {
+            "name": "Elphidran Aqua (Boss)",
+            "asset": "BOSS_FairyDragon_Water"
+        },
+        {
+            "name": "Enchanted Sword",
+            "asset": "YakushimaMonster002"
+        },
+        {
+            "name": "Eye of Cthulhu",
+            "asset": "YakushimaBoss001"
+        },
+        {
+            "name": "Eye of Cthulhu (Boss)",
+            "asset": "BOSS_YakushimaBoss001"
+        },
+        {
+            "name": "Faleris",
+            "asset": "Horus"
+        },
+        {
+            "name": "Faleris",
+            "asset": "Horus_Oilrig"
+        },
+        {
+            "name": "Faleris (Boss)",
+            "asset": "BOSS_Horus"
+        },
+        {
+            "name": "Faleris (Gym)",
+            "asset": "GYM_Horus"
+        },
+        {
+            "name": "Faleris (Gym)",
+            "asset": "GYM_Horus_2"
+        },
+        {
+            "name": "Faleris Aqua",
+            "asset": "Horus_Water"
+        },
+        {
+            "name": "Faleris Aqua (Boss)",
+            "asset": "BOSS_Horus_Water"
+        },
+        {
+            "name": "Faleris Aqua (Predator)",
+            "asset": "PREDATOR_Horus_Water"
+        },
+        {
+            "name": "Felbat",
+            "asset": "CatVampire"
+        },
+        {
+            "name": "Felbat (Boss)",
+            "asset": "BOSS_CatVampire"
+        },
+        {
+            "name": "Fenglope",
+            "asset": "FengyunDeeper"
+        },
+        {
+            "name": "Fenglope (Boss)",
+            "asset": "BOSS_FengyunDeeper"
+        },
+        {
+            "name": "Fenglope Lux",
+            "asset": "FengyunDeeper_Electric"
+        },
+        {
+            "name": "Fenglope Lux (Boss)",
+            "asset": "BOSS_FengyunDeeper_Electric"
+        },
+        {
+            "name": "Finsider",
+            "asset": "StuffedShark"
+        },
+        {
+            "name": "Finsider (Boss)",
+            "asset": "BOSS_StuffedShark"
+        },
+        {
+            "name": "Finsider Ignis",
+            "asset": "StuffedShark_Fire"
+        },
+        {
+            "name": "Flambelle",
+            "asset": "LavaGirl"
+        },
+        {
+            "name": "Flambelle (Boss)",
+            "asset": "BOSS_LavaGirl"
+        },
+        {
+            "name": "Flopie",
+            "asset": "FlowerRabbit"
+        },
+        {
+            "name": "Flopie (Boss)",
+            "asset": "BOSS_FlowerRabbit"
+        },
+        {
+            "name": "FoxExorcist",
+            "asset": "FoxExorcist"
+        },
+        {
+            "name": "Foxcicle",
+            "asset": "IceFox"
+        },
+        {
+            "name": "Foxcicle (Boss)",
+            "asset": "BOSS_IceFox"
+        },
+        {
+            "name": "Foxparks",
+            "asset": "Kitsunebi"
+        },
+        {
+            "name": "Foxparks (Boss)",
+            "asset": "BOSS_Kitsunebi"
+        },
+        {
+            "name": "Foxparks Cryst",
+            "asset": "Kitsunebi_Ice"
+        },
+        {
+            "name": "Foxparks Cryst (Boss)",
+            "asset": "BOSS_Kitsunebi_Ice"
+        },
+        {
+            "name": "Frostallion",
+            "asset": "IceHorse"
+        },
+        {
+            "name": "Frostallion (Boss)",
+            "asset": "BOSS_IceHorse"
+        },
+        {
+            "name": "Frostallion Noct",
+            "asset": "IceHorse_Dark"
+        },
+        {
+            "name": "Frostallion Noct (Boss)",
+            "asset": "BOSS_IceHorse_Dark"
+        },
+        {
+            "name": "Frostplume",
+            "asset": "SnowPeafowl"
+        },
+        {
+            "name": "Frostplume (Boss)",
+            "asset": "BOSS_SnowPeafowl"
+        },
+        {
+            "name": "Fuack",
+            "asset": "BluePlatypus"
+        },
+        {
+            "name": "Fuack (Boss)",
+            "asset": "BOSS_BluePlatypus"
+        },
+        {
+            "name": "Fuack Ignis",
+            "asset": "BluePlatypus_Fire"
+        },
+        {
+            "name": "Fuddler",
+            "asset": "CuteMole"
+        },
+        {
+            "name": "Fuddler (Boss)",
+            "asset": "BOSS_CuteMole"
+        },
+        {
+            "name": "Galeclaw",
+            "asset": "Eagle"
+        },
+        {
+            "name": "Galeclaw (Boss)",
+            "asset": "BOSS_Eagle"
+        },
+        {
+            "name": "Ghangler",
+            "asset": "GhostAnglerfish"
+        },
+        {
+            "name": "Ghangler (Boss)",
+            "asset": "BOSS_GhostAnglerfish"
+        },
+        {
+            "name": "Ghangler Ignis",
+            "asset": "GhostAnglerfish_Fire"
+        },
+        {
+            "name": "GhostBlackCat",
+            "asset": "GhostBlackCat"
+        },
+        {
+            "name": "Gildane",
+            "asset": "GoldenHorse"
+        },
+        {
+            "name": "Gildane (Boss)",
+            "asset": "BOSS_GoldenHorse"
+        },
+        {
+            "name": "Gildane (Predator)",
+            "asset": "PREDATOR_GoldenHorse"
+        },
+        {
+            "name": "Gloopie",
+            "asset": "OctopusGirl"
+        },
+        {
+            "name": "Gloopie (Boss)",
+            "asset": "BOSS_OctopusGirl"
+        },
+        {
+            "name": "Gobfin",
+            "asset": "SharkKid"
+        },
+        {
+            "name": "Gobfin (Boss)",
+            "asset": "BOSS_SharkKid"
+        },
+        {
+            "name": "Gobfin Ignis",
+            "asset": "SharkKid_Fire"
+        },
+        {
+            "name": "Gobfin Ignis (Boss)",
+            "asset": "BOSS_SharkKid_Fire"
+        },
+        {
+            "name": "Gorirat",
+            "asset": "Gorilla"
+        },
+        {
+            "name": "Gorirat (Boss)",
+            "asset": "BOSS_Gorilla"
+        },
+        {
+            "name": "Gorirat (Predator)",
+            "asset": "PREDATOR_Gorilla"
+        },
+        {
+            "name": "Gorirat Terra",
+            "asset": "Gorilla_Ground"
+        },
+        {
+            "name": "Gorirat Terra (Boss)",
+            "asset": "BOSS_Gorilla_Ground"
+        },
+        {
+            "name": "GrassGolem",
+            "asset": "GrassGolem"
+        },
+        {
+            "name": "Green Slime",
+            "asset": "YakushimaMonster001"
+        },
+        {
+            "name": "Grintale",
+            "asset": "NaughtyCat"
+        },
+        {
+            "name": "Grintale (Boss)",
+            "asset": "BOSS_NaughtyCat"
+        },
+        {
+            "name": "Grizzbolt",
+            "asset": "ElecPanda"
+        },
+        {
+            "name": "Grizzbolt (Boss)",
+            "asset": "BOSS_ElecPanda"
+        },
+        {
+            "name": "Grizzbolt (Gym)",
+            "asset": "GYM_ElecPanda"
+        },
+        {
+            "name": "Grizzbolt (Gym)",
+            "asset": "GYM_ElecPanda_2"
+        },
+        {
+            "name": "Grizzbolt (Gym)",
+            "asset": "GYM_ElecPanda_Otomo"
+        },
+        {
+            "name": "Gumoss",
+            "asset": "PlantSlime"
+        },
+        {
+            "name": "Gumoss",
+            "asset": "PlantSlime_Flower"
+        },
+        {
+            "name": "Gumoss (Boss)",
+            "asset": "BOSS_PlantSlime"
+        },
+        {
+            "name": "Gumoss (Boss)",
+            "asset": "BOSS_PlantSlime_Flower"
+        },
+        {
+            "name": "Hangyu",
+            "asset": "WindChimes"
+        },
+        {
+            "name": "Hangyu (Boss)",
+            "asset": "BOSS_WindChimes"
+        },
+        {
+            "name": "Hangyu Cryst",
+            "asset": "WindChimes_Ice"
+        },
+        {
+            "name": "Hangyu Cryst (Boss)",
+            "asset": "BOSS_WindChimes_Ice"
+        },
+        {
+            "name": "Helzephyr",
+            "asset": "HadesBird"
+        },
+        {
+            "name": "Helzephyr",
+            "asset": "HadesBird_Oilrig"
+        },
+        {
+            "name": "Helzephyr (Boss)",
+            "asset": "BOSS_HadesBird"
+        },
+        {
+            "name": "Helzephyr Lux",
+            "asset": "HadesBird_Electric"
+        },
+        {
+            "name": "Helzephyr Lux (Boss)",
+            "asset": "BOSS_HadesBird_Electric"
+        },
+        {
+            "name": "Helzephyr Lux (Predator)",
+            "asset": "PREDATOR_HadesBird_Electric"
+        },
+        {
+            "name": "Herbil",
+            "asset": "LeafMomonga"
+        },
+        {
+            "name": "Herbil (Boss)",
+            "asset": "BOSS_LeafMomonga"
+        },
+        {
+            "name": "Hoocrates",
+            "asset": "WizardOwl"
+        },
+        {
+            "name": "Hoocrates (Boss)",
+            "asset": "BOSS_WizardOwl"
+        },
+        {
+            "name": "HoodGhost",
+            "asset": "HoodGhost"
+        },
+        {
+            "name": "Icelyn",
+            "asset": "IceWitch"
+        },
+        {
+            "name": "Icelyn (Boss)",
+            "asset": "BOSS_IceWitch"
+        },
+        {
+            "name": "Illuminant Bat",
+            "asset": "YakushimaMonster003_Purple"
+        },
+        {
+            "name": "Illuminant Slime",
+            "asset": "YakushimaMonster001_Pink"
+        },
+        {
+            "name": "Incineram",
+            "asset": "Baphomet"
+        },
+        {
+            "name": "Incineram (Boss)",
+            "asset": "BOSS_Baphomet"
+        },
+        {
+            "name": "Incineram Noct",
+            "asset": "Baphomet_Dark"
+        },
+        {
+            "name": "Incineram Noct",
+            "asset": "Baphomet_Dark_Oilrig"
+        },
+        {
+            "name": "Incineram Noct (Boss)",
+            "asset": "BOSS_Baphomet_Dark"
+        },
+        {
+            "name": "Incineram Noct (Predator)",
+            "asset": "PREDATOR_Baphomet_Dark"
+        },
+        {
+            "name": "Jelliette",
+            "asset": "JellyfishFairy"
+        },
+        {
+            "name": "Jelliette (Boss)",
+            "asset": "BOSS_JellyfishFairy"
+        },
+        {
+            "name": "Jellroy",
+            "asset": "JellyfishGhost"
+        },
+        {
+            "name": "Jellroy (Boss)",
+            "asset": "BOSS_JellyfishGhost"
+        },
+        {
+            "name": "Jetragon",
+            "asset": "JetDragon"
+        },
+        {
+            "name": "Jetragon (Boss)",
+            "asset": "BOSS_JetDragon"
+        },
+        {
+            "name": "Jolthog",
+            "asset": "Hedgehog"
+        },
+        {
+            "name": "Jolthog (Boss)",
+            "asset": "BOSS_Hedgehog"
+        },
+        {
+            "name": "Jolthog Cryst",
+            "asset": "Hedgehog_Ice"
+        },
+        {
+            "name": "Jolthog Cryst (Boss)",
+            "asset": "BOSS_Hedgehog_Ice"
+        },
+        {
+            "name": "Jormuntide",
+            "asset": "Umihebi"
+        },
+        {
+            "name": "Jormuntide (Boss)",
+            "asset": "BOSS_Umihebi"
+        },
+        {
+            "name": "Jormuntide Ignis",
+            "asset": "Umihebi_Fire"
+        },
+        {
+            "name": "Jormuntide Ignis (Boss)",
+            "asset": "BOSS_Umihebi_Fire"
+        },
+        {
+            "name": "Jormuntide Ignis (Predator)",
+            "asset": "PREDATOR_Umihebi_Fire"
+        },
+        {
+            "name": "Katress",
+            "asset": "CatMage"
+        },
+        {
+            "name": "Katress (Boss)",
+            "asset": "BOSS_CatMage"
+        },
+        {
+            "name": "Katress Ignis",
+            "asset": "CatMage_Fire"
+        },
+        {
+            "name": "Katress Ignis (Boss)",
+            "asset": "BOSS_CatMage_Fire"
+        },
+        {
+            "name": "Kelpsea",
+            "asset": "Kelpie"
+        },
+        {
+            "name": "Kelpsea (Boss)",
+            "asset": "BOSS_Kelpie"
+        },
+        {
+            "name": "Kelpsea Ignis",
+            "asset": "Kelpie_Fire"
+        },
+        {
+            "name": "Kelpsea Ignis (Boss)",
+            "asset": "BOSS_Kelpie_Fire"
+        },
+        {
+            "name": "Kikit",
+            "asset": "SmallArmadillo"
+        },
+        {
+            "name": "Kikit (Boss)",
+            "asset": "BOSS_SmallArmadillo"
+        },
+        {
+            "name": "Killamari",
+            "asset": "NegativeOctopus"
+        },
+        {
+            "name": "Killamari (Boss)",
+            "asset": "BOSS_NegativeOctopus"
+        },
+        {
+            "name": "Killamari Primo",
+            "asset": "NegativeOctopus_Neutral"
+        },
+        {
+            "name": "KingCrab",
+            "asset": "KingCrab"
+        },
+        {
+            "name": "KingSunfish",
+            "asset": "KingSunfish"
+        },
+        {
+            "name": "KingWhale",
+            "asset": "KingWhale"
+        },
+        {
+            "name": "Kingpaca",
+            "asset": "KingAlpaca"
+        },
+        {
+            "name": "Kingpaca (Boss)",
+            "asset": "BOSS_KingAlpaca"
+        },
+        {
+            "name": "Kingpaca Cryst",
+            "asset": "KingAlpaca_Ice"
+        },
+        {
+            "name": "Kingpaca Cryst (Boss)",
+            "asset": "BOSS_KingAlpaca_Ice"
+        },
+        {
+            "name": "Kitsun",
+            "asset": "AmaterasuWolf"
+        },
+        {
+            "name": "Kitsun (Boss)",
+            "asset": "BOSS_AmaterasuWolf"
+        },
+        {
+            "name": "Kitsun (Predator)",
+            "asset": "PREDATOR_AmaterasuWolf"
+        },
+        {
+            "name": "Kitsun Noct",
+            "asset": "AmaterasuWolf_Dark"
+        },
+        {
+            "name": "Kitsun Noct (Boss)",
+            "asset": "BOSS_AmaterasuWolf_Dark"
+        },
+        {
+            "name": "Knocklem",
+            "asset": "WingGolem"
+        },
+        {
+            "name": "Knocklem",
+            "asset": "WingGolem_Oilrig"
+        },
+        {
+            "name": "Knocklem (Boss)",
+            "asset": "BOSS_WingGolem"
+        },
+        {
+            "name": "Lamball",
+            "asset": "SheepBall"
+        },
+        {
+            "name": "Lamball",
+            "asset": "Quest_Farmer03_SheepBall"
+        },
+        {
+            "name": "Lamball (Boss)",
+            "asset": "BOSS_SheepBall"
+        },
+        {
+            "name": "LanternButler",
+            "asset": "LanternButler"
+        },
+        {
+            "name": "Leezpunk",
+            "asset": "LizardMan"
+        },
+        {
+            "name": "Leezpunk",
+            "asset": "LizardMan_Oilrig"
+        },
+        {
+            "name": "Leezpunk (Boss)",
+            "asset": "BOSS_LizardMan"
+        },
+        {
+            "name": "Leezpunk Ignis",
+            "asset": "LizardMan_Fire"
+        },
+        {
+            "name": "Leezpunk Ignis (Boss)",
+            "asset": "BOSS_LizardMan_Fire"
+        },
+        {
+            "name": "Legendir",
+            "asset": "LegendDeer"
+        },
+        {
+            "name": "Legendir (Boss)",
+            "asset": "BOSS_LegendDeer"
+        },
+        {
+            "name": "Lifmunk",
+            "asset": "Carbunclo"
+        },
+        {
+            "name": "Lifmunk (Boss)",
+            "asset": "BOSS_Carbunclo"
+        },
+        {
+            "name": "LongCat",
+            "asset": "LongCat"
+        },
+        {
+            "name": "Loupmoon",
+            "asset": "Werewolf"
+        },
+        {
+            "name": "Loupmoon (Boss)",
+            "asset": "BOSS_Werewolf"
+        },
+        {
+            "name": "Loupmoon Cryst",
+            "asset": "Werewolf_Ice"
+        },
+        {
+            "name": "Loupmoon Cryst (Boss)",
+            "asset": "BOSS_Werewolf_Ice"
+        },
+        {
+            "name": "Loupmoon Cryst (Predator)",
+            "asset": "PREDATOR_Werewolf_Ice"
+        },
+        {
+            "name": "Lovander",
+            "asset": "PinkLizard"
+        },
+        {
+            "name": "Lovander (Boss)",
+            "asset": "BOSS_PinkLizard"
+        },
+        {
+            "name": "Lovander (Predator)",
+            "asset": "PREDATOR_PinkLizard"
+        },
+        {
+            "name": "Lullu",
+            "asset": "LeafPrincess"
+        },
+        {
+            "name": "Lullu (Boss)",
+            "asset": "BOSS_LeafPrincess"
+        },
+        {
+            "name": "Lunaris",
+            "asset": "Mutant"
+        },
+        {
+            "name": "Lunaris (Boss)",
+            "asset": "BOSS_Mutant"
+        },
+        {
+            "name": "Lyleen",
+            "asset": "LilyQueen"
+        },
+        {
+            "name": "Lyleen (Boss)",
+            "asset": "BOSS_LilyQueen"
+        },
+        {
+            "name": "Lyleen (Gym)",
+            "asset": "GYM_LilyQueen"
+        },
+        {
+            "name": "Lyleen (Gym)",
+            "asset": "GYM_LilyQueen_2"
+        },
+        {
+            "name": "Lyleen Noct",
+            "asset": "LilyQueen_Dark"
+        },
+        {
+            "name": "Lyleen Noct (Boss)",
+            "asset": "BOSS_LilyQueen_Dark"
+        },
+        {
+            "name": "Mammorest",
+            "asset": "GrassMammoth"
+        },
+        {
+            "name": "Mammorest (Boss)",
+            "asset": "BOSS_GrassMammoth"
+        },
+        {
+            "name": "Mammorest Cryst",
+            "asset": "GrassMammoth_Ice"
+        },
+        {
+            "name": "Mammorest Cryst (Boss)",
+            "asset": "BOSS_GrassMammoth_Ice"
+        },
+        {
+            "name": "Maraith",
+            "asset": "GhostBeast"
+        },
+        {
+            "name": "Maraith (Boss)",
+            "asset": "BOSS_GhostBeast"
+        },
+        {
+            "name": "Maraith (Predator)",
+            "asset": "PREDATOR_GhostBeast"
+        },
+        {
+            "name": "Mau",
+            "asset": "Bastet"
+        },
+        {
+            "name": "Mau (Boss)",
+            "asset": "BOSS_Bastet"
+        },
+        {
+            "name": "Mau Cryst",
+            "asset": "Bastet_Ice"
+        },
+        {
+            "name": "Mau Cryst (Boss)",
+            "asset": "BOSS_Bastet_Ice"
+        },
+        {
+            "name": "Melpaca",
+            "asset": "Alpaca"
+        },
+        {
+            "name": "Melpaca (Boss)",
+            "asset": "BOSS_Alpaca"
+        },
+        {
+            "name": "Menasting",
+            "asset": "DarkScorpion"
+        },
+        {
+            "name": "Menasting (Boss)",
+            "asset": "BOSS_DarkScorpion"
+        },
+        {
+            "name": "Menasting Terra",
+            "asset": "DarkScorpion_Ground"
+        },
+        {
+            "name": "Menasting Terra (Boss)",
+            "asset": "BOSS_DarkScorpion_Ground"
+        },
+        {
+            "name": "Mimog",
+            "asset": "MimicDog"
+        },
+        {
+            "name": "Mimog (Boss)",
+            "asset": "BOSS_MimicDog"
+        },
+        {
+            "name": "MonochromeQueen",
+            "asset": "MonochromeQueen"
+        },
+        {
+            "name": "Moon Lord (Raid)",
+            "asset": "RAID_YakushimaBoss002"
+        },
+        {
+            "name": "MoonChild",
+            "asset": "MoonChild"
+        },
+        {
+            "name": "Mossanda",
+            "asset": "GrassPanda"
+        },
+        {
+            "name": "Mossanda (Boss)",
+            "asset": "BOSS_GrassPanda"
+        },
+        {
+            "name": "Mossanda (Predator)",
+            "asset": "PREDATOR_GrassPanda"
+        },
+        {
+            "name": "Mossanda Lux",
+            "asset": "GrassPanda_Electric"
+        },
+        {
+            "name": "Mossanda Lux (Boss)",
+            "asset": "BOSS_GrassPanda_Electric"
+        },
+        {
+            "name": "Mozzarina",
+            "asset": "CowPal"
+        },
+        {
+            "name": "Mozzarina (Boss)",
+            "asset": "BOSS_CowPal"
+        },
+        {
+            "name": "MummyPal",
+            "asset": "MummyPal"
+        },
+        {
+            "name": "Munchill",
+            "asset": "IceCrocodile"
+        },
+        {
+            "name": "Munchill (Boss)",
+            "asset": "BOSS_IceCrocodile"
+        },
+        {
+            "name": "MushroomLady",
+            "asset": "MushroomLady"
+        },
+        {
+            "name": "Necromus",
+            "asset": "BlackCentaur"
+        },
+        {
+            "name": "Necromus (Boss)",
+            "asset": "BOSS_BlackCentaur"
+        },
+        {
+            "name": "Neptilius",
+            "asset": "PoseidonOrca"
+        },
+        {
+            "name": "Neptilius (Boss)",
+            "asset": "BOSS_PoseidonOrca"
+        },
+        {
+            "name": "Nitemary",
+            "asset": "GhostRabbit"
+        },
+        {
+            "name": "Nitemary (Boss)",
+            "asset": "BOSS_GhostRabbit"
+        },
+        {
+            "name": "Nitewing",
+            "asset": "HawkBird"
+        },
+        {
+            "name": "Nitewing (Boss)",
+            "asset": "BOSS_HawkBird"
+        },
+        {
+            "name": "Nox",
+            "asset": "NightFox"
+        },
+        {
+            "name": "Nox (Boss)",
+            "asset": "BOSS_NightFox"
+        },
+        {
+            "name": "Nyafia",
+            "asset": "BadCatgirl"
+        },
+        {
+            "name": "Nyafia (Boss)",
+            "asset": "BOSS_BadCatgirl"
+        },
+        {
+            "name": "Omascul",
+            "asset": "MysteryMask"
+        },
+        {
+            "name": "Omascul (Boss)",
+            "asset": "BOSS_MysteryMask"
+        },
+        {
+            "name": "Omascul (Predator)",
+            "asset": "PREDATOR_MysteryMask"
+        },
+        {
+            "name": "OniGhostGirl",
+            "asset": "OniGhostGirl"
+        },
+        {
+            "name": "Orserk",
+            "asset": "ThunderDragonMan"
+        },
+        {
+            "name": "Orserk (Boss)",
+            "asset": "BOSS_ThunderDragonMan"
+        },
+        {
+            "name": "Orserk (Gym)",
+            "asset": "GYM_ThunderDragonMan"
+        },
+        {
+            "name": "Orserk (Gym)",
+            "asset": "GYM_ThunderDragonMan_2"
+        },
+        {
+            "name": "Paladius",
+            "asset": "SaintCentaur"
+        },
+        {
+            "name": "Paladius (Boss)",
+            "asset": "BOSS_SaintCentaur"
+        },
+        {
+            "name": "Palumba",
+            "asset": "TropicalOstrich"
+        },
+        {
+            "name": "Palumba (Boss)",
+            "asset": "BOSS_TropicalOstrich"
+        },
+        {
+            "name": "Pengullet",
+            "asset": "Penguin"
+        },
+        {
+            "name": "Pengullet (Boss)",
+            "asset": "BOSS_Penguin"
+        },
+        {
+            "name": "Pengullet Lux",
+            "asset": "Penguin_Electric"
+        },
+        {
+            "name": "Penking",
+            "asset": "CaptainPenguin"
+        },
+        {
+            "name": "Penking (Boss)",
+            "asset": "BOSS_CaptainPenguin"
+        },
+        {
+            "name": "Penking Lux",
+            "asset": "CaptainPenguin_Black"
+        },
+        {
+            "name": "Petallia",
+            "asset": "FlowerDoll"
+        },
+        {
+            "name": "Petallia (Boss)",
+            "asset": "BOSS_FlowerDoll"
+        },
+        {
+            "name": "Polapup",
+            "asset": "IceSeal"
+        },
+        {
+            "name": "Polapup (Boss)",
+            "asset": "BOSS_IceSeal"
+        },
+        {
+            "name": "Prixter",
+            "asset": "ScorpionMan"
+        },
+        {
+            "name": "Prixter (Boss)",
+            "asset": "BOSS_ScorpionMan"
+        },
+        {
+            "name": "Prixter (Predator)",
+            "asset": "PREDATOR_ScorpionMan"
+        },
+        {
+            "name": "Prunelia",
+            "asset": "BlueberryFairy"
+        },
+        {
+            "name": "Prunelia (Boss)",
+            "asset": "BOSS_BlueberryFairy"
+        },
+        {
+            "name": "Purple Slime",
+            "asset": "YakushimaMonster001_Purple"
+        },
+        {
+            "name": "PyramidTurtle",
+            "asset": "PyramidTurtle"
+        },
+        {
+            "name": "Pyrin",
+            "asset": "FireKirin"
+        },
+        {
+            "name": "Pyrin (Boss)",
+            "asset": "BOSS_FireKirin"
+        },
+        {
+            "name": "Pyrin Noct",
+            "asset": "FireKirin_Dark"
+        },
+        {
+            "name": "Pyrin Noct (Boss)",
+            "asset": "BOSS_FireKirin_Dark"
+        },
+        {
+            "name": "Quivern",
+            "asset": "SkyDragon"
+        },
+        {
+            "name": "Quivern (Boss)",
+            "asset": "BOSS_SkyDragon"
+        },
+        {
+            "name": "Quivern Botan",
+            "asset": "SkyDragon_Grass"
+        },
+        {
+            "name": "Quivern Botan (Boss)",
+            "asset": "BOSS_SkyDragon_Grass"
+        },
+        {
+            "name": "RAID_YakushimaBoss001_Green_2 (Raid)",
+            "asset": "RAID_YakushimaBoss001_Green_2"
+        },
+        {
+            "name": "RAID_YakushimaBoss002_2 (Raid)",
+            "asset": "RAID_YakushimaBoss002_2"
+        },
+        {
+            "name": "RAID_YakushimaBoss002_Hand_Left (Raid)",
+            "asset": "RAID_YakushimaBoss002_Hand_Left"
+        },
+        {
+            "name": "RAID_YakushimaBoss002_Hand_Left_2 (Raid)",
+            "asset": "RAID_YakushimaBoss002_Hand_Left_2"
+        },
+        {
+            "name": "RAID_YakushimaBoss002_Hand_Right (Raid)",
+            "asset": "RAID_YakushimaBoss002_Hand_Right"
+        },
+        {
+            "name": "RAID_YakushimaBoss002_Hand_Right_2 (Raid)",
+            "asset": "RAID_YakushimaBoss002_Hand_Right_2"
+        },
+        {
+            "name": "RAID_YakushimaBoss002_Head (Raid)",
+            "asset": "RAID_YakushimaBoss002_Head"
+        },
+        {
+            "name": "RAID_YakushimaBoss002_Head_2 (Raid)",
+            "asset": "RAID_YakushimaBoss002_Head_2"
+        },
+        {
+            "name": "Ragnahawk",
+            "asset": "RedArmorBird"
+        },
+        {
+            "name": "Ragnahawk (Boss)",
+            "asset": "BOSS_RedArmorBird"
+        },
+        {
+            "name": "Ragnahawk (Predator)",
+            "asset": "PREDATOR_RedArmorBird"
+        },
+        {
+            "name": "Rainbow Slime",
+            "asset": "YakushimaMonster001_Rainbow"
+        },
+        {
+            "name": "Rayhound",
+            "asset": "ThunderDog"
+        },
+        {
+            "name": "Rayhound (Boss)",
+            "asset": "BOSS_ThunderDog"
+        },
+        {
+            "name": "Rayhound (Predator)",
+            "asset": "PREDATOR_ThunderDog"
+        },
+        {
+            "name": "Red Slime",
+            "asset": "YakushimaMonster001_Red"
+        },
+        {
+            "name": "Reindrix",
+            "asset": "IceDeer"
+        },
+        {
+            "name": "Reindrix (Boss)",
+            "asset": "BOSS_IceDeer"
+        },
+        {
+            "name": "Relaxaurus",
+            "asset": "LazyDragon"
+        },
+        {
+            "name": "Relaxaurus (Boss)",
+            "asset": "BOSS_LazyDragon"
+        },
+        {
+            "name": "Relaxaurus (Predator)",
+            "asset": "PREDATOR_LazyDragon"
+        },
+        {
+            "name": "Relaxaurus Lux",
+            "asset": "LazyDragon_Electric"
+        },
+        {
+            "name": "Relaxaurus Lux (Boss)",
+            "asset": "BOSS_LazyDragon_Electric"
+        },
+        {
+            "name": "Reptyro",
+            "asset": "VolcanicMonster"
+        },
+        {
+            "name": "Reptyro (Boss)",
+            "asset": "BOSS_VolcanicMonster"
+        },
+        {
+            "name": "Reptyro Cryst",
+            "asset": "VolcanicMonster_Ice"
+        },
+        {
+            "name": "Reptyro Cryst (Boss)",
+            "asset": "BOSS_VolcanicMonster_Ice"
+        },
+        {
+            "name": "Reptyro Cryst (Predator)",
+            "asset": "PREDATOR_VolcanicMonster_Ice"
+        },
+        {
+            "name": "Ribbuny",
+            "asset": "PinkRabbit"
+        },
+        {
+            "name": "Ribbuny (Boss)",
+            "asset": "BOSS_PinkRabbit"
+        },
+        {
+            "name": "Ribbuny Botan",
+            "asset": "PinkRabbit_Grass"
+        },
+        {
+            "name": "Ribbuny Botan (Boss)",
+            "asset": "BOSS_PinkRabbit_Grass"
+        },
+        {
+            "name": "Robinquill",
+            "asset": "RobinHood"
+        },
+        {
+            "name": "Robinquill (Boss)",
+            "asset": "BOSS_RobinHood"
+        },
+        {
+            "name": "Robinquill Terra",
+            "asset": "RobinHood_Ground"
+        },
+        {
+            "name": "Robinquill Terra (Boss)",
+            "asset": "BOSS_RobinHood_Ground"
+        },
+        {
+            "name": "RockBeast",
+            "asset": "RockBeast"
+        },
+        {
+            "name": "Rooby",
+            "asset": "FlameBambi"
+        },
+        {
+            "name": "Rooby (Boss)",
+            "asset": "BOSS_FlameBambi"
+        },
+        {
+            "name": "Rushoar",
+            "asset": "Boar"
+        },
+        {
+            "name": "Rushoar (Boss)",
+            "asset": "BOSS_Boar"
+        },
+        {
+            "name": "SamuraiDog",
+            "asset": "SamuraiDog"
+        },
+        {
+            "name": "Sekhmet",
+            "asset": "Sekhmet"
+        },
+        {
+            "name": "Selyne",
+            "asset": "MoonQueen"
+        },
+        {
+            "name": "Selyne (Boss)",
+            "asset": "BOSS_MoonQueen"
+        },
+        {
+            "name": "Selyne (Gym)",
+            "asset": "GYM_MoonQueen"
+        },
+        {
+            "name": "Selyne (Gym)",
+            "asset": "GYM_MoonQueen_2"
+        },
+        {
+            "name": "Selyne (Gym)",
+            "asset": "GYM_MoonQueen_2_Servant"
+        },
+        {
+            "name": "Shadowbeak",
+            "asset": "BlackGriffon"
+        },
+        {
+            "name": "Shadowbeak (Boss)",
+            "asset": "BOSS_BlackGriffon"
+        },
+        {
+            "name": "Shadowbeak (Gym)",
+            "asset": "GYM_BlackGriffon"
+        },
+        {
+            "name": "Shadowbeak (Gym)",
+            "asset": "GYM_BlackGriffon_2"
+        },
+        {
+            "name": "Shadowbeak (Gym)",
+            "asset": "GYM_BlackGriffon_2_Avatar"
+        },
+        {
+            "name": "Shroomer",
+            "asset": "MushroomDragon"
+        },
+        {
+            "name": "Shroomer (Boss)",
+            "asset": "BOSS_MushroomDragon"
+        },
+        {
+            "name": "Shroomer (Predator)",
+            "asset": "PREDATOR_MushroomDragon"
+        },
+        {
+            "name": "Shroomer Noct",
+            "asset": "MushroomDragon_Dark"
+        },
+        {
+            "name": "Shroomer Noct (Boss)",
+            "asset": "BOSS_MushroomDragon_Dark"
+        },
+        {
+            "name": "Sibelyx",
+            "asset": "WhiteMoth"
+        },
+        {
+            "name": "Sibelyx (Boss)",
+            "asset": "BOSS_WhiteMoth"
+        },
+        {
+            "name": "Silvegis",
+            "asset": "WhiteShieldDragon"
+        },
+        {
+            "name": "Silvegis (Boss)",
+            "asset": "BOSS_WhiteShieldDragon"
+        },
+        {
+            "name": "SmallYeti",
+            "asset": "SmallYeti"
+        },
+        {
+            "name": "Smokie",
+            "asset": "BlackPuppy"
+        },
+        {
+            "name": "Smokie (Boss)",
+            "asset": "BOSS_BlackPuppy"
+        },
+        {
+            "name": "SnakeGirl",
+            "asset": "SnakeGirl"
+        },
+        {
+            "name": "Sootseer",
+            "asset": "CandleGhost"
+        },
+        {
+            "name": "Sootseer (Boss)",
+            "asset": "BOSS_CandleGhost"
+        },
+        {
+            "name": "Sootseer (Predator)",
+            "asset": "PREDATOR_CandleGhost"
+        },
+        {
+            "name": "Sparkit",
+            "asset": "ElecCat"
+        },
+        {
+            "name": "Sparkit (Boss)",
+            "asset": "BOSS_ElecCat"
+        },
+        {
+            "name": "Splatterina",
+            "asset": "GrimGirl"
+        },
+        {
+            "name": "Splatterina (Boss)",
+            "asset": "BOSS_GrimGirl"
+        },
+        {
+            "name": "Splatterina (Predator)",
+            "asset": "PREDATOR_GrimGirl"
+        },
+        {
+            "name": "Starryon",
+            "asset": "NightBlueHorse"
+        },
+        {
+            "name": "Starryon (Boss)",
+            "asset": "BOSS_NightBlueHorse"
+        },
+        {
+            "name": "Starryon (Predator)",
+            "asset": "PREDATOR_NightBlueHorse"
+        },
+        {
+            "name": "SumoDog",
+            "asset": "SumoDog"
+        },
+        {
+            "name": "Surfent",
+            "asset": "Serpent"
+        },
+        {
+            "name": "Surfent (Boss)",
+            "asset": "BOSS_Serpent"
+        },
+        {
+            "name": "Surfent Terra",
+            "asset": "Serpent_Ground"
+        },
+        {
+            "name": "Surfent Terra (Boss)",
+            "asset": "BOSS_Serpent_Ground"
+        },
+        {
+            "name": "Suzaku",
+            "asset": "Suzaku"
+        },
+        {
+            "name": "Suzaku (Boss)",
+            "asset": "BOSS_Suzaku"
+        },
+        {
+            "name": "Suzaku Aqua",
+            "asset": "Suzaku_Water"
+        },
+        {
+            "name": "Suzaku Aqua (Boss)",
+            "asset": "BOSS_Suzaku_Water"
+        },
+        {
+            "name": "Swee",
+            "asset": "MopBaby"
+        },
+        {
+            "name": "Swee (Boss)",
+            "asset": "BOSS_MopBaby"
+        },
+        {
+            "name": "Sweepa",
+            "asset": "MopKing"
+        },
+        {
+            "name": "Sweepa (Boss)",
+            "asset": "BOSS_MopKing"
+        },
+        {
+            "name": "SwordCutlassfish",
+            "asset": "SwordCutlassfish"
+        },
+        {
+            "name": "Tanzee",
+            "asset": "Monkey"
+        },
+        {
+            "name": "Tanzee (Boss)",
+            "asset": "BOSS_Monkey"
+        },
+        {
+            "name": "Tarantriss",
+            "asset": "PurpleSpider"
+        },
+        {
+            "name": "Tarantriss (Boss)",
+            "asset": "BOSS_PurpleSpider"
+        },
+        {
+            "name": "Tarantriss (Predator)",
+            "asset": "PREDATOR_PurpleSpider"
+        },
+        {
+            "name": "Teafant",
+            "asset": "Ganesha"
+        },
+        {
+            "name": "Teafant (Boss)",
+            "asset": "BOSS_Ganesha"
+        },
+        {
+            "name": "ThiefBird",
+            "asset": "ThiefBird"
+        },
+        {
+            "name": "ThunderFluffyBird",
+            "asset": "ThunderFluffyBird"
+        },
+        {
+            "name": "Tocotoco",
+            "asset": "ColorfulBird"
+        },
+        {
+            "name": "Tocotoco (Boss)",
+            "asset": "BOSS_ColorfulBird"
+        },
+        {
+            "name": "Tombat",
+            "asset": "CatBat"
+        },
+        {
+            "name": "Tombat (Boss)",
+            "asset": "BOSS_CatBat"
+        },
+        {
+            "name": "True Eye of Cthulhu (Raid)",
+            "asset": "RAID_YakushimaBoss001_Green"
+        },
+        {
+            "name": "Turtacle",
+            "asset": "TentacleTurtle"
+        },
+        {
+            "name": "Turtacle (Boss)",
+            "asset": "BOSS_TentacleTurtle"
+        },
+        {
+            "name": "Turtacle Terra",
+            "asset": "TentacleTurtle_Ground"
+        },
+        {
+            "name": "Univolt",
+            "asset": "Kirin"
+        },
+        {
+            "name": "Univolt (Boss)",
+            "asset": "BOSS_Kirin"
+        },
+        {
+            "name": "Vaelet",
+            "asset": "VioletFairy"
+        },
+        {
+            "name": "Vaelet (Boss)",
+            "asset": "BOSS_VioletFairy"
+        },
+        {
+            "name": "Vanwyrm",
+            "asset": "BirdDragon"
+        },
+        {
+            "name": "Vanwyrm (Boss)",
+            "asset": "BOSS_BirdDragon"
+        },
+        {
+            "name": "Vanwyrm (Predator)",
+            "asset": "PREDATOR_BirdDragon"
+        },
+        {
+            "name": "Vanwyrm Cryst",
+            "asset": "BirdDragon_Ice"
+        },
+        {
+            "name": "Vanwyrm Cryst (Boss)",
+            "asset": "BOSS_BirdDragon_Ice"
+        },
+        {
+            "name": "VenusFlytrap",
+            "asset": "VenusFlytrap"
+        },
+        {
+            "name": "Verdash",
+            "asset": "GrassRabbitMan"
+        },
+        {
+            "name": "Verdash (Boss)",
+            "asset": "BOSS_GrassRabbitMan"
+        },
+        {
+            "name": "Vixy",
+            "asset": "CuteFox"
+        },
+        {
+            "name": "Vixy (Boss)",
+            "asset": "BOSS_CuteFox"
+        },
+        {
+            "name": "Warsect",
+            "asset": "HerculesBeetle"
+        },
+        {
+            "name": "Warsect (Boss)",
+            "asset": "BOSS_HerculesBeetle"
+        },
+        {
+            "name": "Warsect Terra",
+            "asset": "HerculesBeetle_Ground"
+        },
+        {
+            "name": "Warsect Terra (Boss)",
+            "asset": "BOSS_HerculesBeetle_Ground"
+        },
+        {
+            "name": "Whalaska",
+            "asset": "IceNarwhal"
+        },
+        {
+            "name": "Whalaska (Boss)",
+            "asset": "BOSS_IceNarwhal"
+        },
+        {
+            "name": "Whalaska Ignis",
+            "asset": "IceNarwhal_Fire"
+        },
+        {
+            "name": "Wixen",
+            "asset": "FoxMage"
+        },
+        {
+            "name": "Wixen (Boss)",
+            "asset": "BOSS_FoxMage"
+        },
+        {
+            "name": "Wixen Noct",
+            "asset": "FoxMage_Dark"
+        },
+        {
+            "name": "Wixen Noct (Boss)",
+            "asset": "BOSS_FoxMage_Dark"
+        },
+        {
+            "name": "Woolipop",
+            "asset": "SweetsSheep"
+        },
+        {
+            "name": "Woolipop (Boss)",
+            "asset": "BOSS_SweetsSheep"
+        },
+        {
+            "name": "Wumpo",
+            "asset": "Yeti"
+        },
+        {
+            "name": "Wumpo (Boss)",
+            "asset": "BOSS_Yeti"
+        },
+        {
+            "name": "Wumpo (Predator)",
+            "asset": "PREDATOR_Yeti"
+        },
+        {
+            "name": "Wumpo Botan",
+            "asset": "Yeti_Grass"
+        },
+        {
+            "name": "Wumpo Botan (Boss)",
+            "asset": "BOSS_Yeti_Grass"
+        },
+        {
+            "name": "Xenogard",
+            "asset": "WhiteAlienDragon"
+        },
+        {
+            "name": "Xenogard",
+            "asset": "SUMMON_WhiteAlienDragon"
+        },
+        {
+            "name": "Xenogard",
+            "asset": "SUMMON_WhiteAlienDragon_MAX"
+        },
+        {
+            "name": "Xenogard (Boss)",
+            "asset": "BOSS_WhiteAlienDragon"
+        },
+        {
+            "name": "Xenolord",
+            "asset": "DarkMechaDragon"
+        },
+        {
+            "name": "Xenolord (Boss)",
+            "asset": "BOSS_DarkMechaDragon"
+        },
+        {
+            "name": "Xenolord (Raid)",
+            "asset": "RAID_DarkMechaDragon"
+        },
+        {
+            "name": "Xenolord (Raid)",
+            "asset": "RAID_DarkMechaDragon_2"
+        },
+        {
+            "name": "Xenovader",
+            "asset": "DarkAlien"
+        },
+        {
+            "name": "Xenovader",
+            "asset": "SUMMON_DarkAlien"
+        },
+        {
+            "name": "Xenovader",
+            "asset": "SUMMON_DarkAlien_MAX"
+        },
+        {
+            "name": "Xenovader",
+            "asset": "DarkAlien_Oilrig"
+        },
+        {
+            "name": "Xenovader (Boss)",
+            "asset": "BOSS_DarkAlien"
+        },
+        {
+            "name": "Yakumo",
+            "asset": "GuardianDog"
+        },
+        {
+            "name": "Yakumo (Boss)",
+            "asset": "BOSS_GuardianDog"
+        },
+        {
+            "name": "en_text",
+            "asset": "BrownRabbit"
+        },
+        {
+            "name": "en_text",
+            "asset": "PinkKangaroo"
+        },
+        {
+            "name": "en_text",
+            "asset": "BeardedDragon"
+        },
+        {
+            "name": "en_text",
+            "asset": "WaterLizard"
+        },
+        {
+            "name": "en_text",
+            "asset": "GrassDragon"
+        },
+        {
+            "name": "en_text",
+            "asset": "DarkMutant"
+        },
+        {
+            "name": "en_text",
+            "asset": "VolcanoDragon"
+        },
+        {
+            "name": "en_text (Boss)",
+            "asset": "BOSS_BeardedDragon"
+        },
+        {
+            "name": "en_text (Boss)",
+            "asset": "BOSS_BrownRabbit"
+        },
+        {
+            "name": "en_text (Boss)",
+            "asset": "BOSS_DarkMutant"
+        },
+        {
+            "name": "en_text (Boss)",
+            "asset": "BOSS_GrassDragon"
+        },
+        {
+            "name": "en_text (Boss)",
+            "asset": "BOSS_PinkKangaroo"
+        },
+        {
+            "name": "en_text (Boss)",
+            "asset": "BOSS_WaterLizard"
+        },
+        {
+            "name": "en_text (Boss)",
+            "asset": "BOSS_VolcanoDragon"
+        }
+    ]
+}

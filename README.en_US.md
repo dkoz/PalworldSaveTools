@@ -39,7 +39,7 @@
   - Delete Unreferenced Data  
   - Reset Missions  
   - Unlock private chests  
-  - Remove invalid/modded items  
+  - Remove invalid/modded items / pals
   - Exclusions system for protected players/guilds/bases  
   - Move players between guilds  
   - Make a player guild leader  
