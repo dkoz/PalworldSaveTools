@@ -49,11 +49,11 @@ customtkinter_assets=find_customtkinter_assets()
 if customtkinter_assets: build_exe_options["include_files"].append(customtkinter_assets)
 ooz_library=find_ooz_library()
 if ooz_library: build_exe_options["include_files"].append(ooz_library)
-base=None
+base=None 
 if sys.platform=="win32": base="Console"
 setup(
     name="PalworldSaveTools",
-    version="1.1.23",
+    version="1.1.24",
     description="All-in-one tool for fixing/transferring/editing Palworld saves",
     options={"build_exe":build_exe_options},
     executables=[

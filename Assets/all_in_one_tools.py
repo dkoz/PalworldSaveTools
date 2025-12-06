@@ -2453,21 +2453,6 @@ def move_selected_player_to_selected_guild():
     refresh_all()
     refresh_stats("After Deletion")
     messagebox.showinfo(t("Done"), t("guild.move.moved", player=player_uid_raw, guild=target_gid_raw))
-def load_player_json(uid):
-    p=os.path.join(current_save_path,"Players",f"{uid}.sav")
-    if not os.path.isfile(p): return None
-    raw, _ = load_save_gvas_only(p)
-    if raw is None: return None
-    gvas = SkipGvasFile.read(raw)
-    return gvas.properties
-def load_save_gvas_only(path):
-    try:
-        with open(path,"rb") as f:
-            data=f.read()
-        raw_gvas, save_type = decompress_sav_to_gvas(data)
-        return raw_gvas, save_type
-    except:
-        return None, None
 def rebuild_all_players_pals():
     global loaded_level_json,current_save_path
     try:
@@ -2639,14 +2624,19 @@ def rebuild_all_guilds():
         except:
             pass
     for ginfo in guilds.values():
-        pals=[]
+        g_gid=ginfo["gid"]
         players_clean={nu(p['player_uid']) for p in ginfo["players"]}
+        pals=[]
         for ch in cmap:
             try:
-                raw=ch['value']['RawData']['value']
-                sp=raw['object']['SaveParameter']['value']
-                owner=sp.get('OwnerPlayerUId',{}).get('value')
+                rawf=ch['value']['RawData']['value']
+                raw=rawf.get('object',{}).get('SaveParameter',{}).get('value',{})
+                owner=raw.get('OwnerPlayerUId',{}).get('value')
                 if owner and nu(owner) in players_clean:
+                    pals.append(ch)
+                    continue
+                gid2=rawf.get('group_id')
+                if not owner and gid2 and nu(gid2)==nu(g_gid):
                     pals.append(ch)
             except:
                 pass
@@ -2656,19 +2646,13 @@ def rebuild_all_guilds():
         handles=ginfo["handles"]
         handles.clear()
         existing=set()
-        for h in handles:
-            try:
-                inst=h.get("instance_id")
-                existing.add(nu(inst))
-            except:
-                pass
         for ch in ginfo["pals"]:
             try:
-                key_inst=ch["key"]["InstanceId"]["value"]
-                inst_clean=nu(key_inst)
-                raw=ch["value"]["RawData"]["value"]
-                sp=raw["object"]["SaveParameter"]["value"]
-                raw["group_id"]=gid
+                inst=ch["key"]["InstanceId"]["value"]
+                inst_clean=nu(inst)
+                rawf=ch["value"]["RawData"]["value"]
+                rawf["group_id"]=gid
+                sp=rawf["object"]["SaveParameter"]["value"]
                 try: sp["WorkRegion"]["group_id"]["value"]=zero
                 except: pass
                 try: sp["WorkerID"]["value"]=zero
@@ -2677,13 +2661,12 @@ def rebuild_all_guilds():
                     if "TaskData" in sp: sp["TaskData"]["value"]={}
                 except: pass
                 try:
-                    if "MapObjectConcreteInstanceIdAssignedToExpedition" in sp:
-                        del sp["MapObjectConcreteInstanceIdAssignedToExpedition"]
+                    if "MapObjectConcreteInstanceIdAssignedToExpedition" in sp: del sp["MapObjectConcreteInstanceIdAssignedToExpedition"]
                 except: pass
                 try: del sp["WorkSuitabilityOptionInfo"]
                 except: pass
                 if inst_clean not in existing:
-                    handles.append({"guid":zero,"instance_id":key_inst})
+                    handles.append({"guid":zero,"instance_id":inst})
                     existing.add(inst_clean)
             except:
                 pass
@@ -2719,8 +2702,66 @@ def make_selected_member_leader():
             raw=g['value']['RawData']['value']
             raw['admin_player_uid']=p_uid
             break
-    messagebox.showinfo(t("guild.leader_updated.title"),t("guild.leader_updated.msg").format(old=old_leader_name,new=p_name))
     refresh_all()
+    messagebox.showinfo(t("guild.leader_updated.title"),t("guild.leader_updated.msg").format(old=old_leader_name,new=p_name))
+def rename_guild():
+    sel = guild_tree.selection()
+    if not sel:
+        messagebox.showerror(t("error.title"), t("guild.rename.select"))
+        return
+    old_name, gid = guild_tree.item(sel[0])['values']
+    new_name = ask_string_with_icon(t("guild.rename.title"), t("guild.rename.prompt"), ICON_PATH)
+    if not new_name:
+        return
+    wsd = loaded_level_json['properties']['worldSaveData']['value']
+    for g in wsd['GroupSaveDataMap']['value']:
+        if are_equal_uuids(g['key'], gid):
+            g['value']['RawData']['value']['guild_name'] = new_name
+            break
+    refresh_all()
+    messagebox.showinfo(t("guild.rename.done_title"), t("guild.rename.done_msg", old=old_name, new=new_name))
+def rename_player():
+    sel=guild_members_tree.selection()
+    src="guild"
+    if not sel:
+        sel=player_tree.selection()
+        src="player"
+    if not sel:
+        messagebox.showerror(t("error.title"),t("player.rename.select"))
+        return
+    vals=(guild_members_tree.item(sel[0])['values'] if src=="guild" else player_tree.item(sel[0])['values'])
+    if src=="guild":
+        old_name,p_level,p_uid=vals
+    else:
+        p_uid,old_name,*_=vals
+    new_name=ask_string_with_icon(t("player.rename.title"),t("player.rename.prompt"),ICON_PATH)
+    if not new_name:
+        return
+    p_uid_clean=str(p_uid).replace("-","")
+    wsd=loaded_level_json['properties']['worldSaveData']['value']
+    for g in wsd['GroupSaveDataMap']['value']:
+        raw=g['value']['RawData']['value']
+        found=False
+        for p in raw.get('players',[]):
+            uid=str(p.get('player_uid','')).replace("-","")
+            if uid==p_uid_clean:
+                p.setdefault('player_info',{})['player_name']=new_name
+                found=True
+                break
+        if found:
+            break
+    char_map=wsd.get('CharacterSaveParameterMap',{}).get('value',[])
+    for entry in char_map:
+        raw=entry.get('value',{}).get('RawData',{}).get('value',{})
+        sp_val=raw.get('object',{}).get('SaveParameter',{}).get('value',{})
+        if sp_val.get("IsPlayer",{}).get("value"):
+            uid_obj=entry.get('key',{}).get('PlayerUId',{})
+            uid=str(uid_obj.get('value','')).replace("-","") if isinstance(uid_obj,dict) else ""
+            if uid==p_uid_clean:
+                sp_val.setdefault('NickName',{})['value']=new_name
+                break
+    refresh_all()
+    messagebox.showinfo(t("player.rename.done_title"),t("player.rename.done_msg",old=old_name,new=new_name))
 def rename_world():
     meta_path=os.path.join(current_save_path,"LevelMeta.sav")
     if not os.path.exists(meta_path): return None
@@ -2738,6 +2779,7 @@ def all_in_one_tools():
     global guild_result, base_result, player_result
     base_dir = os.path.dirname(os.path.abspath(__file__))
     window = tk.Toplevel()
+    window.running=True
     import webbrowser
     info=check_for_update()
     if info:
@@ -2754,6 +2796,7 @@ def all_in_one_tools():
         current_label.bind("<Button-1>",lambda e:webbrowser.open("https://github.com/deafdudecomputers/PalworldSaveTools/releases/latest"))
         if update_available:
             def pulse_current():
+                if not window.running: return
                 current_label["fg"]="yellow" if current_label["fg"]=="lightgreen" else "lightgreen"
                 window.after(800,pulse_current)
             pulse_current()
@@ -2879,8 +2922,6 @@ def all_in_one_tools():
         with open("deletion_exclusions.json", "w") as f: json.dump(exclusions, f, indent=4)
         tk.messagebox.showinfo(t("Saved"), t("deletion.saved_exclusions"))
     populate_exclusions_trees()
-    def on_exit(): window.destroy()
-    window.protocol("WM_DELETE_WINDOW", on_exit)
     def guild_tree_menu(event):
         iid = guild_tree.identify_row(event.y)
         if iid:
@@ -2890,6 +2931,7 @@ def all_in_one_tools():
             menu.add_command(label=t("deletion.ctx.remove_exclusion"), command=lambda: remove_selected_from_regular(guild_tree, "guilds"))
             menu.add_command(label=t("deletion.ctx.delete_guild"), command=delete_selected_guild)
             menu.add_command(label=t("guild.menu.move_selected_player_to_selected_guild"), command=move_selected_player_to_selected_guild)
+            menu.add_command(label=t("guild.rename.menu"), command=rename_guild)
             menu.tk_popup(event.x_root, event.y_root)
     def base_tree_menu(event):
         iid = base_tree.identify_row(event.y)
@@ -2908,6 +2950,7 @@ def all_in_one_tools():
             menu.add_command(label=t("deletion.ctx.add_exclusion"), command=lambda: add_exclusion(player_tree, "players"))
             menu.add_command(label=t("deletion.ctx.remove_exclusion"), command=lambda: remove_selected_from_regular(player_tree, "players"))
             menu.add_command(label=t("deletion.ctx.delete_player"), command=delete_selected_player)
+            menu.add_command(label=t("player.rename.menu"), command=rename_player)
             menu.add_command(label=t("guild.menu.move_selected_player_to_selected_guild"), command=move_selected_player_to_selected_guild)
             menu.tk_popup(event.x_root, event.y_root)
     def guild_members_tree_menu(event):
@@ -2919,6 +2962,7 @@ def all_in_one_tools():
             menu.add_command(label=t("deletion.ctx.add_exclusion"), command=lambda: add_exclusion(guild_members_tree, "players"))
             menu.add_command(label=t("deletion.ctx.remove_exclusion"), command=lambda: remove_selected_from_regular(guild_members_tree, "players"))
             menu.add_command(label=t("deletion.ctx.delete_player"), command=lambda: delete_selected_guild_member())
+            menu.add_command(label=t("player.rename.menu"), command=rename_player)
             menu.tk_popup(event.x_root, event.y_root)
     def exclusions_guilds_tree_menu(event):
         iid = exclusions_guilds_tree.identify_row(event.y)
@@ -3011,7 +3055,10 @@ def all_in_one_tools():
         player_result.config(text=t("deletion.selected_player", name="N/A"))
     window.bind("<F5>", on_f5_press)
     center_window(window)
-    def on_exit(): window.destroy()
+    def on_exit():
+        window.running=False
+        try: window.destroy()
+        except: pass
     window.protocol("WM_DELETE_WINDOW", on_exit)
     return window
 if __name__=="__main__":

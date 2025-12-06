@@ -42,10 +42,13 @@ def build_with_cx_freeze():
         print(f"Removing {lib_folder}...")
         shutil.rmtree(lib_folder)
 def clean_build_artifacts():
-    for folder in ["build","PalworldSaveTools.egg-info","Backups","PST_standalone","Scan Save Logger"]:
-        if os.path.exists(folder):
-            print(f"Removing {folder}...")
-            shutil.rmtree(folder)
+    for item in ["build","PalworldSaveTools.egg-info","Backups","PST_standalone","Scan Save Logger","psp_windows","ppe_windows","updated_worldmap.png"]:
+        if os.path.exists(item):
+            print(f"Removing {item}...")
+            if os.path.isdir(item):
+                shutil.rmtree(item,ignore_errors=True)
+            else:
+                os.remove(item)
     for root,dirs,files in os.walk(".",topdown=False):
         for d in dirs:
             if d=="__pycache__":
@@ -106,6 +109,7 @@ def create_release_archive():
     os.chdir(old)
     print("7z archive created:",archive_name)
 def main():
+    print("="*40)
     print("PalworldSaveTools Directory Cleaner")
     print("="*40)
     clean_build_artifacts()

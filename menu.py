@@ -6,6 +6,18 @@ from tkinter import ttk
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import os, sys, urllib.request, zipfile, subprocess, re
+def hide_console():
+    import sys, ctypes
+    if sys.platform == "win32":
+        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if hwnd:
+            ctypes.windll.user32.ShowWindow(hwnd, 0)
+def show_console():
+    import sys, ctypes
+    if sys.platform == "win32":
+        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if hwnd:
+            ctypes.windll.user32.ShowWindow(hwnd, 5)
 GITHUB_RAW_URL = "https://raw.githubusercontent.com/deafdudecomputers/PalworldSaveTools/main/Assets/common.py"
 GITHUB_LATEST_ZIP = "https://github.com/deafdudecomputers/PalworldSaveTools/releases/latest"
 UPDATE_CACHE=None
@@ -226,8 +238,22 @@ management_tool_keys = [
     "tool.restore_map",
 ]
 class MenuGUI(tk.Tk):
+    def tk_error_handler(self, exc, val, tb):
+        from traceback import format_exception
+        err_type=exc.__name__
+        err_msg=str(val)
+        full_trace="".join(format_exception(exc,val,tb))
+        show_console()
+        print("\n=== PST START ERROR ===\n")
+        print(full_trace)
+        print(f"[ERROR TYPE] {err_type}")
+        print(f"[DESCRIPTION] {err_msg}")
+        print("\n=== PST END ERROR ===\n")
+        messagebox.showerror("PST Error",f"[ERROR TYPE] {err_type}\n[DESCRIPTION] {err_msg}\n\n========================\nFull Traceback Logged\n========================")
+        hide_console()
     def __init__(self):
         super().__init__()
+        self.report_callback_exception = self.tk_error_handler
         try:
             if os.name == 'nt' and os.path.exists(ICON_PATH):
                 self.iconbitmap(ICON_PATH)
@@ -247,9 +273,9 @@ class MenuGUI(tk.Tk):
         self.configure(bg="#2f2f2f")
         self.geometry("800x550")
         self.resizable(False, True)
-        self.info_labels = [] 
-        self.category_frames = [] 
-        self.tool_buttons = []  
+        self.info_labels = []
+        self.category_frames = []
+        self.tool_buttons = []
         self.lang_combo = None
         self.setup_ui()
         center_window(self)
@@ -419,10 +445,14 @@ class MenuGUI(tk.Tk):
         cur = get_language()
         self.lang_combo.set(t(f'lang.{cur}'))
 def on_exit():
-    app.running=False
+    try: app.running=False
+    except: pass
     try: app.destroy()
     except: pass
+    import os
+    os._exit(0)
 if __name__=="__main__":
+    hide_console()
     try:
         init_language("zh_CN")
     except Exception:
@@ -434,5 +464,11 @@ if __name__=="__main__":
     app.running=True
     try:
         app.mainloop()
+    except Exception:
+        show_console()
+        import traceback
+        traceback.print_exc()
+        input("\nPress Enter to exit...")
+        raise
     finally:
         on_exit()
