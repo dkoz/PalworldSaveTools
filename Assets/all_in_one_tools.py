@@ -1,10 +1,5 @@
 from import_libs import *
 from character_transfer import *
-try:
-    from i18n import init_language, t, set_language, get_language, load_resources
-except Exception:
-    def t(key, **fmt):
-        return key.format(**fmt) if fmt else key
 GITHUB_RAW_URL = "https://raw.githubusercontent.com/deafdudecomputers/PalworldSaveTools/main/Assets/common.py"
 def check_for_update():
     try:
@@ -38,10 +33,6 @@ guild_result = None
 base_result = None
 player_result = None
 files_to_delete = set()
-def change_language(lang):
-    set_language(lang)
-    load_resources(lang)
-    window.destroy()
 def refresh_stats(section):
     stats = get_current_stats()
     section_keys = {
@@ -65,32 +56,6 @@ def refresh_stats(section):
             update_stats_section(stat_labels, "Deletion Result", result)
 def as_uuid(val): return str(val).lower() if val else ''
 def are_equal_uuids(a,b): return as_uuid(a)==as_uuid(b)
-def backup_whole_directory(source_folder, backup_folder):
-    import os, sys, shutil, datetime as dt
-    def get_timestamp():
-        return dt.datetime.now().strftime("%Y%m%d_%H%M%S")
-    source_folder = os.path.abspath(source_folder)
-    if not os.path.isabs(backup_folder):
-        base_path = os.path.dirname(sys.executable) if getattr(sys, "frozen", False) else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        backup_folder = os.path.abspath(os.path.join(base_path, backup_folder))
-    else:
-        backup_folder = os.path.abspath(backup_folder)
-    if not os.path.exists(backup_folder):
-        os.makedirs(backup_folder)
-    print("Now backing up Level.sav, LevelMeta.sav and Players folder...")
-    timestamp = get_timestamp()
-    backup_path = os.path.join(backup_folder, f"PalworldSave_backup_{timestamp}")
-    os.makedirs(backup_path, exist_ok=True)
-    level_src = os.path.join(source_folder, "Level.sav")
-    levelmeta_src = os.path.join(source_folder, "LevelMeta.sav")
-    players_src = os.path.join(source_folder, "Players")
-    if os.path.exists(level_src):
-        shutil.copy2(level_src, os.path.join(backup_path, "Level.sav"))
-    if os.path.exists(levelmeta_src):
-        shutil.copy2(levelmeta_src, os.path.join(backup_path, "LevelMeta.sav"))
-    if os.path.exists(players_src):
-        shutil.copytree(players_src, os.path.join(backup_path, "Players"))
-    print(f"Backup created at: {backup_path}")
 try:
     from menu import run_tool
 except ImportError:
@@ -130,41 +95,46 @@ def json_to_sav(j,path):
     t = 0x32 if "Pal.PalworldSaveGame" in g.header.save_game_class_name else 0x31
     data = compress_gvas_to_sav(g.write(SKP_PALWORLD_CUSTOM_PROPERTIES),t)
     with open(path,"wb") as f: f.write(data)
-def ask_string_with_icon(title, prompt, icon_path):
+def ask_string_with_icon(title,prompt,icon_path,mode="text"):
     class CustomDialog(simpledialog.Dialog):
-        def __init__(self, parent, title):
-            super().__init__(parent, title)
-        def body(self, master):
+        def __init__(self,parent,title):
+            self.mode=mode
+            super().__init__(parent,title)
+        def body(self,master):
             try: self.iconbitmap(icon_path)
             except: pass
-            self.geometry("400x120")
+            self.geometry("400x150")
             self.configure(bg="#2f2f2f")
             master.configure(bg="#2f2f2f")
-            tk.Label(master, text=prompt, bg="#2f2f2f", fg="white", font=("Arial", 10)).grid(row=0, column=0, padx=15, pady=15)
-            self.entry = tk.Entry(master, bg="#444444", fg="white", insertbackground="white", font=("Arial", 10))
-            self.entry.grid(row=1, column=0, padx=15)
+            tk.Label(master,text=prompt,bg="#2f2f2f",fg="white",font=("Arial",10)).grid(row=0,column=0,padx=15,pady=15)
+            self.entry=tk.Entry(master,bg="#444444",fg="white",insertbackground="white",font=("Arial",10))
+            self.entry.grid(row=1,column=0,padx=15)
             return self.entry
         def buttonbox(self):
-            box = tk.Frame(self, bg="#2f2f2f")
-            btn_ok = tk.Button(box, text="OK", width=10, command=self.ok, bg="#555555", fg="white", font=("Arial",10), relief="flat", activebackground="#666666")
-            btn_ok.pack(side="left", padx=5, pady=5)
-            btn_cancel = tk.Button(box, text="Cancel", width=10, command=self.cancel, bg="#555555", fg="white", font=("Arial",10), relief="flat", activebackground="#666666")
-            btn_cancel.pack(side="left", padx=5, pady=5)
-            self.bind("<Return>", lambda event: self.ok())
-            self.bind("<Escape>", lambda event: self.cancel())
+            box=tk.Frame(self,bg="#2f2f2f")
+            tk.Button(box,text="OK",width=10,command=self.ok,bg="#555555",fg="white",font=("Arial",10),relief="flat",activebackground="#666666").pack(side="left",padx=5,pady=5)
+            tk.Button(box,text="Cancel",width=10,command=self.cancel,bg="#555555",fg="white",font=("Arial",10),relief="flat",activebackground="#666666").pack(side="left",padx=5,pady=5)
+            self.bind("<Return>",lambda e:self.ok())
+            self.bind("<Escape>",lambda e:self.cancel())
             box.pack()
         def validate(self):
-            try:
-                int(self.entry.get())
-                return True
-            except ValueError:
-                messagebox.showerror("Invalid Input", "Please enter a valid number.")
-                return False
+            if self.mode=="number":
+                try:
+                    int(self.entry.get())
+                    return True
+                except ValueError:
+                    messagebox.showerror(t("Invalid Input"),t("Please enter a valid number."))
+                    return False
+            return True
         def apply(self):
-            self.result = int(self.entry.get())
-    root = tk.Tk()
+            val=self.entry.get()
+            if self.mode=="number":
+                self.result=int(val)
+            else:
+                self.result=val
+    root=tk.Tk()
     root.withdraw()
-    dlg = CustomDialog(root, title)
+    dlg=CustomDialog(root,title)
     root.destroy()
     return dlg.result
 def clean_character_save_parameter_map(data_source, valid_uids):
@@ -244,24 +214,24 @@ def load_save(path=None):
         p = path
     if not p: return
     if not p.endswith("Level.sav"):
-        messagebox.showerror("Error!", "This is NOT Level.sav. Please select Level.sav file.")
+        messagebox.showerror(t("error.title"), t("error.not_level_sav"))
         return
     d = os.path.dirname(p)
     playerdir = os.path.join(d, "Players")
     if not os.path.isdir(playerdir):
-        messagebox.showerror("Error", "Players folder missing")
+        messagebox.showerror(t("error.title"), t("error.players_folder_missing"))
         return
-    print("Now loading the save...")
+    print(t("loading.save"))
     current_save_path = d
     backup_save_path = current_save_path
     t0 = time.perf_counter()
     loaded_level_json = sav_to_json(p)
     t1 = time.perf_counter()
-    print(f"Loaded save and converted to JSON in {t1 - t0:.2f}s")
+    print(t("loading.converted", seconds=f"{t1 - t0:.2f}"))
     build_player_levels()
     refresh_all()
     refresh_stats("Before Deletion")
-    print("Done loading the save!")
+    print(t("loading.done"))
     stats = get_current_stats()
     for k,v in stats.items():
         print(f"Total {k}: {v}")
@@ -275,7 +245,7 @@ def load_save(path=None):
         if srcGuildMapping._worldSaveData.get('GroupSaveDataMap') is None:
             srcGuildMapping.GroupSaveDataMap = {}
     except Exception as e:
-        messagebox.showerror("Error", f"Failed to load guild mapping: {e}")
+        messagebox.showerror(t("error.title"), t("error.guild_mapping_failed", err=e))
         srcGuildMapping = None
     log_folder = os.path.join(base_path, "Scan Save Logger")
     if os.path.exists(log_folder): shutil.rmtree(log_folder)
@@ -360,74 +330,25 @@ def load_save(path=None):
             total_worker_dropped = int(first_line.split()[0])
     except: total_worker_dropped = 0
     logger.info("="*60)
-    logger.info("")
-    logger.info(f"Total Players: {total_players}")
-    logger.info(f"Total Caught Pals: {total_caught}")
-    logger.info(f"Total Overall Pals: {total_owned + total_worker_dropped}")
-    logger.info(f"Total Owned Pals: {total_owned}")
-    logger.info(f"Total Worker/Dropped Pals: {total_worker_dropped}")
-    logger.info(f"Total Active Guilds: {active_guilds}")
-    logger.info(f"Total Bases: {total_bases}")
-    logger.info("")
+    logger.info("********** PST_STATS_BEGIN **********")
+    logger.info(t("stats.header"))
+    logger.info(f"{t('stats.total_players')}: {total_players}")
+    logger.info(f"{t('stats.total_caught')}: {total_caught}")
+    logger.info(f"{t('stats.total_overall')}: {total_owned + total_worker_dropped}")
+    logger.info(f"{t('stats.total_owned')}: {total_owned}")
+    logger.info(f"{t('stats.total_workers')}: {total_worker_dropped}")
+    logger.info(f"{t('stats.total_guilds')}: {active_guilds}")
+    logger.info(f"{t('stats.total_bases')}: {total_bases}")
+    logger.info(t("stats.header"))
+    logger.info("********** PST_STATS_END ************")
     logger.info("="*60)
+    logger.info(t("stats.header"))
     for h in logger.handlers[:]:
         logger.removeHandler(h)
         h.close()
     t2 = time.perf_counter()
-    print(f"Fully loaded and processed in: {t2-t0:.2f}s")
+    print(t("stats.loaded_time", sec=f"{t2 - t0:.2f}"))
     #start_dps_processing_background(t0)
-def setup_logging():
-    batch_title = f"Pylar's Save Tool"
-    set_console_title(batch_title)
-    if getattr(sys, 'frozen', False):
-        base_path = os.path.dirname(sys.executable)
-    else:
-        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    log_folder = os.path.join(base_path, "Scan Save Logger")
-    for logger_name in ['scanLogger', 'playerLogger']:
-        logger = logging.getLogger(logger_name)
-        for handler in logger.handlers[:]:
-            try:
-                handler.flush()
-                handler.close()
-            except Exception:
-                pass
-            logger.removeHandler(handler)
-    if os.path.exists(log_folder): 
-        print("Deleting Scan Save Logger...")
-        shutil.rmtree(log_folder)
-    print("Making Scan Save Logger...")
-    os.makedirs(log_folder, exist_ok=True)
-    log_file = os.path.join(log_folder, "scan_save.log")
-    player_log_file = os.path.join(log_folder, "players.log")
-    scan_logger = logging.getLogger("scanLogger")
-    scan_logger.setLevel(logging.INFO)
-    scan_logger.propagate = False
-    file_handler = logging.FileHandler(log_file, encoding='utf-8', errors='replace')
-    file_handler.setFormatter(logging.Formatter('%(message)s'))
-    stream_handler = logging.StreamHandler(sys.stdout)
-    stream_handler.setFormatter(logging.Formatter('%(message)s'))
-    scan_logger.handlers.clear()
-    scan_logger.addHandler(file_handler)
-    scan_logger.addHandler(stream_handler)
-    player_logger = logging.getLogger('playerLogger')
-    player_logger.setLevel(logging.INFO)
-    player_logger.propagate = False
-    player_file_handler = logging.FileHandler(player_log_file, mode='w', encoding='utf-8', errors='replace')
-    player_file_handler.setFormatter(logging.Formatter('%(message)s'))
-    player_logger.handlers.clear()
-    player_logger.addHandler(player_file_handler)
-    return scan_logger, player_logger, log_folder
-def close_all_log_handlers():
-    for logger_name in ['scanLogger', 'playerLogger']:
-        logger = logging.getLogger(logger_name)
-        for handler in logger.handlers[:]:
-            try:
-                handler.flush()
-                handler.close()
-                logger.removeHandler(handler)
-            except Exception:
-                pass
 def extract_value(data, key, default_value=''):
     value = data.get(key, default_value)
     if isinstance(value, dict):
@@ -571,7 +492,7 @@ def process_dps_save(player_uid, nickname, dps_file_path, log_folder):
         json_data = gvas.dump()
         values = json_data.get("properties", {}).get("SaveParameterArray", {}).get("value", {}).get("values", [])
         if not values:
-            print(f"No DPS pals found in {os.path.basename(dps_file_path)}")
+            print(t("dps.none_found", file=os.path.basename(dps_file_path)))
             return
         valid_lines = []
         for item in values:
@@ -602,7 +523,7 @@ def process_dps_save(player_uid, nickname, dps_file_path, log_folder):
             talents = f"HP IV: {hp_iv}({rank_hp}%), ATK IV: {atk_iv}({rank_atk}%), DEF IV: {def_iv}({rank_def}%), Work Speed: ({rank_craft}%)"
             valid_lines.append(f"{name}{nickname_str}, Level: {lvl}, Rank: {rank}, Gender: {gender}, {talents}{skill_str}")
         if not valid_lines:
-            print(f"No valid DPS pals to log for {os.path.basename(dps_file_path)}")
+            print(t("dps.none_valid", file=os.path.basename(dps_file_path)))
             return
         log_name = sanitize_filename(nickname.encode("utf-8", "replace").decode("utf-8"))
         log_file = os.path.join(log_folder, f"({log_name})({player_uid})_dps.log")
@@ -626,12 +547,12 @@ def process_dps_save(player_uid, nickname, dps_file_path, log_folder):
         handler.close()
         logger.removeHandler(handler)
     except Exception as e:
-        print(f"Failed to parse {dps_file_path} for {nickname}({player_uid}): {e}")
+        print(t("dps.parse_failed", path=dps_file_path, name=nickname, uid=player_uid, err=e))
 def save_changes():
     global files_to_delete
     folder = current_save_path
     if not folder:
-        messagebox.showerror("Error", "No save loaded!")
+        messagebox.showerror(t("Error"), t("guild.rebuild.no_save"))
         return
     if not current_save_path or not loaded_level_json: return
     backup_whole_directory(backup_save_path, "Backups/AllinOneTools")
@@ -647,7 +568,7 @@ def save_changes():
         except FileNotFoundError: pass
     files_to_delete.clear()
     window.focus_force()
-    messagebox.showinfo("Saved", "Changes saved and files deleted!", parent=window)
+    messagebox.showinfo(t("Saved"), t("Changes saved and files deleted!"), parent=window)
 def format_duration(s):
     d,h = divmod(int(s),86400); hr, m = divmod(h,3600); mm, ss=divmod(m,60)
     return f"{d}d:{hr}h:{mm}m"
@@ -800,22 +721,22 @@ def delete_base_camp(base, guild_id, loaded_json):
         map_objs[:] = [m for m in map_objs if m.get('Model', {}).get('value', {}).get('RawData', {}).get('value', {}).get('instance_id') not in map_obj_ids_to_delete]
     base_list = wsd['BaseCampSaveData']['value']
     base_list[:] = [b for b in base_list if b['key'] != base_id]
-    print(f"Deleted base camp {base_id} for guild {guild_id or 'orphaned'}")
+    print(t("base.deleted_camp", base_id=base_id, guild_id=(guild_id or "orphaned")))
     return True
 def delete_selected_guild():
     global files_to_delete
     folder = current_save_path
     if not folder:
-        messagebox.showerror("Error", "No save loaded!")
+        messagebox.showerror(t("Error"), t("guild.rebuild.no_save"))
         return
     sel = guild_tree.selection()
     if not sel:
-        messagebox.showerror("Error", "Select guild")
+        messagebox.showerror(t("Error"), t("Select guild"))
         return
     raw_gid = guild_tree.item(sel[0])['values'][1]
     gid = raw_gid.replace('-', '')
     if any(gid == ex.replace('-', '') for ex in exclusions.get("guilds", [])):
-        print(f"Guild {raw_gid} is excluded from deletion - skipping...")
+        print(t("guild.excluded", gid=raw_gid))
         return
     wsd = loaded_level_json['properties']['worldSaveData']['value']
     for b in wsd.get('BaseCampSaveData', {}).get('value', []):
@@ -824,7 +745,7 @@ def delete_selected_guild():
         base_id_raw = as_uuid(b['key'])
         base_id = base_id_raw.replace('-', '')
         if base_gid == gid and any(base_id == ex.replace('-', '') for ex in exclusions.get("bases", [])):
-            print(f"Guild {raw_gid} has excluded base {base_id_raw} - skipping guild deletion!")
+            print(t("guild.excluded_with_base", gid=raw_gid, base_id=base_id_raw))
             return
     deleted_uids = set()
     group_data_list = wsd.get('GroupSaveDataMap', {}).get('value', [])
@@ -836,7 +757,7 @@ def delete_selected_guild():
                 pid_raw = str(p.get('player_uid', ''))
                 pid = pid_raw.replace('-', '')
                 if any(pid == ex.replace('-', '') for ex in exclusions.get("players", [])):
-                    print(f"Player {pid_raw} in excluded guild is excluded from deletion - skipping...")
+                    print(t("player.excluded_in_guild", pid=pid_raw))
                     continue
                 deleted_uids.add(pid)
             group_data_list.remove(g)
@@ -857,19 +778,19 @@ def delete_selected_guild():
     delete_orphaned_bases()
     refresh_all()
     refresh_stats("After Deletion")
-    messagebox.showinfo("Marked", f"Guild {raw_gid} and {len(deleted_uids)} players marked for deletion (files will be removed on Save Changes)")
+    messagebox.showinfo(t("Marked"), t("guild.marked_for_deletion", gid=raw_gid, count=len(deleted_uids)))
 def delete_selected_base():
     folder = current_save_path
     if not folder:
-        messagebox.showerror("Error", "No save loaded!")
+        messagebox.showerror(t("Error"), t("guild.rebuild.no_save"))
         return
     sel = base_tree.selection()
     if not sel:
-        messagebox.showerror("Error", "Select base")
+        messagebox.showerror(t("Error"), t("Select base"))
         return
     bid = base_tree.item(sel[0])['values'][0]
     if any(bid.replace('-', '') == ex.replace('-', '') for ex in exclusions.get("bases", [])):
-        print(f"Base {bid} is excluded from deletion - skipping...")
+        print(t("base.excluded", bid=bid))
         return
     for b in loaded_level_json['properties']['worldSaveData']['value']['BaseCampSaveData']['value'][:]:
         if str(b['key']) == bid:
@@ -878,7 +799,7 @@ def delete_selected_base():
     delete_orphaned_bases()
     refresh_all()
     refresh_stats("After Deletion")
-    messagebox.showinfo("Deleted", "Base deleted")
+    messagebox.showinfo(t("Deleted"), t("Base deleted"))
 def get_owner_uid(entry):
     try:
         return entry["value"]["object"]["SaveParameter"]["value"]["OwnerPlayerUId"].get("value", "")
@@ -888,11 +809,11 @@ def delete_selected_player():
     global files_to_delete
     folder = current_save_path
     if not folder:
-        messagebox.showerror("Error", "No save loaded!")
+        messagebox.showerror(t("Error"), t("guild.rebuild.no_save"))
         return
     sel = player_tree.selection()
     if not sel:
-        messagebox.showerror("Error", "Select player")
+        messagebox.showerror(t("Error"), t("Select player"))
         return
     raw_uid = player_tree.item(sel[0])['values'][0]
     uid = raw_uid.replace('-', '')
@@ -909,7 +830,7 @@ def delete_selected_player():
             pid = pid_raw.replace('-', '')
             if pid == uid:
                 if any(pid == ex.replace('-', '') for ex in exclusions.get("players", [])):
-                    print(f"Player {pid_raw} is excluded from deletion - skipping...")
+                    print(t("player.excluded", pid=pid_raw))
                     new_players.append(p)
                     continue
                 files_to_delete.add(pid)
@@ -938,18 +859,18 @@ def delete_selected_player():
                                .get('OwnerPlayerUId', {}).get('value', '')).replace('-', '') != uid]
         refresh_all()
         refresh_stats("After Deletion")
-        messagebox.showinfo("Marked", f"Player {raw_uid} marked for deletion (file will be removed on Save Changes)!")
+        messagebox.showinfo(t("Marked"), t("player.marked_for_deletion", uid=raw_uid))
     else:
-        messagebox.showinfo("Info", "Player not found or already deleted.")
+        messagebox.showinfo(t("Info"), t("player.not_found_or_deleted"))
 def delete_selected_guild_member():
     global files_to_delete
     folder = current_save_path
     if not folder:
-        messagebox.showerror("Error", "No save loaded!")
+        messagebox.showerror(t("Error"), t("guild.rebuild.no_save"))
         return
     sel = guild_members_tree.selection()
     if not sel:
-        messagebox.showerror("Error", "Select player")
+        messagebox.showerror(t("Error"), t("Select player"))
         return
     uid = guild_members_tree.item(sel[0])['values'][2].replace('-', '')
     wsd = loaded_level_json['properties']['worldSaveData']['value']
@@ -993,9 +914,9 @@ def delete_selected_guild_member():
                                .get('OwnerPlayerUId', {}).get('value', '')).replace('-', '') != uid]
         refresh_all()
         refresh_stats("After Deletion")
-        messagebox.showinfo("Marked", "Player marked for deletion (file will be removed on Save Changes)!")
+        messagebox.showinfo(t("Marked"), t("player.marked"))
     else:
-        messagebox.showinfo("Info", "Player not found or already deleted.")
+        messagebox.showinfo(t("Info"), t("player.not_found_or_deleted"))
 def delete_player_pals(wsd, to_delete_uids):
     char_save_map = wsd.get("CharacterSaveParameterMap", {}).get("value", [])
     removed_pals = 0
@@ -1019,9 +940,9 @@ def delete_player_pals(wsd, to_delete_uids):
 def delete_inactive_bases():
     folder = current_save_path
     if not folder:
-        messagebox.showerror("Error", "No save loaded!")
+        messagebox.showerror(t("Error"), t("guild.rebuild.no_save"))
         return
-    d = ask_string_with_icon("Delete Inactive Bases", "Delete bases where ALL players inactive for how many days?", ICON_PATH)
+    d = ask_string_with_icon("Delete Inactive Bases", "Delete bases where ALL players inactive for how many days?", ICON_PATH, mode="number")
     if d is None: return
     wsd = loaded_level_json['properties']['worldSaveData']['value']
     tick = wsd['GameTimeSaveData']['value']['RealDateTimeTicks']['value']
@@ -1050,10 +971,10 @@ def delete_inactive_bases():
     delete_orphaned_bases()
     refresh_all()
     refresh_stats("After Deletion")
-    messagebox.showinfo("Done", f"Deleted {cnt} bases")
+    messagebox.showinfo(t("Done"), t("bases.deleted_count", count=cnt))
 def delete_orphaned_bases():
     folder = current_save_path
-    if not folder: return print("No save loaded!")
+    if not folder: return print(t("guild.rebuild.no_save"))
     wsd = loaded_level_json['properties']['worldSaveData']['value']
     valid_guild_ids = {
         as_uuid(g['key']) for g in wsd.get('GroupSaveDataMap', {}).get('value', [])
@@ -1069,7 +990,7 @@ def delete_orphaned_bases():
             if delete_base_camp(b, gid, loaded_level_json): cnt += 1
     refresh_all()
     refresh_stats("After Deletion")
-    if cnt > 0: print(f"Deleted {cnt} orphaned base(s)")
+    if cnt > 0: print(t("bases.orphaned_deleted", count=cnt))
 def is_valid_level(level):
     try:
         return int(level) > 0
@@ -1078,7 +999,7 @@ def is_valid_level(level):
 def delete_empty_guilds():
     folder = current_save_path
     if not folder:
-        messagebox.showerror("Error", "No save loaded!")
+        messagebox.showerror(t("Error"), t("guild.rebuild.no_save"))
         return
     build_player_levels()
     wsd = loaded_level_json['properties']['worldSaveData']['value']
@@ -1117,7 +1038,7 @@ def delete_empty_guilds():
     delete_orphaned_bases()
     refresh_all()
     refresh_stats("After Deletion")
-    messagebox.showinfo("Done", f"Deleted {len(to_delete)} guild(s)")
+    messagebox.showinfo(t("Done"), t("guilds.deleted_count", count=len(to_delete)))
 def on_player_select(evt):
     sel = player_tree.selection()
     if not sel: return
@@ -1126,20 +1047,20 @@ def on_player_select(evt):
 def delete_inactive_players_button():
     folder = current_save_path
     if not folder:
-        messagebox.showerror("Error", "No save loaded!")
+        messagebox.showerror(t("Error"), t("guild.rebuild.no_save"))
         return
-    d = ask_string_with_icon("Delete Inactive Players", "Delete players inactive for days?", ICON_PATH)
+    d = ask_string_with_icon("Delete Inactive Players", "Delete players inactive for days?", ICON_PATH, mode="number")
     if d is None: return
     delete_inactive_players(folder, inactive_days=d)
 def delete_unreferenced_data():
     global files_to_delete
     folder_path = current_save_path
     if not folder_path:
-        messagebox.showerror("Error", "No save loaded!")
+        messagebox.showerror(t("Error"), t("guild.rebuild.no_save"))
         return
     players_folder = os.path.join(folder_path, 'Players')
     if not os.path.exists(players_folder):
-        print("Players folder not found, aborting.")
+        print(t("players.folder_not_found"))
         return
     def normalize_uid(uid):
         if isinstance(uid, dict): uid = uid.get('value', '')
@@ -1179,7 +1100,7 @@ def delete_unreferenced_data():
             pid = normalize_uid(pid_raw)
             if pid not in char_uids:
                 name = p.get('player_info', {}).get('player_name', 'Unknown')
-                print(f"Removing unreferenced player {name} ({pid_raw})")
+                print(t("player.removing_unreferenced", name=name, pid=pid_raw))
                 unreferenced_uids.append(pid)
                 continue
             level = player_levels.get(pid, None)
@@ -1188,7 +1109,7 @@ def delete_unreferenced_data():
                 valid_players.append(p)
             else:
                 name = p.get('player_info', {}).get('player_name', 'Unknown')
-                print(f"Removing invalid player {name} ({pid_raw})")
+                print(t("player.removing_invalid", name=name, pid=pid_raw))
                 invalid_uids.append(pid)
         if not valid_players or all_invalid:
             gid_raw = group['key']
@@ -1200,7 +1121,7 @@ def delete_unreferenced_data():
                     delete_base_camp(b, gid_raw, loaded_level_json)
             group_data_list.remove(group)
             removed_guilds += 1
-            print(f"Removed guild {gid_raw} (Empty or invalid players).")
+            print(t("guild.removed_empty_or_invalid", gid=gid_raw))
             continue
         raw['players'] = valid_players
         admin_uid_raw = raw.get('admin_player_uid')
@@ -1208,7 +1129,7 @@ def delete_unreferenced_data():
         keep_uids = {normalize_uid(p.get('player_uid')) for p in valid_players}
         if admin_uid not in keep_uids:
             raw['admin_player_uid'] = valid_players[0]['player_uid']
-            print(f"Admin reassigned in group {group['key']} to {raw['admin_player_uid']}")
+            print(t("group.admin_reassigned", gid=group["key"], admin=raw["admin_player_uid"]))
     char_map[:] = [entry for entry in char_map if normalize_uid(entry.get('key', {}).get('PlayerUId')) not in unreferenced_uids + invalid_uids and normalize_uid(entry.get('value', {}).get('RawData', {}).get('value', {}).get('object', {}).get('SaveParameter', {}).get('value', {}).get('OwnerPlayerUId')) not in unreferenced_uids + invalid_uids]
     all_removed_uids = set(unreferenced_uids + invalid_uids)
     files_to_delete.update(all_removed_uids)
@@ -1228,24 +1149,26 @@ def delete_unreferenced_data():
             new_map_objects.append(obj)
     map_objects_wrapper['values'] = new_map_objects
     removed_broken, removed_drops = len(broken_ids), len(dropped_ids)
-    for bid in broken_ids: print(f"Deleted broken MapObject — ID: {bid}")
-    for did in dropped_ids: print(f"Deleted dropped item — ID: {did}")
+    for bid in broken_ids: print(t("mapobject.deleted_broken", id=bid))
+    for did in dropped_ids: print(t("item.deleted_dropped", id=did))
     delete_orphaned_bases()
     build_player_levels()
     refresh_all()
     refresh_stats("After Cleaning Players Without References")
     mapobject_count = count_mapobject_ids(wsd)
-    result_msg = (
-        f"Players removed: {len(all_removed_uids)} "
-        f"(Unreferenced: {len(unreferenced_uids)}, Invalid: {len(invalid_uids)})\n"
-        f"Pals deleted: {removed_pals}\n"
-        f"Guilds removed: {removed_guilds}\n"
-        f"Broken MapObjects removed: {removed_broken}\n"
-        f"Dropped items removed: {removed_drops}\n"
-        f"MapObjects total count: {mapobject_count}"
+    result_msg=t(
+        "cleanup.summary",
+        removed_players=len(all_removed_uids),
+        unref=len(unreferenced_uids),
+        invalid=len(invalid_uids),
+        pals=removed_pals,
+        guilds=removed_guilds,
+        broken=removed_broken,
+        drops=removed_drops,
+        mapobjects=mapobject_count
     )
     print(result_msg)
-    messagebox.showinfo("Done", result_msg)
+    messagebox.showinfo(t("Done"), result_msg)
 def delete_inactive_players(folder_path, inactive_days=30):
     global files_to_delete
     players_folder = os.path.join(folder_path, 'Players')
@@ -1312,21 +1235,22 @@ def delete_inactive_players(folder_path, inactive_days=30):
             len(g['value']['RawData']['value'].get('players', []))
             for g in group_data_list if g['value']['GroupType']['value']['value'] == 'EPalGroupType::Guild'
         )
-        result_msg = (
-            f"Players before deletion: {total_players_before}\n"
-            f"Players marked for deletion: {len(deleted_info)}\n"
-            f"Players after deletion (preview): {total_players_after}\n"
-            f"Pals deleted: {removed_pals}"
+        result_msg=t(
+            "cleanup.preview_summary",
+            before=total_players_before,
+            marked=len(deleted_info),
+            after=total_players_after,
+            pals=removed_pals
         )
         print(result_msg)
-        messagebox.showinfo("Success", result_msg)
+        messagebox.showinfo(t("Success"), result_msg)
     else:
-        messagebox.showinfo("Info", "No players found for deletion.")
+        messagebox.showinfo(t("Info"), t("cleanup.no_players_found"))
 def delete_duplicated_players():
     global files_to_delete
     folder = current_save_path
     if not folder:
-        messagebox.showerror("Error", "No save loaded!")
+        messagebox.showerror(t("Error"), t("guild.rebuild.no_save"))
         return
     wsd = loaded_level_json['properties']['worldSaveData']['value']
     tick_now = wsd['GameTimeSaveData']['value']['RealDateTimeTicks']['value']
@@ -1398,9 +1322,21 @@ def delete_duplicated_players():
     refresh_all()
     refresh_stats("After Deletion")
     for d in deleted_players:
-        print(f"KEPT    -> UID: {d['kept_uid']}, Name: {d['kept_name']}, Guild ID: {d['kept_gid']}, Last Online: {format_duration(tick_now - d['kept_last_online'])}")
-        print(f"DELETED -> UID: {d['deleted_uid']}, Name: {d['deleted_name']}, Guild ID: {d['deleted_gid']}, Last Online: {format_duration(tick_now - d['deleted_last_online'])}\n")
-    print(f"Marked {len(deleted_players)} duplicate player(s) for deletion (will delete on Save Changes)...")
+        print(t(
+            "players.duplicate.kept",
+            uid=d["kept_uid"],
+            name=d["kept_name"],
+            gid=d["kept_gid"],
+            last_online=format_duration(tick_now - d["kept_last_online"])
+        ))
+        print(t(
+            "players.duplicate.deleted",
+            uid=d["deleted_uid"],
+            name=d["deleted_name"],
+            gid=d["deleted_gid"],
+            last_online=format_duration(tick_now - d["deleted_last_online"])
+        ) + "\n")
+    print(t("players.duplicate.marked", count=len(deleted_players)))
 def on_guild_members_search(q=None):
     if q is None:
         q = guild_members_search_var.get()
@@ -2100,7 +2036,7 @@ class KillNearestBaseDialog(tk.Toplevel):
 def open_kill_nearest_base_ui(master=None):
     folder = current_save_path
     if not folder:
-        messagebox.showerror("Error", "No save loaded!")
+        messagebox.showerror(t("Error"), t("guild.rebuild.no_save"))
         return
     dlg = KillNearestBaseDialog(master)
     dlg.grab_set()
@@ -2144,92 +2080,92 @@ def create_stats_panel(parent, style):
     stat_frame.lift()
     return stat_frame, stat_labels
 def generate_map():
-    start_time = time.time()
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    main_dir = os.path.dirname(script_dir)
-    log_file_path = os.path.join(main_dir, 'Scan Save Logger', 'scan_save.log')    
+    start_time=time.time()
+    script_dir=os.path.dirname(os.path.abspath(__file__))
+    main_dir=os.path.dirname(script_dir)
+    log_file_path=os.path.join(main_dir,'Scan Save Logger','scan_save.log')
     if not os.path.exists(log_file_path):
-        messagebox.showerror("Error", f"Log file not found at:\n{log_file_path}\nRun the All in One Deletion Tool first.")
-        return False    
+        messagebox.showerror(t("Error"),t("map.log_not_found",path=log_file_path))
+        return False
     try:
-        guild_data, base_keys = parse_logfile(log_file_path)
-        write_csv(guild_data, base_keys, 'bases.csv')
-        create_world_map()        
-        map_path = os.path.join(main_dir, "updated_worldmap.png")
+        guild_data,base_keys=parse_logfile(log_file_path)
+        write_csv(guild_data,base_keys,'bases.csv')
+        create_world_map()
+        map_path=os.path.join(main_dir,"updated_worldmap.png")
         if os.path.exists(map_path):
-            print("Opening updated_worldmap.png...")
+            print(t("map.opening_image"))
             open_file_with_default_app(map_path)
         else:
-            messagebox.showerror("Error", "updated_worldmap.png not found after creation.")
-            print("updated_worldmap.png not found.")        
-        end_time = time.time()
-        duration = end_time - start_time
-        print(f"Done in {duration:.2f} seconds")
-        return True        
+            messagebox.showerror(t("Error"),t("map.not_found"))
+            print(t("map.not_found"))
+        end_time=time.time()
+        duration=end_time-start_time
+        print(t("map.done_in_seconds",sec=f"{duration:.2f}"))
+        return True
     except Exception as e:
-        messagebox.showerror("Error", f"Error generating map:\n{e}")
-        print(f"Error generating map: {e}")
+        messagebox.showerror(t("Error"),t("map.error_generating",err=e))
+        print(t("map.error_generating",err=e))
         return False
 def reset_anti_air_turrets():
-    folder_path = current_save_path
+    folder_path=current_save_path
     if not folder_path:
-        messagebox.showerror("Error", "No save loaded!")
+        messagebox.showerror(t("Error"),t("guild.rebuild.no_save"))
         return
     try:
-        wsd = loaded_level_json['properties']['worldSaveData']['value']
+        wsd=loaded_level_json['properties']['worldSaveData']['value']
     except KeyError:
-        messagebox.showerror("Error", "Invalid Level.sav structure!")
+        messagebox.showerror(t("Error"),t("turret.invalid_structure"))
         return
     if "FixedWeaponDestroySaveData" in wsd:
         del wsd["FixedWeaponDestroySaveData"]
-        print("All FixedWeaponDestroySaveData (Anti-Air Turrets) reset successfully!")
-        messagebox.showinfo("Success", "Anti-Air Turrets reset successfully!")
+        print(t("turret.reset_success"))
+        messagebox.showinfo(t("Success"),t("turret.reset_success"))
     else:
-        print("No FixedWeaponDestroySaveData found...")
-        messagebox.showinfo("Info", "No destroyed Anti-Air Turrets found to reset.")
+        print(t("turret.none_found"))
+        messagebox.showinfo(t("Info"),t("turret.none_found"))
     refresh_all()
 def unlock_all_private_chests():
-    folder_path = current_save_path
+    folder_path=current_save_path
     if not folder_path:
-        messagebox.showerror("Error", "No save loaded!")
+        messagebox.showerror(t("Error"),t("guild.rebuild.no_save"))
         return
     global loaded_level_json
     try:
-        wsd = loaded_level_json['properties']['worldSaveData']['value']
+        wsd=loaded_level_json['properties']['worldSaveData']['value']
     except KeyError:
-        messagebox.showinfo("Error", "Invalid Level.sav structure!")
+        messagebox.showinfo(t("Error"),t("chest.invalid_structure"))
         return
-    count = 0
+    count=0
     def deep_unlock(data):
         nonlocal count
-        if isinstance(data, dict):
-            ctype = data.get("concrete_model_type", "")
-            if ctype in ("PalMapObjectItemBoothModel", "PalMapObjectPalBoothModel"):
+        if isinstance(data,dict):
+            ctype=data.get("concrete_model_type","")
+            if ctype in("PalMapObjectItemBoothModel","PalMapObjectPalBoothModel"):
                 return
             if "private_lock_player_uid" in data:
-                data["private_lock_player_uid"] = "00000000-0000-0000-0000-000000000000"
-                count += 1
+                data["private_lock_player_uid"]="00000000-0000-0000-0000-000000000000"
+                count+=1
             for v in data.values():
                 deep_unlock(v)
-        elif isinstance(data, list):
+        elif isinstance(data,list):
             for item in data:
                 deep_unlock(item)
     deep_unlock(wsd)
-    msg = f"All private chests have been unlocked (excluding booths)! Total unlocked: {count}"
+    msg=t("chest.unlocked_summary",count=count)
     print(msg)
-    messagebox.showinfo("Unlocked", msg)
+    messagebox.showinfo(t("Unlocked"),msg)
     refresh_all()
 def remove_invalid_items_from_save():
     import json,os
     folder_path=current_save_path
     if not folder_path:
-        messagebox.showerror("Error","No save loaded!")
+        messagebox.showerror(t("Error"),t("guild.rebuild.no_save"))
         return
     global loaded_level_json
     try:
         wsd=loaded_level_json["properties"]["worldSaveData"]["value"]
     except:
-        messagebox.showerror("Error","Invalid Level.sav structure!")
+        messagebox.showerror(t("Error"),t("itemclean.invalid_structure"))
         return
     valid_items=set()
     try:
@@ -2243,9 +2179,11 @@ def remove_invalid_items_from_save():
                     valid_items.add(aid.lower())
     except:
         pass
+    total_before=0
+    total_after=0
     removed=0
-    def count_items(x):
-        t=0
+    def sweep(x):
+        nonlocal total_before,total_after,removed
         if isinstance(x,dict):
             if x.get("prop_name")=="Slots" and isinstance(x.get("value"),dict):
                 for s in x["value"].get("values",[]):
@@ -2254,61 +2192,41 @@ def remove_invalid_items_from_save():
                     val=raw.get("value",{})
                     if isinstance(val,dict):
                         item=val.get("item")
-                        if isinstance(item,dict) and val.get("count",0)>0:
-                            t+=1
-            elif "RawData" in x and isinstance(x["RawData"],dict):
-                val=x["RawData"].get("value",{})
-                if isinstance(val,dict):
-                    item=val.get("item")
-                    if isinstance(item,dict) and val.get("count",0)>0:
-                        t+=1
-            for v in x.values():
-                if isinstance(v,(dict,list)):
-                    t+=count_items(v)
-        elif isinstance(x,list):
-            for v in x:
-                if isinstance(v,(dict,list)):
-                    t+=count_items(v)
-        return t
-    total_before=count_items(wsd)
-    def deep_clean(x):
-        nonlocal removed
-        if isinstance(x,dict):
-            if x.get("prop_name")=="Slots" and isinstance(x.get("value"),dict):
-                for s in x["value"].get("values",[]):
-                    if not isinstance(s,dict): continue
-                    raw=s.get("RawData",{})
-                    val=raw.get("value",{})
-                    if isinstance(val,dict):
-                        item=val.get("item")
-                        if isinstance(item,dict) and val.get("count",0)>0:
+                        cnt=val.get("count",0)
+                        if isinstance(item,dict) and cnt>0:
                             sid=item.get("static_id")
+                            total_before+=1
                             if isinstance(sid,str) and sid.lower() not in valid_items:
                                 val["count"]=0
                                 removed+=1
-                                print(f"[AutoItemCleaner] Removed invalid item: {sid}")
+                                print(t("itemclean.removed",sid=sid))
+                            else:
+                                total_after+=1
             elif "RawData" in x and isinstance(x["RawData"],dict):
                 val=x["RawData"].get("value",{})
                 if isinstance(val,dict):
                     item=val.get("item")
-                    if isinstance(item,dict) and val.get("count",0)>0:
+                    cnt=val.get("count",0)
+                    if isinstance(item,dict) and cnt>0:
                         sid=item.get("static_id")
+                        total_before+=1
                         if isinstance(sid,str) and sid.lower() not in valid_items:
                             val["count"]=0
                             removed+=1
-                            print(f"[AutoItemCleaner] Removed invalid item: {sid}")
+                            print(t("itemclean.removed",sid=sid))
+                        else:
+                            total_after+=1
             for v in x.values():
                 if isinstance(v,(dict,list)):
-                    deep_clean(v)
+                    sweep(v)
         elif isinstance(x,list):
             for v in x:
                 if isinstance(v,(dict,list)):
-                    deep_clean(v)
-    deep_clean(wsd)
-    total_after=count_items(wsd)
-    msg=f"Total items before cleaning: {total_before}\nInvalid items removed: {removed}\nTotal items after cleaning: {total_after}"
+                    sweep(v)
+    sweep(wsd)
+    msg=t("itemclean.summary",before=total_before,removed=removed,after=total_after)
     print(msg)
-    messagebox.showinfo("AutoItemCleaner",msg)
+    messagebox.showinfo(t("AutoItemCleaner"),msg)
     refresh_all()
 def remove_invalid_pals_from_save():
     def load_assets(fname,key):
@@ -2325,13 +2243,13 @@ def remove_invalid_pals_from_save():
     valid_all=valid_pals|valid_npcs
     folder_path=current_save_path
     if not folder_path:
-        messagebox.showerror("Error","No save loaded!")
+        messagebox.showerror(t("Error"),t("guild.rebuild.no_save"))
         return
     global loaded_level_json
     try:
         wsd=loaded_level_json["properties"]["worldSaveData"]["value"]
     except:
-        messagebox.showerror("Error","Invalid Level.sav structure!")
+        messagebox.showerror(t("Error"),t("palclean.invalid_structure"))
         return
     cmap=wsd.get("CharacterSaveParameterMap",{}).get("value",[])
     removed_ids=set()
@@ -2348,7 +2266,7 @@ def remove_invalid_pals_from_save():
             inst=str(entry["key"]["InstanceId"]["value"])
             removed_ids.add(inst)
             removed+=1
-            print(f"[AutoCleaner] Removed invalid: {cid}")
+            print(t("palclean.removed_invalid",cid=cid))
             continue
         filtered.append(entry)
     wsd["CharacterSaveParameterMap"]["value"]=filtered
@@ -2365,61 +2283,61 @@ def remove_invalid_pals_from_save():
                 continue
             newslots.append(s)
         cont["value"]["Slots"]["value"]["values"]=newslots
-    msg=f"Invalid pals removed: {removed}"
+    msg=t("palclean.summary",removed=removed)
     refresh_all()
     refresh_stats("After Deletion")
     print(msg)
-    messagebox.showinfo("AutoCleaner",msg)
+    messagebox.showinfo(t("AutoCleaner"),msg)
 def fix_missions():
-    folder_path = current_save_path
+    folder_path=current_save_path
     if not folder_path:
-        messagebox.showerror("Error", "No save loaded!")
+        messagebox.showerror(t("Error"),t("guild.rebuild.no_save"))
         return
-    save_path = os.path.join(current_save_path, "Players")
+    save_path=os.path.join(current_save_path,"Players")
     if not os.path.exists(save_path):
-        messagebox.showerror("Error", f"'Players' folder not found in: {current_save_path}")
+        messagebox.showerror(t("Error"),t("missions.players_folder_not_found",path=current_save_path))
         return
-    total = 0
-    fixed = 0
-    skipped = 0
+    total=0
+    fixed=0
+    skipped=0
     def deep_delete_completed_quest_array(data):
-        found = False
-        if isinstance(data, dict):
+        found=False
+        if isinstance(data,dict):
             if "CompletedQuestArray" in data:
-                data["CompletedQuestArray"]["value"]["values"] = []
+                data["CompletedQuestArray"]["value"]["values"]=[]
                 return True
             for v in data.values():
                 if deep_delete_completed_quest_array(v):
-                    found = True
-        elif isinstance(data, list):
+                    found=True
+        elif isinstance(data,list):
             for item in data:
                 if deep_delete_completed_quest_array(item):
-                    found = True
+                    found=True
         return found
     for filename in os.listdir(save_path):
         if filename.endswith(".sav") and "_dps" not in filename:
-            total += 1
-            file_path = os.path.join(save_path, filename)
+            total+=1
+            file_path=os.path.join(save_path,filename)
             try:
-                player_json = sav_to_json(file_path)
+                player_json=sav_to_json(file_path)
             except Exception as e:
-                skipped += 1
-                print(f"{filename}: unreadable ({e})")
+                skipped+=1
+                print(t("missions.unreadable",file=filename,err=e))
                 continue
             if deep_delete_completed_quest_array(player_json):
                 try:
-                    json_to_sav(player_json, file_path)
-                    fixed += 1
-                    print(f"{filename}: missions reset")
+                    json_to_sav(player_json,file_path)
+                    fixed+=1
+                    print(t("missions.reset",file=filename))
                 except Exception as e:
-                    skipped += 1
-                    print(f"{filename}: save failed ({e})")
+                    skipped+=1
+                    print(t("missions.save_failed",file=filename,err=e))
             else:
-                skipped += 1
-                print(f"{filename}: no CompletedQuestArray field")
-    result_msg = f"Total players: {total}\nMissions reset: {fixed}\nSkipped: {skipped}"
+                skipped+=1
+                print(t("missions.no_array",file=filename))
+    result_msg=t("missions.summary",total=total,fixed=fixed,skipped=skipped)
     print(result_msg)
-    messagebox.showinfo("Missions Reset", result_msg)
+    messagebox.showinfo(t("missions.reset_title"),result_msg)
     refresh_all()
 def move_selected_player_to_selected_guild():
     if not current_save_path or not loaded_level_json:
@@ -2457,13 +2375,13 @@ def move_selected_player_to_selected_guild():
         except:
             pass
     if not found:
-        messagebox.showerror("Error",t("guild.move.player_not_found"))
+        messagebox.showerror(t("Error"), t("guild.move.player_not_found"))
         return
     if not target_group:
-        messagebox.showerror("Error",t("guild.move.target_missing"))
+        messagebox.showerror(t("Error"), t("guild.move.target_missing"))
         return
     if origin_group is target_group:
-        messagebox.showinfo("Info",t("guild.move.already_in_guild"))
+        messagebox.showinfo(t("Info"), t("guild.move.already_in_guild"))
         return
     origin_raw=origin_group['value']['RawData']['value']
     newplayers=[p for p in origin_raw.get('players',[]) if nu(p.get('player_uid',''))!=player_uid]
@@ -2534,7 +2452,7 @@ def move_selected_player_to_selected_guild():
             pass
     refresh_all()
     refresh_stats("After Deletion")
-    messagebox.showinfo("Done",t("guild.move.moved").format(player=player_uid_raw,guild=target_gid_raw))
+    messagebox.showinfo(t("Done"), t("guild.move.moved", player=player_uid_raw, guild=target_gid_raw))
 def load_player_json(uid):
     p=os.path.join(current_save_path,"Players",f"{uid}.sav")
     if not os.path.isfile(p): return None
@@ -2803,6 +2721,17 @@ def make_selected_member_leader():
             break
     messagebox.showinfo(t("guild.leader_updated.title"),t("guild.leader_updated.msg").format(old=old_leader_name,new=p_name))
     refresh_all()
+def rename_world():
+    meta_path=os.path.join(current_save_path,"LevelMeta.sav")
+    if not os.path.exists(meta_path): return None
+    meta_json=sav_to_json(meta_path)
+    old=meta_json["properties"]["SaveData"]["value"].get("WorldName",{}).get("value","Unknown World")
+    new_name=ask_string_with_icon(t("world.rename.title"),t("world.rename.prompt",old=old),ICON_PATH,mode="text")
+    if new_name:
+        meta_json["properties"]["SaveData"]["value"]["WorldName"]["value"]=new_name
+        json_to_sav(meta_json,meta_path)
+        return new_name
+    return None
 def all_in_one_tools():
     global window, stat_labels, guild_tree, base_tree, player_tree, guild_members_tree
     global guild_search_var, base_search_var, player_search_var, guild_members_search_var
@@ -3036,6 +2965,7 @@ def all_in_one_tools():
     file_menu.add_command(label=t("menu.file.character_transfer"), command=open_character_transfer)
     file_menu.add_command(label=t("menu.file.fix_host_save"), command=open_fix_host_save)
     file_menu.add_command(label=t("menu.file.restore_map"), command=open_restore_map)
+    file_menu.add_command(label=t("menu.file.rename_world"), command=rename_world)
     menubar.add_cascade(label=t("deletion.menu.file"), menu=file_menu)
     delete_menu = tk.Menu(menubar, tearoff=0)
     delete_menu.add_command(label=t("deletion.menu.delete_selected_guild"), command=delete_selected_guild)
@@ -3068,16 +2998,6 @@ def all_in_one_tools():
     guild_menu.add_command(label=t("guild.menu.move_selected_player_to_selected_guild"), command=move_selected_player_to_selected_guild)
     guild_menu.add_command(label=t("guild.menu.rebuild_all_guilds"), command=rebuild_all_guilds)
     menubar.add_cascade(label=t("guild.menu.title"), menu=guild_menu)
-    language_menu = tk.Menu(menubar, tearoff=0)
-    language_menu.add_command(label=t("lang.zh_CN"), command=lambda: change_language("zh_CN"))
-    language_menu.add_command(label=t("lang.en_US"), command=lambda: change_language("en_US"))
-    language_menu.add_command(label=t("lang.ru_RU"), command=lambda: change_language("ru_RU"))
-    language_menu.add_command(label=t("lang.fr_FR"), command=lambda: change_language("fr_FR"))
-    language_menu.add_command(label=t("lang.es_ES"), command=lambda: change_language("es_ES"))
-    language_menu.add_command(label=t("lang.de_DE"), command=lambda: change_language("de_DE"))
-    language_menu.add_command(label=t("lang.ja_JP"), command=lambda: change_language("ja_JP"))
-    language_menu.add_command(label=t("lang.ko_KR"), command=lambda: change_language("ko_KR"))
-    menubar.add_cascade(label=t("menu.language"), menu=language_menu)
     window.config(menu=menubar)
     def on_f5_press(event):
         folder = current_save_path
@@ -3094,12 +3014,6 @@ def all_in_one_tools():
     def on_exit(): window.destroy()
     window.protocol("WM_DELETE_WINDOW", on_exit)
     return window
-def center_window(win):
-    win.update_idletasks()
-    w, h = win.winfo_width(), win.winfo_height()
-    ws, hs = win.winfo_screenwidth(), win.winfo_screenheight()
-    x, y = (ws - w) // 2, (hs - h) // 2
-    win.geometry(f'{w}x{h}+{x}+{y}')
 if __name__=="__main__":
     all_in_one_tools()
     if len(sys.argv) > 1:

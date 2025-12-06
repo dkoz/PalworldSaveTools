@@ -1,12 +1,4 @@
 from import_libs import *
-try:
-    from i18n import t
-except Exception:
-    def t(key, **fmt):
-        return key.format(**fmt) if fmt else key
-import tkinter as tk
-from tkinter import ttk, messagebox
-import os
 def get_steam_id_from_local():
     local_app_data_path = os.path.expandvars(r"%localappdata%\Pal\Saved\SaveGames")
     if os.path.exists(local_app_data_path):

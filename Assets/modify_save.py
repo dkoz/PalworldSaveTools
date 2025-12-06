@@ -1,16 +1,4 @@
-import os, sys, shutil, subprocess, zipfile, urllib.request, json, tkinter as tk
-from tkinter import ttk, messagebox
-from pathlib import Path
-from common import open_file_with_default_app
-try:
-    from i18n import t, init_language, set_language, get_language, load_resources
-except Exception:
-    def t(key, **fmt):
-        return key.format(**fmt) if fmt else key
-    def init_language(default_lang="zh_CN"): pass
-    def set_language(lang): pass
-    def get_language(): return "zh_CN"
-    def load_resources(lang=None): pass
+from import_libs import *
 def _format_bytes(num:int)->str:
     for unit in("B","KB","MB","GB"):
         if num<1024 or unit=="GB":

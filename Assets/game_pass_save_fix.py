@@ -1,9 +1,4 @@
 from import_libs import *
-try:
-    from i18n import t
-except Exception:
-    def t(key, **fmt):
-        return key.format(**fmt) if fmt else key
 saves = []
 save_extractor_done = threading.Event()
 save_converter_done = threading.Event()
@@ -224,10 +219,4 @@ def game_pass_save_fix():
     def on_exit(): shutil.rmtree(os.path.join(root_dir, "saves"), ignore_errors=True); window.destroy()
     window.protocol("WM_DELETE_WINDOW", on_exit)
     return window
-def center_window(win):
-    win.update_idletasks()
-    w, h = win.winfo_width(), win.winfo_height()
-    ws, hs = win.winfo_screenwidth(), win.winfo_screenheight()
-    x, y = (ws - w) // 2, (hs - h) // 2
-    win.geometry(f'{w}x{h}+{x}+{y}')
 if __name__ == "__main__": game_pass_save_fix()

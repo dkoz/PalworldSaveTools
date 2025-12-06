@@ -1,36 +1,5 @@
 from import_libs import *
-try:
-    from i18n import t
-except Exception:
-    def t(key, **fmt):
-        return key.format(**fmt) if fmt else key
 player_list_cache = []
-def backup_whole_directory(source_folder, backup_folder):
-    import os, sys, shutil, datetime as dt
-    def get_timestamp():
-        return dt.datetime.now().strftime("%Y%m%d_%H%M%S")
-    source_folder = os.path.abspath(source_folder)
-    if not os.path.isabs(backup_folder):
-        base_path = os.path.dirname(sys.executable) if getattr(sys, "frozen", False) else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        backup_folder = os.path.abspath(os.path.join(base_path, backup_folder))
-    else:
-        backup_folder = os.path.abspath(backup_folder)
-    if not os.path.exists(backup_folder):
-        os.makedirs(backup_folder)
-    print("Now backing up Level.sav, LevelMeta.sav and Players folder...")
-    timestamp = get_timestamp()
-    backup_path = os.path.join(backup_folder, f"PalworldSave_backup_{timestamp}")
-    os.makedirs(backup_path, exist_ok=True)
-    level_src = os.path.join(source_folder, "Level.sav")
-    levelmeta_src = os.path.join(source_folder, "LevelMeta.sav")
-    players_src = os.path.join(source_folder, "Players")
-    if os.path.exists(level_src):
-        shutil.copy2(level_src, os.path.join(backup_path, "Level.sav"))
-    if os.path.exists(levelmeta_src):
-        shutil.copy2(levelmeta_src, os.path.join(backup_path, "LevelMeta.sav"))
-    if os.path.exists(players_src):
-        shutil.copytree(players_src, os.path.join(backup_path, "Players"))
-    print(f"Backup created at: {backup_path}")
 def fix_save(save_path, new_guid, old_guid, guild_fix=True):
     new_guid_formatted = '{}-{}-{}-{}-{}'.format(new_guid[:8], new_guid[8:12], new_guid[12:16], new_guid[16:20], new_guid[20:]).lower()
     old_guid_formatted = '{}-{}-{}-{}-{}'.format(old_guid[:8], old_guid[8:12], old_guid[12:16], old_guid[16:20], old_guid[20:]).lower()
@@ -375,9 +344,3 @@ def fix_host_save():
     def on_exit(): window.destroy()
     window.protocol("WM_DELETE_WINDOW", on_exit)
     return window
-def center_window(win):
-    win.update_idletasks()
-    w, h = win.winfo_width(), win.winfo_height()
-    ws, hs = win.winfo_screenwidth(), win.winfo_screenheight()
-    x, y = (ws - w) // 2, (hs - h) // 2
-    win.geometry(f'{w}x{h}+{x}+{y}')

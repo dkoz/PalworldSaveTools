@@ -38,6 +38,12 @@ def check_github_update(auto_download=False, download_folder="PST_update", force
     except Exception as e:
         print(f"{RED_FONT}{t('update.failed')} {e}{RESET_FONT}")
         return True,None
+def center_window(win):
+    win.update_idletasks()
+    w, h = win.winfo_width(), win.winfo_height()
+    ws, hs = win.winfo_screenwidth(), win.winfo_screenheight()
+    x, y = (ws - w) // 2, (hs - h) // 2
+    win.geometry(f'{w}x{h}+{x}+{y}')
 def is_frozen():
     return getattr(sys, 'frozen', False)
 def get_assets_path():
@@ -412,12 +418,6 @@ class MenuGUI(tk.Tk):
         self.lang_combo.configure(values=values)
         cur = get_language()
         self.lang_combo.set(t(f'lang.{cur}'))
-def center_window(win):
-    win.update_idletasks()
-    w, h = win.winfo_width(), win.winfo_height()
-    ws, hs = win.winfo_screenwidth(), win.winfo_screenheight()
-    x, y = (ws - w) // 2, (hs - h) // 2
-    win.geometry(f'{w}x{h}+{x}+{y}')
 def on_exit():
     app.running=False
     try: app.destroy()

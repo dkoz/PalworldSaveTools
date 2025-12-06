@@ -54,32 +54,61 @@ def sanitize_text(text):
 def extract_info_from_log():
     print(t("mapgen.extract"))
     try:
-        with open('Scan Save Logger/scan_save.log','r',encoding='utf-8') as f:
-            log_content=f.read()
+        with open('Scan Save Logger/scan_save.log', 'r', encoding='utf-8') as f:
+            log_content = f.read()
     except UnicodeDecodeError:
         raise ValueError("UTF-8 read error.")
-    stats={
-        'Total Players':'N/A',
-        'Total Caught Pals':'N/A',
-        'Total Overall Pals':'N/A',
-        'Total Owned Pals':'N/A',
-        'Total Worker/Dropped Pals':'N/A',
-        'Total Active Guilds':'N/A',
-        'Total Bases':'N/A'
+    stats = {
+        'Total Players': 'N/A',
+        'Total Caught Pals': 'N/A',
+        'Total Overall Pals': 'N/A',
+        'Total Owned Pals': 'N/A',
+        'Total Worker/Dropped Pals': 'N/A',
+        'Total Active Guilds': 'N/A',
+        'Total Bases': 'N/A'
     }
-    for key in list(stats.keys()):
-        m=re.search(rf"{re.escape(key)}:\s*(\d+)",log_content)
-        if m: stats[key]=m.group(1)
-    translation_map={
-        "Total Players":"stats.total_players",
-        "Total Caught Pals":"stats.total_caught",
-        "Total Overall Pals":"stats.total_overall",
-        "Total Owned Pals":"stats.total_owned",
-        "Total Worker/Dropped Pals":"stats.total_workers",
-        "Total Active Guilds":"stats.total_guilds",
-        "Total Bases":"stats.total_bases"
+    block = re.search(r"PST_STATS_BEGIN(.*?)PST_STATS_END", log_content, re.S)
+    if not block:
+        return stats
+    text = block.group(1)
+    patterns = {
+        'Total Players': r":\s*(\d+)",
+        'Total Caught Pals': r":\s*(\d+)",
+        'Total Overall Pals': r":\s*(\d+)",
+        'Total Owned Pals': r":\s*(\d+)",
+        'Total Worker/Dropped Pals': r":\s*(\d+)",
+        'Total Active Guilds': r":\s*(\d+)",
+        'Total Bases': r":\s*(\d+)"
     }
-    for key,value in stats.items():
+    keys_in_order = [
+        'Total Players',
+        'Total Caught Pals',
+        'Total Overall Pals',
+        'Total Owned Pals',
+        'Total Worker/Dropped Pals',
+        'Total Active Guilds',
+        'Total Bases'
+    ]
+    lines = text.splitlines()
+    ki = 0
+    for line in lines:
+        if ki >= len(keys_in_order):
+            break
+        key = keys_in_order[ki]
+        m = re.search(patterns[key], line)
+        if m:
+            stats[key] = m.group(1)
+            ki += 1
+    translation_map = {
+        "Total Players": "stats.total_players",
+        "Total Caught Pals": "stats.total_caught",
+        "Total Overall Pals": "stats.total_overall",
+        "Total Owned Pals": "stats.total_owned",
+        "Total Worker/Dropped Pals": "stats.total_workers",
+        "Total Active Guilds": "stats.total_guilds",
+        "Total Bases": "stats.total_bases"
+    }
+    for key, value in stats.items():
         print(f"{t(translation_map[key])}: {value}")
     return stats
 def render_text_pil(text,size=20,color=(255,0,0)):

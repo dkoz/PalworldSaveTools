@@ -1,12 +1,4 @@
 from import_libs import *
-try:
-    from i18n import t
-except Exception:
-    def t(key, **fmt):
-        return key.format(**fmt) if fmt else key
-import tkinter as tk
-from tkinter import ttk, messagebox
-import os, shutil, time
 savegames_path = os.path.join(os.environ['LOCALAPPDATA'], 'Pal', 'Saved', 'SaveGames')
 restore_map_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Backups', 'Restore Map')
 os.makedirs(restore_map_path, exist_ok=True)
@@ -84,11 +76,5 @@ def restore_map():
     window.protocol("WM_DELETE_WINDOW", window.destroy)
     window.grab_set()
     return window
-def center_window(win):
-    win.update_idletasks()
-    w, h = win.winfo_width(), win.winfo_height()
-    ws, hs = win.winfo_screenwidth(), win.winfo_screenheight()
-    x, y = (ws - w) // 2, (hs - h) // 2
-    win.geometry(f'{w}x{h}+{x}+{y}')
 def main(): restore_map()
 if __name__ == '__main__': main()
