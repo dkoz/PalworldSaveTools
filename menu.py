@@ -6,13 +6,32 @@ from tkinter import ttk
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import os, sys, urllib.request, zipfile, subprocess, re
+import os, subprocess, tempfile, sys
+def unlock_self_folder():
+    folder=os.path.dirname(os.path.abspath(sys.argv[0]))
+    script=(
+        f"$target=\"{folder}\"\n"
+        "$p=Get-Process\n"
+        "foreach($x in $p){try{if($x.Path -and $x.Path.StartsWith($target)){Stop-Process -Id $x.Id -Force -ErrorAction SilentlyContinue}}catch{}}\n"
+        "foreach($x in $p){try{$m=$x.Modules|Where-Object{$_.FileName -and $_.FileName.StartsWith($target)};if($m.Count -gt 0){Stop-Process -Id $x.Id -Force -ErrorAction SilentlyContinue}}catch{}}\n"
+        "exit\n"
+    )
+    tmp=tempfile.NamedTemporaryFile(delete=False,suffix=".ps1")
+    tmp.write(script.encode())
+    tmp.close()
+    si=subprocess.STARTUPINFO()
+    si.dwFlags=subprocess.STARTF_USESHOWWINDOW
+    subprocess.Popen(["powershell","-WindowStyle","Hidden","-ExecutionPolicy","Bypass","-File",tmp.name],startupinfo=si,creationflags=subprocess.CREATE_NO_WINDOW)
+    os._exit(0)
 def hide_console():
+    return
     import sys, ctypes
     if sys.platform == "win32":
         hwnd = ctypes.windll.kernel32.GetConsoleWindow()
         if hwnd:
             ctypes.windll.user32.ShowWindow(hwnd, 0)
 def show_console():
+    return
     import sys, ctypes
     if sys.platform == "win32":
         hwnd = ctypes.windll.kernel32.GetConsoleWindow()
@@ -446,11 +465,8 @@ class MenuGUI(tk.Tk):
         cur = get_language()
         self.lang_combo.set(t(f'lang.{cur}'))
 def on_exit():
-    try: app.running=False
+    try: unlock_self_folder()
     except: pass
-    try: app.destroy()
-    except: pass
-    import os
     os._exit(0)
 if __name__=="__main__":
     hide_console()

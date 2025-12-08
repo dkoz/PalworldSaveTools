@@ -19,4 +19,3 @@ echo Using Python: "%PYEXE%"
 "%PYEXE%" -c "import sys; print('Python', sys.version)" 2>nul
 
 "%PYEXE%" "%SCRIPT_DIR%menu.py"
-pause
