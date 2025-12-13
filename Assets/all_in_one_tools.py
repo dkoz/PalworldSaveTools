@@ -60,6 +60,8 @@ def refresh_stats(section):
             update_stats_section(stat_labels, "Result", result)
 def as_uuid(val): return str(val).lower() if val else ''
 def are_equal_uuids(a,b): return as_uuid(a)==as_uuid(b)
+def fast_deepcopy(json_dict):
+    return pickle.loads(pickle.dumps(json_dict, -1))
 try:
     from menu import run_tool
 except ImportError:
@@ -2569,13 +2571,11 @@ def rebuild_all_players_pals():
         cmap=wsd["CharacterSaveParameterMap"]["value"]
         containers=wsd["CharacterContainerSaveData"]["value"]
         gmap=wsd["GroupSaveDataMap"]["value"]
+        mapobjs=wsd.get("MapObjectSaveData",{}).get("value",{}).get("values",[])
     except:
         return False
     zero=UUID.from_str("00000000-0000-0000-0000-000000000000")
-    used_ids=set()
-    for ch in cmap:
-        try: used_ids.add(str(ch["key"]["InstanceId"]["value"]))
-        except: pass
+    used_ids={str(ch["key"]["InstanceId"]["value"]) for ch in cmap if "key" in ch}
     def bump_guid_str(s):
         v=str(s).lower()
         t=str.maketrans("0123456789abcdef","123456789abcdef0")
@@ -2584,122 +2584,68 @@ def rebuild_all_players_pals():
             bumped=bumped.translate(t)
         used_ids.add(bumped)
         return bumped
-    players_folder=os.path.normpath(os.path.join(current_save_path,"Players"))
-    if not os.path.isdir(players_folder):
-        return False
-    def load_player_file(uid):
+    players_folder=os.path.join(current_save_path,"Players")
+    if not os.path.isdir(players_folder): return False
+    real_players={p.get("player_uid") for g in gmap for p in g.get("value",{}).get("RawData",{}).get("value",{}).get("players",[]) if p.get("player_uid")}
+    id_map={}
+    new_params=[]
+    for ch in cmap:
         try:
-            fname=str(uid).replace("-","").upper()+".sav"
-            full=os.path.join(players_folder,fname)
-            if not os.path.isfile(full): return None
-            with open(full,"rb") as f: raw=f.read()
-            gvas,_=decompress_sav_to_gvas(raw)
-            return SkipGvasFile.read(gvas).properties
+            raw=ch["value"]["RawData"]["value"]
+            sp=raw["object"]["SaveParameter"]["value"]
+            owner=sp["OwnerPlayerUId"]["value"]
+            if owner not in real_players: continue
         except:
-            return None
-    real_players=set()
+            continue
+        cp=fast_deepcopy(ch)
+        old_inst=cp["key"]["InstanceId"]["value"]
+        new_inst=UUID.from_str(bump_guid_str(old_inst))
+        id_map[str(old_inst)]=new_inst
+        cp["key"]["InstanceId"]["value"]=new_inst
+        raw2=cp["value"]["RawData"]["value"]
+        sp2=raw2["object"]["SaveParameter"]["value"]
+        sp2["OwnerPlayerUId"]["value"]=owner
+        gid=next((g["value"]["RawData"]["value"].get("group_id") for g in gmap for p in g["value"]["RawData"]["value"].get("players",[]) if p.get("player_uid")==owner),zero)
+        raw2["group_id"]=gid
+        try: sp2["WorkerID"]["value"]=zero
+        except: pass
+        try: sp2["WorkRegion"]["group_id"]["value"]=zero
+        except: pass
+        try:
+            if "TaskData" in sp2: sp2["TaskData"]["value"]={}
+        except: pass
+        try: del sp2["WorkSuitabilityOptionInfo"]
+        except: pass
+        try: del sp2["MapObjectConcreteInstanceIdAssignedToExpedition"]
+        except: pass
+        new_params.append(cp)
+    for c in containers:
+        try:
+            for s in c["value"]["Slots"]["value"]["values"]:
+                inst=s.get("RawData",{}).get("value",{}).get("instance_id")
+                if inst and str(inst) in id_map:
+                    s["RawData"]["value"]["instance_id"]=id_map[str(inst)]
+        except:
+            pass
+    for m in mapobjs:
+        try:
+            aid=m["Model"]["value"]["RawData"]["value"].get("assigned_individual_character_handle_id")
+            if aid and str(aid["instance_id"]) in id_map:
+                aid["instance_id"]=id_map[str(aid["instance_id"])]
+        except:
+            pass
     for g in gmap:
         try:
             raw=g["value"]["RawData"]["value"]
-            for p in raw.get("players",[]): 
-                uid=p.get("player_uid")
-                if uid: real_players.add(uid)
+            for h in raw.get("worker_character_handle_ids",[]):
+                if str(h["instance_id"]) in id_map:
+                    h["instance_id"]=id_map[str(h["instance_id"])]
+            handles=raw.get("individual_character_handle_ids",[])
+            handles.clear()
+            for n in id_map.values():
+                handles.append({"guid":zero,"instance_id":n})
         except:
             pass
-    final_new_params=[]
-    removed_total=0
-    for uid in real_players:
-        pdata=load_player_file(uid)
-        if pdata is None: continue
-        try:
-            pal_id=pdata["SaveData"]["value"]["PalStorageContainerId"]["value"]["ID"]["value"]
-            oto_id=pdata["SaveData"]["value"]["OtomoCharacterContainerId"]["value"]["ID"]["value"]
-        except:
-            continue
-        pal_cont=None
-        oto_cont=None
-        for c in containers:
-            try:
-                cid=c["key"]["ID"]["value"]
-                if cid==pal_id: pal_cont=c
-                if cid==oto_id: oto_cont=c
-            except:
-                pass
-        try: cur_pal_slots=pal_cont["value"]["Slots"]["value"].get("values",[]) if pal_cont else []
-        except: cur_pal_slots=[]
-        try: cur_oto_slots=oto_cont["value"]["Slots"]["value"].get("values",[]) if oto_cont else []
-        except: cur_oto_slots=[]
-        gid=zero
-        for g in gmap:
-            try:
-                raw=g["value"]["RawData"]["value"]
-                for p in raw.get("players",[]):
-                    if p.get("player_uid")==uid:
-                        gid=raw.get("group_id",zero)
-                        break
-            except:
-                pass
-        id_map={}
-        new_params=[]
-        removed_count=0
-        for ch in cmap:
-            try:
-                raw=ch["value"]["RawData"]["value"]
-                sp=raw["object"]["SaveParameter"]["value"]
-                owner=sp["OwnerPlayerUId"]["value"]
-            except:
-                continue
-            if owner!=uid: continue
-            removed_count+=1
-            cp=fast_deepcopy(ch)
-            old_inst=cp["key"]["InstanceId"]["value"]
-            bumped=bump_guid_str(old_inst)
-            new_inst=UUID.from_str(bumped)
-            id_map[str(old_inst)]=new_inst
-            cp["key"]["InstanceId"]["value"]=new_inst
-            raw2=cp["value"]["RawData"]["value"]
-            sp2=raw2["object"]["SaveParameter"]["value"]
-            sp2["OwnerPlayerUId"]["value"]=uid
-            raw2["group_id"]=gid
-            try: sp2["WorkRegion"]["group_id"]["value"]=zero
-            except: pass
-            try: sp2["WorkerID"]["value"]=zero
-            except: pass
-            try:
-                if "TaskData" in sp2: sp2["TaskData"]["value"]={}
-            except: pass
-            try:
-                if "MapObjectConcreteInstanceIdAssignedToExpedition" in sp2: del sp2["MapObjectConcreteInstanceIdAssignedToExpedition"]
-            except: pass
-            try: del sp2["WorkSuitabilityOptionInfo"]
-            except: pass
-            new_params.append(cp)
-        if pal_cont:
-            newslots=fast_deepcopy(cur_pal_slots)
-            for s in newslots:
-                raw=s.get("RawData",{}).get("value",{})
-                inst=raw.get("instance_id")
-                if inst and str(inst) in id_map: raw["instance_id"]=id_map[str(inst)]
-            pal_cont["value"]["Slots"]["value"]["values"]=newslots
-        if oto_cont:
-            newslots=fast_deepcopy(cur_oto_slots)
-            for s in newslots:
-                raw=s.get("RawData",{}).get("value",{})
-                inst=raw.get("instance_id")
-                if inst and str(inst) in id_map: raw["instance_id"]=id_map[str(inst)]
-            oto_cont["value"]["Slots"]["value"]["values"]=newslots
-        for g in gmap:
-            try:
-                raw=g["value"]["RawData"]["value"]
-                if raw.get("group_id")!=gid: continue
-                handles=raw.get("individual_character_handle_ids")
-                if not isinstance(handles,list): continue
-                for o,n in id_map.items():
-                    handles.append({"guid":str(zero),"instance_id":n})
-            except:
-                pass
-        final_new_params.extend(new_params)
-        removed_total+=removed_count
     final_cmap=[]
     for ch in cmap:
         try:
@@ -2709,7 +2655,7 @@ def rebuild_all_players_pals():
         except:
             pass
         final_cmap.append(ch)
-    final_cmap+=final_new_params
+    final_cmap.extend(new_params)
     wsd["CharacterSaveParameterMap"]["value"]=final_cmap
     return True
 def rebuild_all_guilds():
@@ -2780,7 +2726,7 @@ def rebuild_all_guilds():
             except:
                 pass
     refresh_all()
-    refresh_stats("After")
+    refresh_stats("After Deletion")
     messagebox.showinfo("Done", t("guild.rebuild.done"))
 def make_selected_member_leader():
     sel=guild_members_tree.selection()
