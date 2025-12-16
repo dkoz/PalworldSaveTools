@@ -240,6 +240,7 @@
 "xgp.err.import_exception": "Error al importar módulo palworld_xgp_import: {err}",
 "xgp.err.import_failed": "Importación fallida: {err}",
 "xgp.ui.choose_save": "Selecciona el guardado a convertir:",
+"xgp.ui.description": "Convertir partidas guardadas entre Xbox (Game Pass) y Steam",
 "xgp.ui.convert": "Convertir guardado",
 "xgp.title.converter": "Convertidor de guardados Palworld",
 "xgp.ui.btn_xgp_folder": "Carpeta de guardados GamePass",
@@ -440,5 +441,12 @@
 "Error": "Error",
 "deletion.exclusions.player_label": "UIDs de Jugador Excluidas:",
 "deletion.exclusions.guild_label": "IDs de Gremio Excluidas:",
-"deletion.exclusions.base_label": "IDs de Base Excluidas:"
+"deletion.exclusions.base_label": "IDs de Base Excluidas:",
+"deletion.menu.delete_non_base_map_objs": "Eliminar Objetos de Mapa Huérfanos/No Base",
+"map_obj.checking_id": "Comprobando ID de {object_name}: {instance_id}",
+"map_obj.keeping_base": "MANTENIENDO Objeto de Mapa Base ID: {instance_id} ({object_name}) - ID de Base: {base_camp_id} está ACTIVA",
+"map_obj.reason_null_id": "La ID de Base falta o es nula",
+"map_obj.reason_orphaned": "ID de Base: {base_camp_id} NO está en la Lista de Bases Activas (HUÉRFANO)",
+"map_obj.deleting_orphan": "ELIMINANDO Objeto de Mapa Huérfano/No Base ID: {instance_id} ({object_name}) - RAZÓN: {reason}",
+"map_obj.deleted_summary": "Se eliminaron {deleted_count} objetos de mapa huérfanos/no base. Quedan {remaining_count} objetos de mapa."
 }

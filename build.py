@@ -1,10 +1,10 @@
 import os, sys, subprocess, shutil, re
-VENV_DIR = "venv"
+VENV_DIR = "pst_venv"
 PYTHON_EXE = os.path.join(VENV_DIR, "Scripts", "python.exe") if os.name == "nt" else os.path.join(VENV_DIR, "bin", "python")
 def create_venv():
     if not os.path.exists(VENV_DIR):
         print("Creating virtual environment...")
-        subprocess.check_call([sys.executable, "-m", "venv", VENV_DIR])
+        subprocess.check_call([sys.executable, "-m", "pst_venv", VENV_DIR])
     else:
         print("Virtual environment already exists.")
 def install_deps():
@@ -42,7 +42,7 @@ def build_with_cx_freeze():
         print(f"Removing {lib_folder}...")
         shutil.rmtree(lib_folder)
 def clean_build_artifacts():
-    for item in ["build","PalworldSaveTools.egg-info","Backups","PST_standalone","Scan Save Logger","psp_windows","ppe_windows","updated_worldmap.png","PalDefender"]:
+    for item in ["build","PalworldSaveTools.egg-info","Backups","PST_standalone","Scan Save Logger","psp_windows","ppe_windows","updated_worldmap.png","PalDefender","XGP_converted_saves"]:
         if os.path.exists(item):
             print(f"Removing {item}...")
             if os.path.isdir(item):

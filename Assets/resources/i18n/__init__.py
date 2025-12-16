@@ -32,10 +32,20 @@ def set_language(lang: str) -> None:
         lang = "zh_CN"
     _LANG = lang
     try:
+        # Load existing config to preserve other settings
+        cfg = _load_json(_CFG) if os.path.exists(_CFG) else {}
+        cfg["lang"] = lang
         with open(_CFG, "w", encoding="utf-8") as f:
-            json.dump({"lang": lang}, f, ensure_ascii=False, indent=2)
+            json.dump(cfg, f, ensure_ascii=False, indent=2)
     except Exception:
         pass
+
+def get_config_value(key: str, default: Any = None) -> Any:
+    """Get a value from the config.json file"""
+    if os.path.exists(_CFG):
+        cfg = _load_json(_CFG)
+        return cfg.get(key, default)
+    return default
 
 def init_language(default_lang: str = "zh_CN") -> None:
     lang = default_lang

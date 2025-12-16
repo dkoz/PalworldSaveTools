@@ -2,12 +2,43 @@ import os, warnings
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT']='1'
 warnings.filterwarnings("ignore", category=UserWarning, module="pygame.pkgdata")
 import sys,argparse,code,collections,copy,ctypes,datetime,functools,gc,importlib.metadata,json,shutil,glob
-import logging,multiprocessing,platform,pprint,re,subprocess,tarfile,threading,pickle,zipfile,customtkinter,string,palworld_coord
-import time,traceback,uuid,io,pathlib,tkinter as tk,tkinter.font,csv,urllib.request,tempfile,random,pandas as pd
+import logging,multiprocessing,platform,pprint,re,subprocess,tarfile,threading,pickle,zipfile,string,palworld_coord
+import time,traceback,uuid,io,pathlib,csv,urllib.request,tempfile,random,pandas as pd
 import matplotlib.pyplot as plt,matplotlib.patches as patches,matplotlib.font_manager as font_manager,matplotlib.patheffects as path_effects
 from multiprocessing import shared_memory
-from tkinter import ttk, filedialog, messagebox, PhotoImage, simpledialog
-from PIL import Image,ImageDraw,ImageOps,ImageFont,ImageTk
+try:
+    import tkinter as tk
+    from tkinter import ttk, filedialog, messagebox, PhotoImage, simpledialog
+except ImportError:
+    tk = None
+    ttk = None
+    filedialog = None
+    messagebox = None
+    PhotoImage = None
+    simpledialog = None
+try:
+    import customtkinter as ctk
+    ctk.set_appearance_mode("Dark")
+    ctk.set_default_color_theme("blue")
+except ImportError:
+    ctk = None
+from PySide6.QtWidgets import QApplication, QWidget, QMainWindow, QDialog, QMessageBox, QFileDialog, QInputDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QComboBox, QTextEdit, QTreeWidget, QTreeWidgetItem, QProgressBar, QCheckBox, QRadioButton, QGroupBox, QTabWidget, QTableWidget, QTableWidgetItem, QHeaderView, QSplitter, QScrollArea, QFrame, QMenuBar, QMenu, QStatusBar, QSystemTrayIcon, QStyle, QCommonStyle
+from PySide6.QtGui import QPixmap, QIcon, QFont, QPainter, QPen, QBrush, QColor, QAction
+from PySide6.QtCore import Qt, QTimer, QThread, Signal, QObject, QEvent, QSize, QPoint, QRect
+from PIL import Image,ImageDraw,ImageOps,ImageFont
+try:
+    from i18n import init_language, t, set_language, get_language, load_resources
+except Exception:
+    def t(key, **fmt):
+        return key.format(**fmt) if fmt else key
+    def init_language(default_lang: str = "zh_CN"):
+        pass
+    def set_language(lang: str):
+        pass
+    def get_language():
+        return "zh_CN"
+    def load_resources(lang: str | None = None):
+        pass
 sys.path.insert(0,os.path.abspath(os.path.join(os.path.dirname(__file__),"palworld_save_tools","commands")))
 from palworld_save_tools.archive import *
 from palworld_save_tools.palsav import *
@@ -43,22 +74,19 @@ def backup_whole_directory(source_folder, backup_folder):
     if os.path.exists(levelmeta_src): shutil.copy2(levelmeta_src, os.path.join(backup_path, "LevelMeta.sav"))
     if os.path.exists(players_src): shutil.copytree(players_src, os.path.join(backup_path, "Players"))
     print(f"Backup created at: {backup_path}")
-def center_window(win):
-    win.update_idletasks()
-    w, h = win.winfo_width(), win.winfo_height()
-    ws, hs = win.winfo_screenwidth(), win.winfo_screenheight()
-    x, y = (ws - w) // 2, (hs - h) // 2
-    win.geometry(f'{w}x{h}+{x}+{y}')
-try:
-    from i18n import init_language, t, set_language, get_language, load_resources
-except Exception:
-    def t(key, **fmt):
-        return key.format(**fmt) if fmt else key
-    def init_language(default_lang: str = "zh_CN"):
-        pass
-    def set_language(lang: str):
-        pass
-    def get_language():
-        return "zh_CN"
-    def load_resources(lang: str | None = None):
+def center_window(window):
+    if hasattr(window, 'move'):
+        screen = QApplication.primaryScreen().availableGeometry()
+        size = window.size()
+        window.move((screen.width() - size.width()) // 2, (screen.height() - size.height()) // 2)
+    elif hasattr(window, 'geometry'):
+        window.update_idletasks()
+        screen_width = window.winfo_screenwidth()
+        screen_height = window.winfo_screenheight()
+        width = window.winfo_width()
+        height = window.winfo_height()
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2
+        window.geometry(f"{width}x{height}+{x}+{y}")
+    else:
         pass

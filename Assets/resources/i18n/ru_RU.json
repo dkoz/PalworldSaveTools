@@ -187,6 +187,7 @@
 "xgp.err.import_exception": "Ошибка при импорте модуля palworld_xgp_import: {err}",
 "xgp.err.import_failed": "Импорт не удался: {err}",
 "xgp.ui.choose_save": "Выберите сохранение для конвертации:",
+"xgp.ui.description": "Конвертировать сохранения между Xbox (Game Pass) и Steam",
 "xgp.ui.convert": "Конвертировать сохранение",
 "xgp.title.converter": "Конвертер сохранений Palworld",
 "xgp.ui.btn_xgp_folder": "Папка сохранений GamePass",
@@ -437,5 +438,12 @@
 "Error": "Ошибка",
 "deletion.exclusions.player_label": "Исключенные UID игроков:",
 "deletion.exclusions.guild_label": "Исключенные ID гильдий:",
-"deletion.exclusions.base_label": "Исключенные ID баз:"
+"deletion.exclusions.base_label": "Исключенные ID баз:",
+"deletion.menu.delete_non_base_map_objs": "Удалить осиротевшие/внебазовые объекты карты",
+"map_obj.checking_id": "Проверка {object_name} ID: {instance_id}",
+"map_obj.keeping_base": "СОХРАНЕНИЕ базового объекта карты ID: {instance_id} ({object_name}) - ID базы: {base_camp_id} АКТИВЕН",
+"map_obj.reason_null_id": "ID базы отсутствует или равно нулю",
+"map_obj.reason_orphaned": "ID базы: {base_camp_id} ОТСУТСТВУЕТ в списке активных баз (ОСИРОТЕВШИЙ)",
+"map_obj.deleting_orphan": "УДАЛЕНИЕ осиротевшего/внебазового объекта карты ID: {instance_id} ({object_name}) - ПРИЧИНА: {reason}",
+"map_obj.deleted_summary": "Удалено {deleted_count} осиротевших/внебазовых объектов карты. Осталось {remaining_count} объектов карты."
 }

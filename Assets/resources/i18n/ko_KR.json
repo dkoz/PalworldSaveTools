@@ -240,6 +240,7 @@
 "xgp.err.import_exception": "palworld_xgp_import 모듈 가져오기 실패: {err}",
 "xgp.err.import_failed": "가져오기 실패: {err}",
 "xgp.ui.choose_save": "변환할 세이브 선택:",
+"xgp.ui.description": "Xbox (Game Pass)와 Steam 간 저장 데이터 변환",
 "xgp.ui.convert": "세이브 변환",
 "xgp.title.converter": "Palworld 세이브 변환기",
 "xgp.ui.btn_xgp_folder": "GamePass 세이브 폴더",
@@ -441,5 +442,12 @@
 "Error": "오류",
 "deletion.exclusions.player_label": "제외된 플레이어 UID:",
 "deletion.exclusions.guild_label": "제외된 길드 ID:",
-"deletion.exclusions.base_label": "제외된 거점 ID:"
+"deletion.exclusions.base_label": "제외된 거점 ID:",
+"deletion.menu.delete_non_base_map_objs": "고아/비-거점 지도 오브젝트 삭제",
+"map_obj.checking_id": "{object_name} ID: {instance_id} 확인 중",
+"map_obj.keeping_base": "거점 지도 오브젝트 ID: {instance_id} ({object_name}) 유지 - 거점 ID: {base_camp_id} 활성 상태",
+"map_obj.reason_null_id": "거점 ID가 누락되었거나 null입니다",
+"map_obj.reason_orphaned": "거점 ID: {base_camp_id}는 활성 거점 목록에 없습니다 (고아)",
+"map_obj.deleting_orphan": "고아/비-거점 지도 오브젝트 ID: {instance_id} ({object_name}) 삭제 - 사유: {reason}",
+"map_obj.deleted_summary": "고아/비-거점 지도 오브젝트 {deleted_count}개 삭제. 남은 지도 오브젝트: {remaining_count}개."
 }

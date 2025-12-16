@@ -1,4 +1,12 @@
 from import_libs import *
+from PySide6.QtWidgets import (
+    QHeaderView, QWidget, QTreeWidget, QTreeWidgetItem, QLabel, QPushButton,
+    QVBoxLayout, QHBoxLayout, QLineEdit, QFileDialog, QMessageBox, QApplication,
+    QFrame
+)
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QIcon, QFont
+player_list_cache = []
 level_sav_path, host_sav_path, t_level_sav_path, t_host_sav_path = None, None, None, None
 level_json, host_json, targ_lvl, targ_json = None, None, None, None
 target_section_ranges, target_save_type, target_raw_gvas, targ_json_gvas = None, None, None, None
@@ -140,6 +148,249 @@ class SkipGvasFile(GvasFile):
         writer.properties(self.properties)
         writer.write(self.trailer)
         return writer.bytes()
+def center_window(win):
+    screen=QApplication.primaryScreen().availableGeometry()
+    geo=win.frameGeometry()
+    geo.moveCenter(screen.center())
+    win.move(geo.topLeft())
+class CharacterTransferWindow(QWidget):
+    message_signal = Signal(str, str)
+    def __init__(self):
+        super().__init__()
+        self.source_player_list = None
+        self.target_player_list = None
+        self.source_level_path_label = None
+        self.target_level_path_label = None
+        self.current_selection_label = None
+        self.source_search_entry = None
+        self.target_search_entry = None
+        self.message_signal.connect(self.show_message)
+        self.setup_ui()
+        global source_player_list, target_player_list, source_level_path_label, target_level_path_label, current_selection_label
+        source_player_list = self.source_player_list
+        target_player_list = self.target_player_list
+        source_level_path_label = self.source_level_path_label
+        target_level_path_label = self.target_level_path_label
+        current_selection_label = self.current_selection_label
+    def setup_ui(self):
+        self.setWindowTitle(t("tool.character_transfer"))
+        self.setFixedSize(1200, 640)
+        self.setStyleSheet("""
+QWidget {
+    background: qlineargradient(spread:pad, x1:0.0, y1:0.0, x2:1.0, y2:1.0,
+                stop:0 #07080a, stop:0.5 #08101a, stop:1 #05060a);
+    color: #dfeefc;
+    font-family: "Segoe UI", Roboto, Arial;
+}
+QFrame#glass {
+    background: rgba(18,20,24,0.78);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.04);
+    padding: 12px;
+}
+QLabel { color: #dfeefc; background-color: #121418; }
+QLineEdit {
+    background-color: #333333;
+    color: #dfeefc;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 8px;
+}
+QPushButton {
+    background-color: #555555;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    min-width: 120px;
+}
+QPushButton:hover { background-color: #666666; }
+QTreeWidget {
+    background-color: #222222;
+    color: #dfeefc;
+    border-radius: 12px;
+    padding: 6px;
+    border: 1px solid rgba(255,255,255,0.04);
+}
+QHeaderView::section {
+    background-color: #333333;
+    color: #dfeefc;
+    padding: 8px;
+    border: none;
+    height: 28px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+QTreeView::item:hover { background: #333333; }
+""")
+        try:
+            if ICON_PATH and os.path.exists(ICON_PATH):
+                self.setWindowIcon(QIcon(ICON_PATH))
+        except Exception:
+            pass
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(14, 14, 14, 14)
+        main_layout.setSpacing(12)
+        glass_frame = QFrame()
+        glass_frame.setObjectName("glass")
+        glass_layout = QVBoxLayout(glass_frame)
+        glass_layout.setContentsMargins(12, 12, 12, 12)
+        glass_layout.setSpacing(12)
+        file_row = QHBoxLayout()
+        file_row.setSpacing(10)
+        src_btn = QPushButton(f"{t('Select Source Level File')}")
+        src_btn.setToolTip(t("Select the Level.sav file to use as the source (host)"))
+        src_btn.clicked.connect(self.source_level_file)
+        file_row.addWidget(src_btn)
+        tgt_btn = QPushButton(f"{t('Select Target Level File')}")
+        tgt_btn.setToolTip(t("Select the Level.sav file to use as the target"))
+        tgt_btn.clicked.connect(self.target_level_file)
+        file_row.addWidget(tgt_btn)
+        glass_layout.addLayout(file_row)
+        paths_row = QHBoxLayout()
+        self.source_level_path_label = QLabel(t("No source selected"))
+        self.source_level_path_label.setWordWrap(True)
+        self.source_level_path_label.setMinimumWidth(480)
+        paths_row.addWidget(self.source_level_path_label)
+        self.target_level_path_label = QLabel(t("No target selected"))
+        self.target_level_path_label.setWordWrap(True)
+        self.target_level_path_label.setMinimumWidth(480)
+        paths_row.addWidget(self.target_level_path_label)
+        glass_layout.addLayout(paths_row)
+        trees_layout = QHBoxLayout()
+        trees_layout.setSpacing(14)
+        source_panel = QFrame()
+        source_panel.setStyleSheet("QFrame { background-color: transparent; }")
+        source_panel_layout = QVBoxLayout(source_panel)
+        source_panel_layout.setContentsMargins(6, 6, 6, 6)
+        source_panel_layout.setSpacing(8)
+        source_title = QLabel(t("Source (Host) Players"))
+        source_title.setFont(QFont("Segoe UI", 11, QFont.Bold))
+        source_title.setAlignment(Qt.AlignCenter)
+        source_panel_layout.addWidget(source_title)
+        self.source_search_entry = QLineEdit()
+        self.source_search_entry.setPlaceholderText(t("Search source players..."))
+        self.source_search_entry.textChanged.connect(lambda txt: self.filter_treeview(self.source_player_list, txt, True))
+        source_panel_layout.addWidget(self.source_search_entry)
+        self.source_player_list = QTreeWidget()
+        self.source_player_list.setHeaderLabels([t('GUID'), t('Name'), t('Guild ID')])
+        self.source_player_list.itemSelectionChanged.connect(self.on_selection_of_source_player)
+        self.source_player_list.setSortingEnabled(True)
+        src_header = self.source_player_list.header()
+        src_header.setSectionResizeMode(0, QHeaderView.Stretch)
+        src_header.setSectionResizeMode(1, QHeaderView.Stretch)
+        src_header.setSectionResizeMode(2, QHeaderView.Stretch)
+        source_panel_layout.addWidget(self.source_player_list, 1)
+        trees_layout.addWidget(source_panel, 1)
+        target_panel = QFrame()
+        target_panel.setStyleSheet("QFrame { background-color: transparent; }")
+        target_panel_layout = QVBoxLayout(target_panel)
+        target_panel_layout.setContentsMargins(6, 6, 6, 6)
+        target_panel_layout.setSpacing(8)
+        target_title = QLabel(t("Target Players"))
+        target_title.setFont(QFont("Segoe UI", 11, QFont.Bold))
+        target_title.setAlignment(Qt.AlignCenter)
+        target_panel_layout.addWidget(target_title)
+        self.target_search_entry = QLineEdit()
+        self.target_search_entry.setPlaceholderText(t("Search target players..."))
+        self.target_search_entry.textChanged.connect(lambda txt: self.filter_treeview(self.target_player_list, txt, False))
+        target_panel_layout.addWidget(self.target_search_entry)
+        self.target_player_list = QTreeWidget()
+        self.target_player_list.setHeaderLabels([t('GUID'), t('Name'), t('Guild ID')])
+        self.target_player_list.itemSelectionChanged.connect(self.on_selection_of_target_player)
+        self.target_player_list.setSortingEnabled(True)
+        tgt_header = self.target_player_list.header()
+        tgt_header.setSectionResizeMode(0, QHeaderView.Stretch)
+        tgt_header.setSectionResizeMode(1, QHeaderView.Stretch)
+        tgt_header.setSectionResizeMode(2, QHeaderView.Stretch)
+        target_panel_layout.addWidget(self.target_player_list, 1)
+        trees_layout.addWidget(target_panel, 1)
+        glass_layout.addLayout(trees_layout)
+        self.current_selection_label = QLabel(t("Source: N/A, Target: N/A"))
+        self.current_selection_label.setWordWrap(True)
+        self.current_selection_label.setAlignment(Qt.AlignCenter)
+        glass_layout.addWidget(self.current_selection_label)
+        actions_row = QHBoxLayout()
+        actions_row.setSpacing(12)
+        transfer_all_btn = QPushButton(t('Transfer All'))
+        transfer_all_btn.setToolTip(t("Transfer all characters from source to target (in memory)."))
+        transfer_all_btn.clicked.connect(self.transfer_all_characters)
+        actions_row.addWidget(transfer_all_btn)
+        transfer_btn = QPushButton(t('Transfer'))
+        transfer_btn.setToolTip(t("Transfer selected character(s)."))
+        transfer_btn.clicked.connect(lambda: self.main(skip_msgbox=False))
+        actions_row.addWidget(transfer_btn)
+        save_btn = QPushButton(t('Save Changes'))
+        save_btn.setToolTip(t("Write changes to target Level.sav and player files."))
+        save_btn.clicked.connect(self.finalize_save)
+        actions_row.addWidget(save_btn)
+        glass_layout.addLayout(actions_row)
+        tip_label = QLabel(t("Tip: Select source and target players, then press Transfer. Use 'Save Changes' to persist."))
+        tip_label.setAlignment(Qt.AlignCenter)
+        tip_label.setFont(QFont("Segoe UI", 9))
+        glass_layout.addWidget(tip_label)
+        main_layout.addWidget(glass_frame)
+        center_window(self)
+    def filter_treeview(self, tree, query, is_source):
+        query = query.lower()
+        for i in range(tree.topLevelItemCount()):
+            item = tree.topLevelItem(i)
+            visible = any(query in item.text(col).lower() for col in range(item.columnCount()))
+            item.setHidden(not visible)
+    def source_level_file(self):
+        try:
+            source_level_file()
+        except Exception as e:
+            print(f"GUI: Error calling source_level_file: {e}")
+    def target_level_file(self):
+        try:
+            target_level_file()
+        except Exception as e:
+            print(f"GUI: Error calling target_level_file: {e}")
+    def on_selection_of_source_player(self):
+        try:
+            on_selection_of_source_player()
+        except Exception:
+            selected_items = self.source_player_list.selectedItems()
+            global selected_source_player
+            if selected_items:
+                selected_source_player = selected_items[0].text(1)
+            else:
+                selected_source_player = None
+            self.current_selection_label.setText(f"Source: {selected_source_player}, Target: {selected_target_player}")
+    def on_selection_of_target_player(self):
+        try:
+            on_selection_of_target_player()
+        except Exception:
+            selected_items = self.target_player_list.selectedItems()
+            global selected_target_player
+            if selected_items:
+                selected_target_player = selected_items[0].text(1)
+            else:
+                selected_target_player = None
+            self.current_selection_label.setText(f"Source: {selected_source_player}, Target: {selected_target_player}")
+    def transfer_all_characters(self):
+        try:
+            transfer_all_characters()
+        except Exception as e:
+            print(f"GUI wrapper transfer_all_characters error: {e}")
+    def main(self, skip_msgbox=False):
+        try:
+            return main(skip_msgbox=skip_msgbox)
+        except Exception as e:
+            print(f"GUI wrapper main error: {e}")
+            return False
+    def show_message(self, title, message):
+        msg = QMessageBox(QMessageBox.Information, title, message)
+        try:
+            msg.setWindowIcon(QIcon(ICON_PATH))
+        except Exception:
+            pass
+        msg.exec()
+    def finalize_save(self):
+        try:
+            finalize_save(self)
+        except Exception as e:
+            print(f"GUI finalize_save error: {e}")
 def load_json_files():
     global host_json_gvas, targ_json_gvas, host_json, targ_json
     host_json_gvas = load_player_file(level_sav_path, selected_source_player)
@@ -169,11 +420,12 @@ modified_targets_data = {}
 def transfer_all_characters():
     def worker():
         skipped_uids = set()
-        total_players = len(source_player_list.get_children())
+        total_players = source_player_list.topLevelItemCount()
         count = 0
-        for item_id in source_player_list.get_children():
+        for i in range(total_players):
             count += 1
-            player_uuid = source_player_list.item(item_id)['values'][1]
+            item = source_player_list.topLevelItem(i)
+            player_uuid = item.text(1)
             if player_uuid in modified_target_players:
                 print(f"Player {player_uuid} already transferred. Skipping duplicate transfer.")
                 continue
@@ -188,18 +440,26 @@ def transfer_all_characters():
             global selected_source_player, selected_target_player
             selected_source_player = player_uuid
             selected_target_player = player_uuid
-            main(skip_msgbox=True)
-        selected_source_player = None
-        selected_target_player = None
-        host_guid = None
-        targ_uid = None
-        exported_map = None
-        current_selection_label.config(text="Source: None, Target: None")
-        source_player_list.selection_remove(source_player_list.selection())
-        target_player_list.selection_remove(target_player_list.selection())
-        messagebox.showinfo(t("Transfer Successful"), t("Transfer successful in memory! Hit 'Save Changes' to save."))
-    threading.Thread(target=worker, daemon=True).start()
-def main(skip_msgbox=False):
+            main(skip_msgbox=True, skip_gui=True)
+    thread = threading.Thread(target=worker)
+    thread.start()
+    thread.join()
+    load_players(targ_lvl, is_source=False)
+    selected_source_player = None
+    selected_target_player = None
+    host_guid = None
+    targ_uid = None
+    exported_map = None
+    current_selection_label.setText("Source: None, Target: None")
+    source_player_list.clearSelection()
+    target_player_list.clearSelection()
+    msg = QMessageBox(QMessageBox.Information, t("Transfer Successful"), t("Transfer successful in memory! Hit 'Save Changes' to save."))
+    try:
+        msg.setWindowIcon(QIcon(ICON_PATH))
+    except Exception:
+        pass
+    msg.exec()
+def main(skip_msgbox=False, skip_gui=False):
     global host_guid, targ_uid, exported_map, selected_source_player, selected_target_player
     if not all([level_sav_path, t_level_sav_path, selected_source_player]):
         print("Error! Please have level files and source player selected before starting transfer.")
@@ -208,9 +468,10 @@ def main(skip_msgbox=False):
         host_guid = None
         targ_uid = None
         exported_map = None
-        current_selection_label.config(text="Source: None, Target: None")
-        source_player_list.selection_remove(source_player_list.selection())
-        target_player_list.selection_remove(target_player_list.selection())
+        if not skip_gui:
+            current_selection_label.setText("Source: None, Target: None")
+            source_player_list.clearSelection()
+            target_player_list.clearSelection()
         return False
     if not selected_target_player:
         selected_target_player = selected_source_player
@@ -221,9 +482,10 @@ def main(skip_msgbox=False):
         host_guid = None
         targ_uid = None
         exported_map = None
-        current_selection_label.config(text="Source: None, Target: None")
-        source_player_list.selection_remove(source_player_list.selection())
-        target_player_list.selection_remove(target_player_list.selection())
+        if not skip_gui:
+            current_selection_label.setText("Source: None, Target: None")
+            source_player_list.clearSelection()
+            target_player_list.clearSelection()
         return False
     try:
         host_guid = UUID.from_str(selected_source_player)
@@ -250,17 +512,24 @@ def main(skip_msgbox=False):
     gather_and_update_dynamic_containers()
     modified_target_players.add(selected_target_player)
     modified_targets_data[selected_target_player] = (fast_deepcopy(targ_json), targ_json_gvas)
-    load_players(targ_lvl, is_source=False)
+    if not skip_gui:
+        load_players(targ_lvl, is_source=False)
     selected_source_player = None
     selected_target_player = None
     host_guid = None
     targ_uid = None
     exported_map = None
-    current_selection_label.config(text="Source: None, Target: None")
-    source_player_list.selection_remove(source_player_list.selection())
-    target_player_list.selection_remove(target_player_list.selection())
+    if not skip_gui:
+        current_selection_label.setText("Source: None, Target: None")
+        source_player_list.clearSelection()
+        target_player_list.clearSelection()
     if not skip_msgbox:
-        messagebox.showinfo("Transfer Successful", "Transfer successful in memory! Hit 'Save Changes' to save.")
+        msg = QMessageBox(QMessageBox.Information, t("Transfer Successful"), t("Transfer successful in memory! Hit 'Save Changes' to save."))
+        try:
+            msg.setWindowIcon(QIcon(ICON_PATH))
+        except Exception:
+            pass
+        msg.exec()
 def gather_and_update_dynamic_containers():
     global targ_lvl, dynamic_guids
     src_containers = level_json['DynamicItemSaveData']['value']['values']
@@ -304,7 +573,7 @@ def transfer_character_only(host_guid, targ_uid):
     for container_list in ("CharacterContainerSaveData","ItemContainerSaveData"):
         existing_ids={c.get("key",{}).get("ID",{}).get("value") for c in targ_lvl[container_list]["value"]}
         for c in level_json.get(container_list,{}).get("value",[]):
-            cid=c.get("key",{}).get("ID",{}).get("value")
+            cid=c["key"]["ID"]["value"]
             if cid not in existing_ids:
                 targ_lvl[container_list]["value"].append(fast_deepcopy(c))
     return True
@@ -597,7 +866,7 @@ def gvas_to_sav(file, gvas_data):
     with open(file, 'wb') as out:
         out.write(sav_file_data)
 def select_file():
-    return filedialog.askopenfilename(filetypes=[("Palworld Saves", "*.sav *.json")])
+    return QFileDialog.getOpenFileName(None, "Select Palworld Save File", "", "Palworld Saves (*.sav *.json);;All Files (*)")[0]
 def load_file(path):
     global status_label, root
     loaded_file, save_type = None, None
@@ -632,24 +901,12 @@ def load_players(save_json, is_source):
             players[group_id] = group_data["value"]["RawData"]["value"]["players"]
             guild_dict[group_id] = group_data
     list_box = source_player_list if is_source else target_player_list
-    list_box.delete(*list_box.get_children())
-    if is_source:
-        filter_treeview.source_original_rows = []
-    else:
-        filter_treeview.target_original_rows = []
-    rows_to_insert = []
+    list_box.clear()
     for guild_id, player_items in players.items():
         for player_item in player_items:
             playerUId = ''.join(safe_uuid_str(player_item['player_uid']).split('-')).upper()
-            rows_to_insert.append((safe_uuid_str(guild_id), playerUId, player_item['player_info']['player_name']))
-    row_ids = []
-    for values in rows_to_insert:
-        row_id = list_box.insert('', tk.END, values=values)
-        row_ids.append(row_id)
-    if is_source:
-        filter_treeview.source_original_rows.extend(row_ids)
-    else:
-        filter_treeview.target_original_rows.extend(row_ids)
+            item = QTreeWidgetItem([safe_uuid_str(guild_id), playerUId, player_item['player_info']['player_name']])
+            list_box.addTopLevelItem(item)
 def load_all_source_sections_async(group_save_section, reader):
     global level_json
     level_json, _ = reader.load_sections([
@@ -660,15 +917,21 @@ def load_all_source_sections_async(group_save_section, reader):
         path='.worldSaveData')
     level_json.update(group_save_section)
 def source_level_file():
-    global level_sav_path, source_level_path_label, level_json, selected_source_player, source_section_load_handle
+    global level_sav_path, level_json, selected_source_player, source_section_load_handle
     tmp = select_file()
     if tmp:
         if not tmp.endswith("Level.sav"):
-            print(f"Error!", "This is NOT Level.sav. Please select Level.sav file.")
+            msg = QMessageBox(QMessageBox.Warning, t("Error!"), t("This is NOT Level.sav. Please select Level.sav file."))
+            try: msg.setWindowIcon(QIcon(ICON_PATH))
+            except: pass
+            msg.exec()
             return
         raw_gvas, save_type = load_file(tmp)
         if not raw_gvas:
-            print(f"Error!", "Invalid file, must be Level.sav!")
+            msg = QMessageBox(QMessageBox.Warning, t("Error!"), t("Invalid file, must be Level.sav!"))
+            try: msg.setWindowIcon(QIcon(ICON_PATH))
+            except: pass
+            msg.exec()
             return
         print("Now loading the data from Source Save...")
         reader = MyReader(raw_gvas, PALWORLD_TYPE_HINTS, PALWORLD_CUSTOM_PROPERTIES)
@@ -677,10 +940,10 @@ def source_level_file():
         source_section_load_handle.start()
         source_section_load_handle.join()
         load_players(group_save_section, True)
-        source_level_path_label.config(text=tmp)
+        source_level_path_label.setText(tmp)
         level_sav_path = tmp
         selected_source_player = None
-        current_selection_label.config(text=f"Source: {selected_source_player}, Target: {selected_target_player}")
+        current_selection_label.setText(f"Source: {selected_source_player}, Target: {selected_target_player}")
         print("Done loading the data from Source Save!")
 def load_all_target_sections_async(group_save_section, group_save_section_range, reader):
     global targ_lvl, target_section_ranges
@@ -693,15 +956,21 @@ def load_all_target_sections_async(group_save_section, group_save_section_range,
     targ_lvl.update(group_save_section)
     target_section_ranges.append(group_save_section_range)
 def target_level_file():
-    global t_level_sav_path, target_level_path_label, targ_lvl, target_level_cache, target_section_ranges, target_raw_gvas, target_save_type, selected_target_player, target_section_load_handle
+    global t_level_sav_path, targ_lvl, target_section_ranges, target_raw_gvas, target_save_type, selected_target_player, target_section_load_handle
     tmp = select_file()
     if tmp:
         if not tmp.endswith("Level.sav"):
-            print(f"Error!", "This is NOT Level.sav. Please select Level.sav file.")
+            msg = QMessageBox(QMessageBox.Warning, t("Error!"), t("This is NOT Level.sav. Please select Level.sav file."))
+            try: msg.setWindowIcon(QIcon(ICON_PATH))
+            except: pass
+            msg.exec()
             return
         raw_gvas, target_save_type = load_file(tmp)
         if not raw_gvas:
-            print(f"Error!", "Invalid file, must be Level.sav!")
+            msg = QMessageBox(QMessageBox.Warning, t("Error!"), t("Invalid file, must be Level.sav!"))
+            try: msg.setWindowIcon(QIcon(ICON_PATH))
+            except: pass
+            msg.exec()
             return
         print("Now loading the data from Target Save...")
         target_raw_gvas = raw_gvas
@@ -711,23 +980,23 @@ def target_level_file():
         target_section_load_handle.start()
         target_section_load_handle.join()
         load_players(group_save_section, False)
-        target_level_path_label.config(text=tmp)
+        target_level_path_label.setText(tmp)
         t_level_sav_path = tmp
         selected_target_player = None
-        current_selection_label.config(text=f"Source: {selected_source_player}, Target: {selected_target_player}")
+        current_selection_label.setText(f"Source: {selected_source_player}, Target: {selected_target_player}")
         print("Done loading the data from Target Save!")
-def on_selection_of_source_player(event):
+def on_selection_of_source_player():
     global selected_source_player
-    selections = source_player_list.selection()
-    if len(selections):
-        selected_source_player = source_player_list.item(selections[0])['values'][1]
-        current_selection_label.config(text=f"Source: {selected_source_player}, Target: {selected_target_player}")
-def on_selection_of_target_player(event):
+    selections = source_player_list.selectedItems()
+    if selections:
+        selected_source_player = selections[0].text(1)
+        current_selection_label.setText(f"Source: {selected_source_player}, Target: {selected_target_player}")
+def on_selection_of_target_player():
     global selected_target_player
-    selections = target_player_list.selection()
-    if len(selections):
-        selected_target_player = target_player_list.item(selections[0])['values'][1]
-        current_selection_label.config(text=f"Source: {selected_source_player}, Target: {selected_target_player}")
+    selections = target_player_list.selectedItems()
+    if selections:
+        selected_target_player = selections[0].text(1)
+        current_selection_label.setText(f"Source: {selected_source_player}, Target: {selected_target_player}")
 def sort_treeview_column(treeview, col_index, reverse):
     data = [(treeview.set(child, col_index), child) for child in treeview.get_children('')]
     data.sort(reverse=reverse, key=lambda x: x[0])
@@ -754,87 +1023,11 @@ def filter_treeview(tree, query, is_source):
 def finalize_save(window):
     try:
         save_and_backup()
-        messagebox.showinfo(t("Save Complete"), t("Changes saved successfully."))
-        window.destroy()
+        QMessageBox.information(window, t("Save Complete"), t("Changes saved successfully."))
+        window.close()
     except Exception as e:
         print(f"Exception in finalize_save: {e}")
-        print(f"Save Failed", f"Save failed:\n{e}")
-        try:
-            window.after(100, window.destroy)
-        except:
-            pass
+        QMessageBox.critical(window, "Save Failed", f"Save failed:\n{e}")
+        window.close()
 def character_transfer():
-    global source_player_list, target_player_list, source_level_path_label, target_level_path_label, current_selection_label, btn_toggle
-    window = tk.Toplevel()
-    window.title(t("tool.character_transfer"))
-    window.minsize(1100, 500)
-    window.config(bg="#2f2f2f")
-    try:
-        window.iconbitmap(ICON_PATH)
-    except Exception as e:
-        print(f"Could not set icon: {e}")
-    font_style = ("Arial", 10)
-    heading_font = ("Arial", 12, "bold")
-    style = ttk.Style(window)
-    style.theme_use('clam')
-    style.configure("Treeview.Heading", font=heading_font, background="#444444", foreground="white")
-    style.configure("Treeview", background="#333333", foreground="white", rowheight=25, fieldbackground="#333333", borderwidth=0)
-    style.configure("TFrame", background="#2f2f2f")
-    style.configure("TLabel", background="#2f2f2f", foreground="white")
-    style.configure("TEntry", fieldbackground="#444444", foreground="white")
-    style.configure("Dark.TButton", background="#555555", foreground="white", padding=6)
-    style.map("Dark.TButton", background=[("active", "#666666"), ("!disabled", "#555555")], foreground=[("disabled", "#888888"), ("!disabled", "white")])
-    window.columnconfigure(0, weight=0)
-    window.columnconfigure(1, weight=0)
-    window.rowconfigure(1, weight=1)
-    source_frame = ttk.Frame(window, style="TFrame")
-    source_frame.grid(row=0, column=0, padx=10, pady=5, sticky="ew")
-    ttk.Label(source_frame, text=t("Search Source Player:"), font=font_style, style="TLabel").pack(side="top", anchor="w", padx=(0, 5))
-    source_search_var = tk.StringVar()
-    source_search_entry = ttk.Entry(source_frame, textvariable=source_search_var, font=font_style, style="TEntry", width=20)
-    source_search_entry.pack(side="top", fill="x", expand=True)
-    source_search_entry.bind("<KeyRelease>", lambda e: filter_treeview(source_player_list, source_search_entry.get(), is_source=True))
-    target_frame = ttk.Frame(window, style="TFrame")
-    target_frame.grid(row=0, column=1, padx=10, pady=5, sticky="ew")
-    ttk.Label(target_frame, text=t("Search Target Player:"), font=font_style, style="TLabel").pack(side="top", anchor="w", padx=(0, 5))
-    target_search_var = tk.StringVar()
-    target_search_entry = ttk.Entry(target_frame, textvariable=target_search_var, font=font_style, style="TEntry", width=20)
-    target_search_entry.pack(side="top", fill="x", expand=True)
-    target_search_entry.bind("<KeyRelease>", lambda e: filter_treeview(target_player_list, target_search_entry.get(), is_source=False))
-    ttk.Button(window, text=t('Select Source Level File'), command=source_level_file, style="Dark.TButton").grid(row=2, column=0, padx=10, pady=10, sticky="ew")
-    ttk.Button(window, text=t('Select Target Level File'), command=target_level_file, style="Dark.TButton").grid(row=2, column=1, padx=10, pady=10, sticky="ew")
-    source_level_path_label = ttk.Label(window, text=t("Please select a file:"), font=font_style, style="TLabel", wraplength=600)
-    source_level_path_label.grid(row=3, column=0, padx=10, sticky="ew")
-    target_level_path_label = ttk.Label(window, text=t("Please select a file:"), font=font_style, style="TLabel", wraplength=600)
-    target_level_path_label.grid(row=3, column=1, padx=10, sticky="ew")
-    source_player_list = ttk.Treeview(window, columns=(0, 1, 2), show='headings', style="Treeview")
-    source_player_list.grid(row=1, column=0, padx=10, pady=10, sticky='nw')
-    for col in (0, 1, 2): source_player_list.column(col, anchor='center', width=180, stretch=False)
-    source_player_list.tag_configure("even", background="#333333", foreground="white")
-    source_player_list.tag_configure("odd", background="#444444", foreground="white")
-    source_player_list.tag_configure("selected", background="#555555", foreground="white")
-    source_player_list.heading(0, text=t('Guild ID'), command=lambda: sort_treeview_column(source_player_list, 0, False))
-    source_player_list.heading(1, text=t('Player UID'), command=lambda: sort_treeview_column(source_player_list, 1, False))
-    source_player_list.heading(2, text=t('Nickname'), command=lambda: sort_treeview_column(source_player_list, 2, False))
-    source_player_list.bind('<<TreeviewSelect>>', on_selection_of_source_player)
-    target_player_list = ttk.Treeview(window, columns=(0, 1, 2), show='headings', style="Treeview")
-    target_player_list.grid(row=1, column=1, padx=10, pady=10, sticky='nw')
-    for col in (0, 1, 2): target_player_list.column(col, anchor='center', width=180, stretch=False)
-    target_player_list.tag_configure("even", background="#333333", foreground="white")
-    target_player_list.tag_configure("odd", background="#444444", foreground="white")
-    target_player_list.tag_configure("selected", background="#555555", foreground="white")
-    target_player_list.heading(0, text=t('Guild ID'), command=lambda: sort_treeview_column(target_player_list, 0, False))
-    target_player_list.heading(1, text=t('Player UID'), command=lambda: sort_treeview_column(target_player_list, 1, False))
-    target_player_list.heading(2, text=t('Nickname'), command=lambda: sort_treeview_column(target_player_list, 2, False))
-    target_player_list.bind('<<TreeviewSelect>>', on_selection_of_target_player)
-    current_selection_label = ttk.Label(window, text=t("Source: N/A, Target: N/A"), font=font_style, style="TLabel", anchor="w", wraplength=600)
-    current_selection_label.grid(row=4, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
-    window.grid_columnconfigure(0, weight=1)
-    window.grid_columnconfigure(1, weight=1)
-    ttk.Button(window, text=t('Transfer All'), command=transfer_all_characters, style="Dark.TButton").grid(row=6, column=0, padx=10, pady=(0,10), sticky="ew")
-    ttk.Button(window, text=t('Transfer'), command=lambda: main(skip_msgbox=False), style="Dark.TButton").grid(row=5, column=1, padx=10, pady=(10, 0), sticky="ew")
-    ttk.Button(window, text=t('Save Changes'), command=lambda: finalize_save(window), style="Dark.TButton").grid(row=6, column=1, padx=10, pady=(0, 10), sticky="ew")
-    center_window(window)
-    def on_exit(): window.destroy()
-    window.protocol("WM_DELETE_WINDOW", on_exit)
-    return window
+    return CharacterTransferWindow()

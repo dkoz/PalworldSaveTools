@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 sys.path.append(os.path.dirname(__file__))
 from import_libs import *
 from common import open_file_with_default_app
-from i18n import t
 x_min,x_max=-1000,1000
 y_min,y_max=-1000,1000
 image_path=os.path.join(os.path.dirname(__file__),"resources","worldmap.png")

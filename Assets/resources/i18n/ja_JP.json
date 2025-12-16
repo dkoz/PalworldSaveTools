@@ -240,6 +240,7 @@
 "xgp.err.import_exception": "palworld_xgp_import モジュールのインポートに失敗：{err}",
 "xgp.err.import_failed": "インポートに失敗しました：{err}",
 "xgp.ui.choose_save": "変換するセーブデータを選択：",
+"xgp.ui.description": "Xbox - Game Pass とSteam間でセーブデータを変換する",
 "xgp.ui.convert": "セーブ変換",
 "xgp.title.converter": "Palworld セーブコンバーター",
 "xgp.ui.btn_xgp_folder": "GamePass セーブフォルダ",
@@ -440,5 +441,12 @@
 "Error": "エラー",
 "deletion.exclusions.player_label": "除外されたプレイヤーUID:",
 "deletion.exclusions.guild_label": "除外されたギルドID:",
-"deletion.exclusions.base_label": "除外された拠点ID:"
+"deletion.exclusions.base_label": "除外された拠点ID:",
+"deletion.menu.delete_non_base_map_objs": "孤立した/非拠点マップオブジェクトを削除",
+"map_obj.checking_id": "{object_name} ID: {instance_id} を確認中",
+"map_obj.keeping_base": "拠点マップオブジェクト ID: {instance_id} ({object_name}) を保持 - 拠点ID: {base_camp_id} はアクティブです",
+"map_obj.reason_null_id": "拠点IDが見つからないかnullです",
+"map_obj.reason_orphaned": "拠点ID: {base_camp_id} はアクティブな拠点リストにありません (孤立)",
+"map_obj.deleting_orphan": "孤立した/非拠点マップオブジェクト ID: {instance_id} ({object_name}) を削除 - 理由: {reason}",
+"map_obj.deleted_summary": "{deleted_count} 個の孤立した/非拠点マップオブジェクトを削除しました。残り {remaining_count} 個のマップオブジェクト。"
 }

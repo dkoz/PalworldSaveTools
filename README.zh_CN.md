@@ -1,6 +1,6 @@
 [English](README.en_US.md) | [简体中文](README.zh_CN.md) | [Deutsch](README.de_DE.md) | [Español](README.es_ES.md) | [Français](README.fr_FR.md) | [Русский](README.ru_RU.md) | [日本語](README.ja_JP.md) | [한국어](README.ko_KR.md)
 
-![PalworldSaveTools Logo](Assets/resources/PalworldSaveTools.png)
+![PalworldSaveTools Logo](Assets/resources/PalworldSaveTools_Black.png)
 ---
 - **联系 Discord：** Pylar1991
 ---

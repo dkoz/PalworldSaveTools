@@ -1,0 +1,5 @@
+{
+    "tool.convert.level.to_json": "convert",
+    "tool.convert.level.to_sav": "convert",
+    "tool.deletion": "delete"
+}

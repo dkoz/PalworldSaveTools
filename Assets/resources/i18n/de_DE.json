@@ -240,6 +240,7 @@
 "xgp.err.import_exception": "Fehler beim Import des Moduls palworld_xgp_import: {err}",
 "xgp.err.import_failed": "Import fehlgeschlagen: {err}",
 "xgp.ui.choose_save": "Wähle den Speicher zur Konvertierung:",
+"xgp.ui.description": "Spielstände zwischen Xbox (Game Pass) und Steam konvertieren",
 "xgp.ui.convert": "Speicher konvertieren",
 "xgp.title.converter": "Palworld Speicher-Konverter",
 "xgp.ui.btn_xgp_folder": "GamePass Speicherordner",
@@ -440,5 +441,12 @@
 "Error": "Fehler",
 "deletion.exclusions.player_label": "Ausgeschlossene Spieler-UIDs:",
 "deletion.exclusions.guild_label": "Ausgeschlossene Gilden-IDs:",
-"deletion.exclusions.base_label": "Ausgeschlossene Basis-IDs:"
+"deletion.exclusions.base_label": "Ausgeschlossene Basis-IDs:",
+"deletion.menu.delete_non_base_map_objs": "Verwaiste/Nicht-Basis-Kartenobjekte löschen",
+"map_obj.checking_id": "Überprüfe {object_name} ID: {instance_id}",
+"map_obj.keeping_base": "BEHALTE Basis-Kartenobjekt ID: {instance_id} ({object_name}) - Basis-ID: {base_camp_id} ist AKTIV",
+"map_obj.reason_null_id": "Basis-ID fehlt oder ist null",
+"map_obj.reason_orphaned": "Basis-ID: {base_camp_id} ist NICHT in der Liste der aktiven Basen (VERWAIST)",
+"map_obj.deleting_orphan": "LÖSCHE Verwaistes/Nicht-Basis-Kartenobjekt ID: {instance_id} ({object_name}) - GRUND: {reason}",
+"map_obj.deleted_summary": "{deleted_count} verwaiste/Nicht-Basis-Kartenobjekte gelöscht. {remaining_count} Kartenobjekte verbleiben."
 }

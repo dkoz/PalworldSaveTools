@@ -1,4 +1,10 @@
 from import_libs import *
+from PySide6.QtWidgets import (
+    QHeaderView, QMainWindow, QWidget, QLineEdit, QTreeWidget, QTreeWidgetItem,
+    QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QFileDialog, QMessageBox, QFrame, QApplication
+)
+from PySide6.QtGui import QIcon, QFont
+from PySide6.QtCore import Qt, QTimer
 player_list_cache = []
 def fix_save(save_path,new_guid,old_guid,guild_fix=True):
     fmt=lambda g:'{}-{}-{}-{}-{}'.format(g[:8],g[8:12],g[12:16],g[16:20],g[20:]).lower()
@@ -53,7 +59,12 @@ def fix_save(save_path,new_guid,old_guid,guild_fix=True):
     if os.path.exists(new_sav):os.rename(new_sav,os.path.join(save_path,"Players",old_guid.upper()+".sav"))
     os.rename(tmp_path,os.path.join(save_path,"Players",new_guid.upper()+".sav"))
     print(t("Success! Fix has been applied! Have fun!"))
-    messagebox.showinfo(t("Success"),t("Fix has been applied! Have fun!"))
+    msg = QMessageBox(QMessageBox.Information, t("Success"), t("Fix has been applied! Have fun!"))
+    try:
+        msg.setWindowIcon(QIcon(ICON_PATH))
+    except Exception:
+        pass
+    msg.exec()
 def copy_dps_file(src_folder, src_uid, tgt_folder, tgt_uid):
     src_file = os.path.join(src_folder, f"{str(src_uid).replace('-', '').upper()}_dps.sav")
     tgt_file = os.path.join(tgt_folder, f"{str(tgt_uid).replace('-', '').upper()}_dps.sav")
@@ -63,35 +74,30 @@ def copy_dps_file(src_folder, src_uid, tgt_folder, tgt_uid):
     shutil.copy2(src_file, tgt_file)
     print(f"DPS save copied from {src_file} to {tgt_file}")
 def ask_string_with_icon(title, prompt, icon_path):
-    class CustomDialog(simpledialog.Dialog):
-        def __init__(self, parent, title):
-            super().__init__(parent, title)
-        def body(self, master):
-            try: self.iconbitmap(icon_path)
+    class CustomDialog(QDialog):
+        def __init__(self, parent):
+            super().__init__(parent)
+            self.setWindowTitle(title)
+            try: self.setWindowIcon(QIcon(icon_path))
             except: pass
-            self.geometry("400x120")
-            self.configure(bg="#2f2f2f")
-            master.configure(bg="#2f2f2f")
-            tk.Label(master, text=prompt, bg="#2f2f2f", fg="white", font=("Arial", 10)).grid(row=0, column=0, padx=15, pady=15)
-            self.entry = tk.Entry(master, bg="#444444", fg="white", insertbackground="white", font=("Arial", 10))
-            self.entry.grid(row=1, column=0, padx=15)
-            return self.entry
-        def buttonbox(self):
-            box = tk.Frame(self, bg="#2f2f2f")
-            btn_ok = tk.Button(box, text=t("OK"), width=10, command=self.ok, bg="#555555", fg="white", font=("Arial",10), relief="flat", activebackground="#666666")
-            btn_ok.pack(side="left", padx=5, pady=5)
-            btn_cancel = tk.Button(box, text=t("Cancel"), width=10, command=self.cancel, bg="#555555", fg="white", font=("Arial",10), relief="flat", activebackground="#666666")
-            btn_cancel.pack(side="left", padx=5, pady=5)
-            self.bind("<Return>", lambda event: self.ok())
-            self.bind("<Escape>", lambda event: self.cancel())
-            box.pack()
-        def apply(self):
-            self.result = self.entry.get()
-    root = tk.Tk()
-    root.withdraw()
-    dlg = CustomDialog(root, title)
-    root.destroy()
-    return dlg.result if dlg.result else None
+            self.setFixedSize(400, 120)
+            layout = QVBoxLayout(self)
+            label = QLabel(prompt)
+            layout.addWidget(label)
+            self.entry = QLineEdit()
+            layout.addWidget(self.entry)
+            button_layout = QHBoxLayout()
+            ok_button = QPushButton(t("OK"))
+            ok_button.clicked.connect(self.accept)
+            cancel_button = QPushButton(t("Cancel"))
+            cancel_button.clicked.connect(self.reject)
+            button_layout.addWidget(ok_button)
+            button_layout.addWidget(cancel_button)
+            layout.addLayout(button_layout)
+            self.entry.setFocus()
+    dialog = CustomDialog(None)
+    result = dialog.exec()
+    return dialog.entry.text() if result == QDialog.Accepted else None
 def sav_to_json(filepath):
     with open(filepath, "rb") as f:
         data = f.read()
@@ -110,7 +116,7 @@ def populate_player_lists(folder_path):
         return player_list_cache
     players_folder = os.path.join(folder_path, "Players")
     if not os.path.exists(players_folder):
-        messagebox.showerror("Error", "Players folder not found next to selected Level.sav")
+        QMessageBox.warning(None, "Error", "Players folder not found next to selected Level.sav")
         return []
     level_json = sav_to_json(os.path.join(folder_path, 'Level.sav'))
     group_data_list = level_json['properties']['worldSaveData']['value']['GroupSaveDataMap']['value']
@@ -130,7 +136,7 @@ def populate_player_lists(folder_path):
     player_list_cache = player_files
     return player_files
 def populate_player_tree(tree, folder_path):
-    tree.delete(*tree.get_children())
+    tree.clear()
     player_list = populate_player_lists(folder_path)
     existing_iids = set()
     for player in player_list:
@@ -141,51 +147,49 @@ def populate_player_tree(tree, folder_path):
         while uid in existing_iids:
             uid = f"{orig_uid}_{count}"
             count += 1
-        tree.insert('', 'end', iid=uid, values=(orig_uid, name, guild))
+        item = QTreeWidgetItem([orig_uid, name, guild])
+        tree.addTopLevelItem(item)
         existing_iids.add(uid)
-    tree.original_rows = list(tree.get_children())
+    tree.original_items = [tree.topLevelItem(i) for i in range(tree.topLevelItemCount())]
 def filter_treeview(tree, query):
     query = query.lower()
-    for row in tree.original_rows:
-        tree.reattach(row, '', 'end')
-    for row in tree.original_rows:
-        values = tree.item(row, "values")
+    for item in tree.original_items:
+        tree.addTopLevelItem(item)
+    for item in tree.original_items:
+        values = [item.text(col) for col in range(item.columnCount())]
         if not any(query in str(value).lower() for value in values):
-            tree.detach(row)
-def choose_level_file():
+            tree.takeTopLevelItem(tree.indexOfTopLevelItem(item))
+def choose_level_file(window, level_sav_entry, old_tree, new_tree):
     global player_list_cache
-    path = filedialog.askopenfilename(title="Select Level.sav file", filetypes=[("SAV Files", "*.sav")])
+    path, _ = QFileDialog.getOpenFileName(window, t("Select Level.sav file"), "", "SAV Files (*.sav)")
     if not path: return
     if not path.endswith("Level.sav"):
-        messagebox.showerror("Error!", "This is NOT Level.sav. Please select Level.sav file.")
+        QMessageBox.warning(window, "Error!", "This is NOT Level.sav. Please select Level.sav file.")
         return
     folder_path = os.path.dirname(path)
     players_folder = os.path.join(folder_path, "Players")
     if not os.path.exists(players_folder):
-        messagebox.showerror("Error", "Players folder not found next to selected Level.sav")
+        QMessageBox.warning(window, "Error", "Players folder not found next to selected Level.sav")
         return
     player_list_cache = []
-    level_sav_entry.delete(0, "end")
-    level_sav_entry.insert(0, path)
+    level_sav_entry.setText(path)
     populate_player_lists(folder_path)
     populate_player_tree(old_tree, folder_path)
     populate_player_tree(new_tree, folder_path)
-    old_search_var.set('')
-    new_search_var.set('')
 def extract_guid_from_tree_selection(tree):
-    selected = tree.selection()
+    selected = tree.selectedItems()
     if not selected:
         return None
-    return tree.item(selected[0], 'values')[0]
-def fix_save_wrapper():
+    return selected[0].text(0)
+def fix_save_wrapper(window, level_sav_entry, old_tree, new_tree):
     old_guid = extract_guid_from_tree_selection(old_tree)
     new_guid = extract_guid_from_tree_selection(new_tree)
-    file_path = level_sav_entry.get()
+    file_path = level_sav_entry.text()
     if not (old_guid and new_guid and file_path):
-        messagebox.showerror("Error", "Please select old GUID, new GUID and level save file!")
+        QMessageBox.warning(window, "Error", "Please select old GUID, new GUID and level save file!")
         return
     if old_guid == new_guid:
-        messagebox.showerror("Error", "Old GUID and New GUID cannot be the same.")
+        QMessageBox.warning(window, "Error", "Old GUID and New GUID cannot be the same.")
         return
     folder_path = os.path.dirname(file_path)
     fix_save(folder_path, new_guid, old_guid)
@@ -196,108 +200,194 @@ def fix_save_wrapper():
             player_list_cache[i] = entry.replace(new_guid, old_guid, 1)
     populate_player_tree(old_tree, folder_path)
     populate_player_tree(new_tree, folder_path)
-def sort_treeview_column(treeview, col, reverse):
-    data = [(treeview.set(k, col), k) for k in treeview.get_children('')]
-    data.sort(reverse=reverse)
-    for index, (_, k) in enumerate(data):
-        treeview.move(k, '', index)
-    treeview.heading(col, command=lambda: sort_treeview_column(treeview, col, not reverse))
+def center_window(win):
+    screen=QApplication.primaryScreen().availableGeometry()
+    geo=win.frameGeometry()
+    geo.moveCenter(screen.center())
+    win.move(geo.topLeft())
+class FixHostSaveWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle(t("Fix Host Save - GUID Migrator"))
+        self.setGeometry(100, 100, 1200, 640)
+        self.setAttribute(Qt.WA_QuitOnClose, False)
+        try:
+            self.setWindowIcon(QIcon(ICON_PATH))
+        except:
+            pass
+        self.setStyleSheet("""
+QMainWindow {
+    background: qlineargradient(spread:pad, x1:0.0, y1:0.0, x2:1.0, y2:1.0,
+                stop:0 #07080a, stop:0.5 #08101a, stop:1 #05060a);
+    color: #dfeefc;
+    font-family: "Segoe UI", Roboto, Arial;
+}
+QFrame#glass {
+    background: rgba(18,20,24,0.78);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.04);
+    padding: 12px;
+}
+QLineEdit {
+    background-color: rgba(255,255,255,0.05);
+    color: #dfeefc;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 8px;
+}
+QPushButton {
+    background-color: #555555;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    min-width: 100px;
+}
+QPushButton#MigrateButton {
+    background-color: #007bff;
+    border: 1px solid #0056b3;
+    min-width: 140px;
+}
+QPushButton:hover { background-color: #666666; }
+QPushButton:disabled {
+    background-color: #333333;
+    color: #888888;
+    border: 1px solid #444444;
+}
+QLabel { color: #dfeefc; }
+
+QFrame#treePanel {
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.04);
+}
+
+/* Rounded tables (transparent background) */
+QTreeWidget {
+    background: transparent;
+    color: #dfeefc;
+}
+QHeaderView::section {
+    background-color: rgba(255,255,255,0.04);
+    color: #dfeefc;
+    padding: 8px;
+    border: none;
+    height: 28px;
+}
+
+/* Slight hover for rows */
+QTreeView::item:hover { background: rgba(255,255,255,0.02); }
+""")
+
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(16, 16, 16, 16)
+        main_layout.setSpacing(12)
+        glass_frame = QFrame()
+        glass_frame.setObjectName("glass")
+        glass_layout = QVBoxLayout(glass_frame)
+        glass_layout.setContentsMargins(12, 12, 12, 12)
+        glass_layout.setSpacing(14)
+        file_row = QHBoxLayout()
+        file_label = QLabel(t('Select Level.sav file:'))
+        file_label.setFont(QFont("Segoe UI", 10, QFont.Bold))
+        file_row.addWidget(file_label)
+        self.level_sav_entry = QLineEdit()
+        self.level_sav_entry.setPlaceholderText(t("Path to Level.sav"))
+        file_row.addWidget(self.level_sav_entry, 1)
+        self.browse_button = QPushButton(t("Browse"))
+        self.browse_button.setFixedWidth(100)
+        file_row.addWidget(self.browse_button)
+        self.migrate_button = QPushButton(t("Migrate"))
+        self.migrate_button.setObjectName("MigrateButton")
+        self.migrate_button.setFixedWidth(140)
+        file_row.addWidget(self.migrate_button)
+        glass_layout.addLayout(file_row)
+        trees_layout = QHBoxLayout()
+        trees_layout.setSpacing(14)
+        old_panel = QFrame()
+        old_panel.setObjectName("treePanel")
+        old_panel_layout = QVBoxLayout(old_panel)
+        old_panel_layout.setContentsMargins(8, 8, 8, 8)
+        old_panel_layout.setSpacing(8)
+        old_header = QLabel(t("Source Player (Old GUID)"))
+        old_header.setFont(QFont("Segoe UI", 11, QFont.Bold))
+        old_header.setAlignment(Qt.AlignCenter)
+        old_panel_layout.addWidget(old_header)
+        old_search_row = QHBoxLayout()
+        old_search_label = QLabel(t("Search:"))
+        old_search_row.addWidget(old_search_label)
+        self.old_search_entry = QLineEdit()
+        self.old_search_entry.setPlaceholderText(t("Search source player..."))
+        old_search_row.addWidget(self.old_search_entry)
+        old_panel_layout.addLayout(old_search_row)
+        self.old_tree = QTreeWidget()
+        self.old_tree.setHeaderLabels([t("GUID"), t("Name"), t("Guild ID")])
+        self.old_tree.setSortingEnabled(True)
+        self.old_tree.setSelectionMode(QTreeWidget.SingleSelection)
+        old_panel_layout.addWidget(self.old_tree, 1)
+        self.source_result_label = QLabel(t("Source Player: N/A"))
+        old_panel_layout.addWidget(self.source_result_label)
+        trees_layout.addWidget(old_panel, 1)
+        new_panel = QFrame()
+        new_panel.setObjectName("treePanel")
+        new_panel_layout = QVBoxLayout(new_panel)
+        new_panel_layout.setContentsMargins(8, 8, 8, 8)
+        new_panel_layout.setSpacing(8)
+        new_header = QLabel(t("Target Player (New GUID)"))
+        new_header.setFont(QFont("Segoe UI", 11, QFont.Bold))
+        new_header.setAlignment(Qt.AlignCenter)
+        new_panel_layout.addWidget(new_header)
+        new_search_row = QHBoxLayout()
+        new_search_label = QLabel(t("Search:"))
+        new_search_row.addWidget(new_search_label)
+        self.new_search_entry = QLineEdit()
+        self.new_search_entry.setPlaceholderText(t("Search target player..."))
+        new_search_row.addWidget(self.new_search_entry)
+        new_panel_layout.addLayout(new_search_row)
+        self.new_tree = QTreeWidget()
+        self.new_tree.setHeaderLabels([t("GUID"), t("Name"), t("Guild ID")])
+        self.new_tree.setSortingEnabled(True)
+        self.new_tree.setSelectionMode(QTreeWidget.SingleSelection)
+        new_panel_layout.addWidget(self.new_tree, 1)
+        self.target_result_label = QLabel(t("Target Player: N/A"))
+        new_panel_layout.addWidget(self.target_result_label)
+        trees_layout.addWidget(new_panel, 1)
+        glass_layout.addLayout(trees_layout)
+        bottom_label = QLabel(t("Tip: Select source and target players, then press Migrate."))
+        bottom_label.setAlignment(Qt.AlignCenter)
+        bottom_label.setFont(QFont("Segoe UI", 9))
+        glass_layout.addWidget(bottom_label)
+        main_layout.addWidget(glass_frame)
+        old_header_widget = self.old_tree.header()
+        old_header_widget.setSectionResizeMode(0, QHeaderView.Stretch)
+        old_header_widget.setSectionResizeMode(1, QHeaderView.Stretch)
+        old_header_widget.setSectionResizeMode(2, QHeaderView.Stretch)
+        new_header_widget = self.new_tree.header()
+        new_header_widget.setSectionResizeMode(0, QHeaderView.Stretch)
+        new_header_widget.setSectionResizeMode(1, QHeaderView.Stretch)
+        new_header_widget.setSectionResizeMode(2, QHeaderView.Stretch)
+        self.browse_button.clicked.connect(lambda: choose_level_file(self, self.level_sav_entry, self.old_tree, self.new_tree))
+        self.migrate_button.clicked.connect(lambda: fix_save_wrapper(self, self.level_sav_entry, self.old_tree, self.new_tree))
+        self.old_search_entry.textChanged.connect(lambda: filter_treeview(self.old_tree, self.old_search_entry.text()))
+        self.new_search_entry.textChanged.connect(lambda: filter_treeview(self.new_tree, self.new_search_entry.text()))
+        self.old_tree.itemSelectionChanged.connect(self.update_source_selection)
+        self.new_tree.itemSelectionChanged.connect(self.update_target_selection)
+        QTimer.singleShot(0,lambda:center_window(self))
+    def update_source_selection(self):
+        selected = self.old_tree.selectedItems()
+        if selected:
+            values = [selected[0].text(col) for col in range(3)]
+            self.source_result_label.setText(t("Source Player: {name} ({guid})", name=values[1], guid=values[0]))
+        else:
+            self.source_result_label.setText(t("Source Player: N/A"))
+    def update_target_selection(self):
+        selected = self.new_tree.selectedItems()
+        if selected:
+            values = [selected[0].text(col) for col in range(3)]
+            self.target_result_label.setText(t("Target Player: {name} ({guid})", name=values[1], guid=values[0]))
+        else:
+            self.target_result_label.setText(t("Target Player: N/A"))
 def fix_host_save():
-    global window, level_sav_entry, old_tree, new_tree, source_result_label, target_result_label, old_search_var, new_search_var
-    window = tk.Toplevel()
-    window.title(t("Fix Host Save - GUID Migrator"))
-    window.geometry("1200x600")
-    window.config(bg="#2f2f2f")
-    try:
-        window.iconbitmap(ICON_PATH)
-    except Exception as e:
-        print(f"Could not set icon: {e}")
-    font_style = ("Arial", 10)
-    style = ttk.Style(window)
-    style.theme_use('clam')
-    for opt in [
-        ("Treeview.Heading", {"font": ("Arial", 12, "bold"), "background": "#444444", "foreground": "white"}),
-        ("Treeview", {"background": "#333333", "foreground": "white", "rowheight": 25, "fieldbackground": "#333333", "borderwidth": 0}),
-        ("TFrame", {"background": "#2f2f2f"}),
-        ("TLabel", {"background": "#2f2f2f", "foreground": "white"}),
-        ("TEntry", {"fieldbackground": "#444444", "foreground": "white"}),
-        ("Dark.TButton", {"background": "#555555", "foreground": "white", "font": font_style, "padding": 6}),
-    ]: style.configure(opt[0], **opt[1])
-    style.map("Dark.TButton", background=[("active", "#666666"), ("!disabled", "#555555")], foreground=[("disabled", "#888888"), ("!disabled", "white")])
-    file_frame = ttk.Frame(window, style="TFrame")
-    file_frame.pack(fill='x', padx=10, pady=10)
-    ttk.Label(file_frame, text=t('Select Level.sav file:'), font=font_style, style="TLabel").pack(side='left')
-    level_sav_entry = ttk.Entry(file_frame, width=65, font=font_style, style="TEntry")
-    level_sav_entry.pack(side='left', padx=5)
-    browse_button = ttk.Button(file_frame, text=t("Browse"), command=choose_level_file, style="Dark.TButton")
-    browse_button.pack(side='left')
-    migrate_button = ttk.Button(file_frame, text=t("Migrate"), command=fix_save_wrapper, style="Dark.TButton")
-    migrate_button.pack(side='right')
-    old_frame = ttk.Frame(window, style="TFrame")
-    old_frame.pack(side='left', fill='both', expand=True, padx=(10,5), pady=10)
-    search_frame_old = ttk.Frame(old_frame, style="TFrame")
-    search_frame_old.pack(fill='x', pady=5)
-    old_search_var = tk.StringVar()
-    old_search_entry = ttk.Entry(search_frame_old, textvariable=old_search_var, font=font_style, style="TEntry")
-    ttk.Label(search_frame_old, text=t("Search Source Player:"), font=font_style, style="TLabel").pack(side='left', padx=(0,5))
-    old_search_entry.pack(side='left', fill='x', expand=True)
-    old_search_entry.bind('<KeyRelease>', lambda e: filter_treeview(old_tree, old_search_entry.get()))
-    old_tree = ttk.Treeview(old_frame, columns=("GUID", "Name", "GuildID"), show='headings', selectmode='browse', style="Treeview")
-    old_tree.pack(fill='both', expand=True)
-    old_tree.heading("GUID", text=t("GUID"), command=lambda: sort_treeview_column(old_tree, "GUID", False))
-    old_tree.heading("Name", text=t("Name"), command=lambda: sort_treeview_column(old_tree, "Name", False))
-    old_tree.heading("GuildID", text=t("Guild ID"), command=lambda: sort_treeview_column(old_tree, "GuildID", False))
-    old_tree.column("GUID", width=150, anchor='center')
-    old_tree.column("Name", width=200, anchor='center')
-    old_tree.column("GuildID", width=150, anchor='center')
-    old_tree.tag_configure("even", background="#333333")
-    old_tree.tag_configure("odd", background="#444444")
-    old_tree.tag_configure("selected", background="#555555")
-    new_frame = ttk.Frame(window, style="TFrame")
-    new_frame.pack(side='left', fill='both', expand=True, padx=(5,10), pady=10)
-    search_frame_new = ttk.Frame(new_frame, style="TFrame")
-    search_frame_new.pack(fill='x', pady=5)
-    new_search_var = tk.StringVar()
-    new_search_entry = ttk.Entry(search_frame_new, textvariable=new_search_var, font=font_style, style="TEntry")
-    ttk.Label(search_frame_new, text=t("Search Target Player:"), font=font_style, style="TLabel").pack(side='left', padx=(0,5))
-    new_search_entry.pack(side='left', fill='x', expand=True)
-    new_search_entry.bind('<KeyRelease>', lambda e: filter_treeview(new_tree, new_search_entry.get()))
-    new_tree = ttk.Treeview(new_frame, columns=("GUID", "Name", "GuildID"), show='headings', selectmode='browse', style="Treeview")
-    new_tree.pack(fill='both', expand=True)
-    new_tree.heading("GUID", text=t("GUID"), command=lambda: sort_treeview_column(new_tree, "GUID", False))
-    new_tree.heading("Name", text=t("Name"), command=lambda: sort_treeview_column(new_tree, "Name", False))
-    new_tree.heading("GuildID", text=t("Guild ID"), command=lambda: sort_treeview_column(new_tree, "GuildID", False))
-    new_tree.column("GUID", width=150, anchor='center')
-    new_tree.column("Name", width=200, anchor='center')
-    new_tree.column("GuildID", width=150, anchor='center')
-    new_tree.tag_configure("even", background="#333333")
-    new_tree.tag_configure("odd", background="#444444")
-    new_tree.tag_configure("selected", background="#555555")
-    old_tree.original_rows = []
-    new_tree.original_rows = []
-    old_search_var.trace_add('write', lambda *args: filter_treeview(old_tree, old_search_var.get()))
-    new_search_var.trace_add('write', lambda *args: filter_treeview(new_tree, new_search_var.get()))
-    source_result_label = ttk.Label(old_frame, text=t("Source Player: N/A"), font=font_style, style="TLabel")
-    source_result_label.pack(fill='x', pady=(5,0))
-    target_result_label = ttk.Label(new_frame, text=t("Target Player: N/A"), font=font_style, style="TLabel")
-    target_result_label.pack(fill='x', pady=(5,0))
-    def update_source_selection(event):
-        selected = old_tree.selection()
-        if selected:
-            values = old_tree.item(selected[0], 'values')
-            source_result_label.config(text=t("Source Player: {name} ({guid})", name=values[1], guid=values[0]))
-        else:
-            source_result_label.config(text=t("Source Player: N/A"))
-    def update_target_selection(event):
-        selected = new_tree.selection()
-        if selected:
-            values = new_tree.item(selected[0], 'values')
-            target_result_label.config(text=t("Target Player: {name} ({guid})", name=values[1], guid=values[0]))
-        else:
-            target_result_label.config(text=t("Target Player: N/A"))
-    old_tree.bind('<<TreeviewSelect>>', update_source_selection)
-    new_tree.bind('<<TreeviewSelect>>', update_target_selection)
-    center_window(window)
-    def on_exit(): window.destroy()
-    window.protocol("WM_DELETE_WINDOW", on_exit)
+    window = FixHostSaveWindow()
     return window

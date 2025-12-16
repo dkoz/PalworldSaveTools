@@ -240,6 +240,7 @@
 "xgp.err.import_exception": "Échec de l'import du module palworld_xgp_import : {err}",
 "xgp.err.import_failed": "Import échoué : {err}",
 "xgp.ui.choose_save": "Sélectionner la sauvegarde à convertir :",
+"xgp.ui.description": "Convertir les sauvegardes entre Xbox (Game Pass) et Steam",
 "xgp.ui.convert": "Convertir la sauvegarde",
 "xgp.title.converter": "Convertisseur de sauvegardes Palworld",
 "xgp.ui.btn_xgp_folder": "Dossier de sauvegardes GamePass",
@@ -440,5 +441,12 @@
 "Error": "Erreur",
 "deletion.exclusions.player_label": "UIDs de Joueur Exclues :",
 "deletion.exclusions.guild_label": "IDs de Guilde Exclues :",
-"deletion.exclusions.base_label": "IDs de Base Exclues :"
+"deletion.exclusions.base_label": "IDs de Base Exclues :",
+"deletion.menu.delete_non_base_map_objs": "Supprimer les Objets de Carte Orphelins/Hors-Base",
+"map_obj.checking_id": "Vérification de l'ID {object_name} : {instance_id}",
+"map_obj.keeping_base": "CONSERVATION de l'Objet de Carte Base ID : {instance_id} ({object_name}) - ID de Base : {base_camp_id} est ACTIF",
+"map_obj.reason_null_id": "L'ID de Base est manquant ou nul",
+"map_obj.reason_orphaned": "L'ID de Base : {base_camp_id} N'est PAS dans la Liste des Bases Actives (ORPHELIN)",
+"map_obj.deleting_orphan": "SUPPRESSION de l'Objet de Carte Orphelin/Hors-Base ID : {instance_id} ({object_name}) - RAISON : {reason}",
+"map_obj.deleted_summary": "{deleted_count} objets de carte orphelins/hors-base supprimés. {remaining_count} objets de carte restants."
 }

@@ -240,6 +240,7 @@
 "xgp.err.import_exception": "导入 palworld_xgp_import 模块失败：{err}",
 "xgp.err.import_failed": "导入失败：{err}",
 "xgp.ui.choose_save": "选择要转换的存档：",
+"xgp.ui.description": "在 Xbox - Game Pass 和 Steam 之间转换存档",
 "xgp.ui.convert": "转换存档",
 "xgp.title.converter": "Palworld 存档转换器",
 "xgp.ui.btn_xgp_folder": "GamePass 存档文件夹",
@@ -440,5 +441,12 @@
 "Error": "错误",
 "deletion.exclusions.player_label": "排除的玩家 UID:",
 "deletion.exclusions.guild_label": "排除的公会 ID:",
-"deletion.exclusions.base_label": "排除的据点 ID:"
+"deletion.exclusions.base_label": "排除的据点 ID:",
+"deletion.menu.delete_non_base_map_objs": "删除孤立/非基地地图对象",
+"map_obj.checking_id": "正在检查 {object_name} ID: {instance_id}",
+"map_obj.keeping_base": "保留基地地图对象 ID: {instance_id} ({object_name}) - 基地 ID: {base_camp_id} 处于活动状态",
+"map_obj.reason_null_id": "基地ID缺失或为空",
+"map_obj.reason_orphaned": "基地ID: {base_camp_id} 不在活动基地列表中 (孤立)",
+"map_obj.deleting_orphan": "正在删除孤立/非基地地图对象 ID: {instance_id} ({object_name}) - 原因: {reason}",
+"map_obj.deleted_summary": "已删除 {deleted_count} 个孤立/非基地地图对象。剩余 {remaining_count} 个地图对象。"
 }

@@ -1,4 +1,10 @@
 from import_libs import *
+from PySide6.QtWidgets import (
+    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QMessageBox, QFrame, QApplication
+)
+from PySide6.QtGui import QIcon, QFont
+from PySide6.QtCore import Qt, QTimer
+import os, time, shutil
 savegames_path = os.path.join(os.environ['LOCALAPPDATA'], 'Pal', 'Saved', 'SaveGames')
 restore_map_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Backups', 'Restore Map')
 os.makedirs(restore_map_path, exist_ok=True)
@@ -29,52 +35,134 @@ def copy_to_all_subfolders(source_file, file_size):
     print(t("Total worlds/servers updated: {copied_count}", copied_count=copied_count))
     print(t("LocalData.sav Size: {file_size} bytes", file_size=file_size))
     print("="*80)
+def center_window(win):
+    screen = QApplication.primaryScreen().availableGeometry()
+    size = win.sizeHint()
+    if not size.isValid():
+        win.adjustSize()
+        size = win.size()
+    win.move((screen.width() - size.width()) // 2, (screen.height() - size.height()) // 2)
 def restore_map():
     resources_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'LocalData.sav')
     if not os.path.exists(resources_file):
-        messagebox.showerror(t("Error"), t("LocalData.sav not found: {file}", file=resources_file))
+        QMessageBox.critical(None, t("Error"), t("LocalData.sav not found: {file}", file=resources_file))
         return
-    window = tk.Toplevel()
-    window.title(t("tool.restore_map"))
-    window.geometry("600x250")
-    window.config(bg="#2f2f2f")
-    try: window.iconbitmap(ICON_PATH)
-    except: pass
-    font_style = ("Arial", 10)
-    style = ttk.Style(window)
-    style.theme_use('clam')
-    for opt in [
-        ("TFrame", {"background": "#2f2f2f"}),
-        ("TLabel", {"background": "#2f2f2f", "foreground": "white"}),
-        ("Dark.TButton", {"background": "#555555", "foreground": "white", "font": font_style, "padding": 6}),
-    ]: style.configure(opt[0], **opt[1])
-    style.map("Dark.TButton", background=[("active", "#666666"), ("!disabled", "#555555")])
-    msg_frame = ttk.Frame(window, style="TFrame")
-    msg_frame.pack(fill='both', expand=True, padx=20, pady=20)
-    ttk.Label(msg_frame, text=t("Warning: This will perform the following actions:"), font=font_style, anchor='center', justify='center').pack(fill='x', pady=2)
-    ttk.Label(msg_frame, text=t("1. Use LocalData.sav from the 'resources' folder"), font=font_style, anchor='center', justify='center').pack(fill='x', pady=2)
-    ttk.Label(msg_frame, text=t("2. Create backups of each existing LocalData.sav"), font=font_style, anchor='center', justify='center').pack(fill='x', pady=2)
-    ttk.Label(msg_frame, text=t("3. Copy LocalData.sav to all other worlds/servers"), font=font_style, anchor='center', justify='center').pack(fill='x', pady=2)
-    button_frame = ttk.Frame(window, style="TFrame")
-    button_frame.pack(pady=20)
-    result_label = ttk.Label(window, text="", font=font_style, style="TLabel")
-    result_label.pack(pady=10)
-    def on_yes():
-        file_size = os.path.getsize(resources_file)
-        copy_to_all_subfolders(resources_file, file_size)
-        result_label.config(text=t("Restore completed successfully!"))
-        yes_button.config(state='disabled')
-        no_button.config(state='disabled')
-        window.destroy()
-    def on_no():
-        window.destroy()
-    yes_button = ttk.Button(button_frame, text=t("Yes"), style="Dark.TButton", command=on_yes)
-    yes_button.pack(side='left', padx=10)
-    no_button = ttk.Button(button_frame, text=t("No"), style="Dark.TButton", command=on_no)
-    no_button.pack(side='left', padx=10)
-    center_window(window)
-    window.protocol("WM_DELETE_WINDOW", window.destroy)
-    window.grab_set()
-    return window
-def main(): restore_map()
-if __name__ == '__main__': main()
+    class RestoreMapDialog(QDialog):
+        def __init__(self):
+            super().__init__()
+            self.setWindowTitle(t("tool.restore_map"))
+            self.setFixedSize(640, 320)
+            self.setStyleSheet("""
+QDialog {
+    background: qlineargradient(spread:pad, x1:0.0, y1:0.0, x2:1.0, y2:1.0,
+                stop:0 #07080a, stop:0.5 #08101a, stop:1 #05060a);
+    color: #dfeefc;
+    font-family: "Segoe UI", Roboto, Arial;
+}
+QFrame#glass {
+    background: rgba(18,20,24,0.65);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.04);
+    padding: 14px;
+}
+QLabel {
+    color: #dfeefc;
+}
+QPushButton {
+    background-color: #555555;
+    color: white;
+    padding: 8px;
+    border-radius: 6px;
+    min-width: 120px;
+}
+QPushButton:hover {
+    background-color: #666666;
+}
+QPushButton:disabled {
+    background-color: #333333;
+    color: #888888;
+    border: 1px solid #444444;
+}
+""")
+            try:
+                if ICON_PATH and os.path.exists(ICON_PATH):
+                    self.setWindowIcon(QIcon(ICON_PATH))
+            except Exception:
+                pass
+            main_layout = QVBoxLayout(self)
+            main_layout.setContentsMargins(16, 16, 16, 16)
+            main_layout.setSpacing(12)
+            glass_frame = QFrame()
+            glass_frame.setObjectName("glass")
+            glass_layout = QVBoxLayout(glass_frame)
+            glass_layout.setContentsMargins(14, 14, 14, 14)
+            glass_layout.setSpacing(12)
+            tip_label = QLabel(t("Warning: This will perform the following actions:"))
+            tip_label.setFont(QFont("Segoe UI", 12, QFont.Bold))
+            tip_label.setAlignment(Qt.AlignCenter)
+            tip_label.setStyleSheet("color: #FF6347;")
+            glass_layout.addWidget(tip_label)
+            steps_layout = QVBoxLayout()
+            step_font = QFont("Segoe UI", 10)
+            step1_label = QLabel(t("1. Use LocalData.sav from the 'resources' folder"))
+            step1_label.setFont(step_font)
+            step1_label.setAlignment(Qt.AlignCenter)
+            steps_layout.addWidget(step1_label)
+            step2_label = QLabel(t("2. Create backups of each existing LocalData.sav"))
+            step2_label.setFont(step_font)
+            step2_label.setAlignment(Qt.AlignCenter)
+            steps_layout.addWidget(step2_label)
+            step3_label = QLabel(t("3. Copy LocalData.sav to all other worlds/servers"))
+            step3_label.setFont(step_font)
+            step3_label.setAlignment(Qt.AlignCenter)
+            steps_layout.addWidget(step3_label)
+            glass_layout.addLayout(steps_layout)
+            self.result_label = QLabel("")
+            self.result_label.setAlignment(Qt.AlignCenter)
+            self.result_label.setFont(QFont("Segoe UI", 10, QFont.Bold))
+            self.result_label.setStyleSheet("color: #7FFF00;")
+            glass_layout.addWidget(self.result_label)
+            button_layout = QHBoxLayout()
+            button_layout.addStretch()
+            self.yes_button = QPushButton(t("Yes"))
+            self.yes_button.setFont(QFont("Segoe UI", 10))
+            self.yes_button.clicked.connect(self.on_yes)
+            button_layout.addWidget(self.yes_button)
+            self.no_button = QPushButton(t("No"))
+            self.no_button.setFont(QFont("Segoe UI", 10))
+            self.no_button.clicked.connect(self.on_no)
+            button_layout.addWidget(self.no_button)
+            button_layout.addStretch()
+            glass_layout.addLayout(button_layout)
+            hint_label = QLabel(t("Restore Source: {file}", file=resources_file))
+            hint_label.setFont(QFont("Segoe UI", 9))
+            hint_label.setAlignment(Qt.AlignCenter)
+            hint_label.setStyleSheet("color: rgba(223,238,252,0.7);")
+            glass_layout.addWidget(hint_label)
+            main_layout.addWidget(glass_frame)
+            center_window(self)
+            self.setModal(True)
+        def on_yes(self):
+            file_size = os.path.getsize(resources_file)
+            copy_to_all_subfolders(resources_file, file_size)
+            self.result_label.setText(t("Restore completed successfully!"))
+            self.yes_button.setEnabled(False)
+            self.no_button.setEnabled(False)
+            QTimer.singleShot(2000, self.accept)
+        def on_no(self):
+            self.reject()
+    dialog = RestoreMapDialog()
+    return dialog
+def main():
+    import sys
+    app = QApplication(sys.argv) if not QApplication.instance() else QApplication.instance()
+    dialog = restore_map()
+    dialog.exec()
+    if not QApplication.instance().closingDown():
+        try:
+            if not app.instance():
+                app.exec()
+        except Exception:
+            pass
+if __name__ == '__main__':
+    main()

@@ -1,6 +1,13 @@
 from import_libs import *
 import customtkinter as ctk
-ctk.set_appearance_mode("Dark")
+from ui_theme import (
+    apply_theme, BG as DARK_BG, GLASS as GLASS_BG, TEXT as TEXT_COLOR, ACCENT as ACCENT_COLOR,
+    BORDER as BORDER_COLOR, BUTTON_BG, BUTTON_HOVER, MUTED as MUTED_COLOR, EMPHASIS as EMPHASIS_COLOR,
+    ALERT as ALERT_COLOR, SUCCESS as SUCCESS_COLOR, ERROR as ERROR_COLOR, BUTTON_FG,
+    BUTTON_PRIMARY, BUTTON_SECONDARY, FONT, FONT_BOLD, FONT_LARGE, FONT_SMALL,
+    SPACE_SMALL, SPACE_MEDIUM, SPACE_LARGE, CTK_BUTTON_CORNER_RADIUS, CTK_FRAME_CORNER_RADIUS, TREE_ROW_HEIGHT
+)
+apply_theme()
 GITHUB_RAW_URL = "https://raw.githubusercontent.com/deafdudecomputers/PalworldSaveTools/main/Assets/common.py"
 def check_for_update():
     try:
@@ -60,36 +67,7 @@ def refresh_stats(section):
             update_stats_section(stat_labels, "Result", result)
 def as_uuid(val): return str(val).lower() if val else ''
 def are_equal_uuids(a,b): return as_uuid(a)==as_uuid(b)
-def fast_deepcopy(json_dict):
-    return pickle.loads(pickle.dumps(json_dict, -1))
-try:
-    from menu import run_tool
-except ImportError:
-    import importlib
-    menu = importlib.import_module("menu")
-    run_tool = menu.run_tool
-def open_convert_level_to_json():
-    run_tool((0, 0))
-def open_convert_json_to_level():
-    run_tool((0, 1))
-def open_convert_players_to_json():
-    run_tool((0, 2))
-def open_convert_players_to_sav():
-    run_tool((0, 3))
-def open_gamepass_converter():
-    run_tool((0, 4))
-def open_id_converter():
-    run_tool((0, 5))
-def open_slot_injector():
-    run_tool((1, 1))
-def open_modify_save():
-    run_tool((1, 2))
-def open_character_transfer():
-    run_tool((1, 3))
-def open_fix_host_save():
-    run_tool((1, 4))
-def open_restore_map():
-    run_tool((1, 5))
+def fast_deepcopy(json_dict): return pickle.loads(pickle.dumps(json_dict, -1))
 def sav_to_json(path):
     with open(path,"rb") as f:
         data = f.read()
@@ -656,6 +634,37 @@ def delete_base_camp(base, guild_id, loaded_json):
     base_list[:] = [b for b in base_list if b['key'] != base_id]
     print(t("base.deleted_camp", base_id=base_id, guild_id=(guild_id or "orphaned")))
     return True
+def delete_non_base_map_objects():
+    global loaded_level_json
+    wsd = loaded_level_json['properties']['worldSaveData']['value']
+    base_camp_list = wsd['BaseCampSaveData']['value']
+    active_base_ids = {b['key'] for b in base_camp_list}
+    map_objs = wsd['MapObjectSaveData']['value']['values']
+    initial_count = len(map_objs)
+    new_map_objs = []
+    for m in map_objs:
+        raw_data = m.get('Model', {}).get('value', {}).get('RawData', {}).get('value', {})
+        base_camp_id = raw_data.get('base_camp_id_belong_to')
+        instance_id = raw_data.get('instance_id', 'UNKNOWN_ID')
+        object_name = m.get('MapObjectId', {}).get('value', 'UNKNOWN_OBJECT_TYPE')
+        print(t("map_obj.checking_id", object_name=object_name, instance_id=instance_id))
+        should_keep = False
+        if base_camp_id and base_camp_id in active_base_ids:
+            should_keep = True
+        if should_keep:
+            new_map_objs.append(m)
+            print(t("map_obj.keeping_base", instance_id=instance_id, object_name=object_name, base_camp_id=base_camp_id))
+        else:
+            reason = t("map_obj.reason_null_id")
+            if base_camp_id and base_camp_id not in active_base_ids:
+                reason = t("map_obj.reason_orphaned", base_camp_id=base_camp_id)
+            print(t("map_obj.deleting_orphan", instance_id=instance_id, object_name=object_name, reason=reason))
+    deleted_count = initial_count - len(new_map_objs)
+    map_objs[:] = new_map_objs
+    print(t("map_obj.deleted_summary", deleted_count=deleted_count, remaining_count=len(map_objs)))
+    refresh_all()
+    refresh_stats("After")
+    return deleted_count
 def delete_selected_guild():
     global files_to_delete
     folder = current_save_path
@@ -1914,24 +1923,27 @@ class KillNearestBaseDialog(tk.Toplevel):
         load_exclusions()
         self.title("Generate PalDefender killnearestbase Commands")
         self.geometry("800x600")
-        try: self.iconbitmap(ICON_PATH)
-        except: pass
-        self.config(bg="#2f2f2f")
+        try: 
+            self.iconbitmap(ICON_PATH)
+            self.tk.call('wm', 'iconbitmap', '.', ICON_PATH)
+        except Exception as e:
+            print(f"Error setting window icon: {e}")
+        self.config(bg=GLASS_BG)
         font_style = ("Arial", 10)
         style = ttk.Style(self)
         style.theme_use('clam')
-        style.configure("TFrame", background="#2f2f2f")
-        style.configure("TLabel", background="#2f2f2f", foreground="white", font=font_style)
-        style.configure("TEntry", fieldbackground="#444444", foreground="white", font=font_style)
-        style.configure("Dark.TButton", background="#555555", foreground="white", font=font_style, padding=6)
+        style.configure("TFrame", background=GLASS_BG)
+        style.configure("TLabel", background=GLASS_BG, foreground=TEXT_COLOR, font=font_style)
+        style.configure("TEntry", fieldbackground="#444444", foreground=TEXT_COLOR, font=font_style)
+        style.configure("Dark.TButton", background=BUTTON_FG, foreground=TEXT_COLOR, font=font_style, padding=6)
         style.map("Dark.TButton",
-            background=[("active", "#666666"), ("!disabled", "#555555")],
-            foreground=[("disabled", "#888888"), ("!disabled", "white")]
+            background=[("active", BUTTON_HOVER), ("!disabled", BUTTON_FG)],
+            foreground=[("disabled", "#888888"), ("!disabled", TEXT_COLOR)]
         )
-        style.configure("TRadiobutton", background="#2f2f2f", foreground="white", font=font_style)
+        style.configure("TRadiobutton", background=GLASS_BG, foreground=TEXT_COLOR, font=font_style)
         style.map("TRadiobutton",
-            background=[("active", "#3a3a3a"), ("!active", "#2f2f2f")],
-            foreground=[("active", "white"), ("!active", "white")]
+            background=[("active", "#3a3a3a"), ("!active", GLASS_BG)],
+            foreground=[("active", TEXT_COLOR), ("!active", TEXT_COLOR)]
         )
         self.setup_ui()
         self.protocol("WM_DELETE_WINDOW", self.on_exit)
@@ -1955,7 +1967,7 @@ class KillNearestBaseDialog(tk.Toplevel):
         self.maxlevel_entry.grid(row=1, column=3, sticky="w")
         run_btn = ttk.Button(frame, text="Run", command=self.on_generate, style="Dark.TButton")
         run_btn.grid(row=2, column=0, columnspan=5, pady=15, sticky="ew")
-        self.output_text = tk.Text(frame, bg="#222222", fg="white", font=("Consolas", 10), wrap="word")
+        self.output_text = tk.Text(frame, bg=GLASS_BG, fg=TEXT_COLOR, font=("Consolas", 10), wrap="word")
         self.output_text.grid(row=3, column=0, columnspan=5, sticky="nsew")
         frame.rowconfigure(3, weight=1)
         frame.columnconfigure(4, weight=1)
@@ -2838,8 +2850,32 @@ def all_in_one_tools():
     global guild_search_var, base_search_var, player_search_var, guild_members_search_var
     global guild_result, base_result, player_result
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    window = ctk.CTkToplevel()
+    try:
+        import tkinter as tk
+        if not hasattr(tk, '_default_root') or tk._default_root is None or not tk._default_root.winfo_exists():
+            tk._default_root = tk.Tk()
+            tk._default_root.withdraw()
+    except:
+        pass
+    try:
+        window = ctk.CTkToplevel()
+    except tk.TclError as e:
+        if "application has been destroyed" in str(e):
+            try:
+                tk._default_root = tk.Tk()
+                tk._default_root.withdraw()
+                window = ctk.CTkToplevel()
+            except:
+                messagebox.showerror("Error", "Failed to create window: Tkinter root destroyed")
+                return None
+        else:
+            raise
     window.running=True
+    try:
+        window.iconbitmap(ICON_PATH)
+        window.tk.call('wm', 'iconbitmap', '.', ICON_PATH)
+    except:
+        pass
     window.refresh_elements = {
         'menu_buttons': [],
         'main_labels': [],
@@ -2897,25 +2933,21 @@ def all_in_one_tools():
     font = ("Segoe UI", 10)
     s = ttk.Style(window)
     s.theme_use('clam')
-    DARK_BG = "#333333"
-    DARK_FIELD = "#444444"
-    DARK_FG = "white"
-    ACCENT_COLOR = '#3B8ED0'
-    s.configure("Treeview.Heading", font=("Segoe UI", 11, "bold"), background="#3a3a3a", foreground="white")
-    s.configure("Treeview", background=DARK_BG, foreground=DARK_FG, fieldbackground=DARK_BG, rowheight=18, bordercolor=DARK_BG, focuscolor=DARK_BG)
+    s.configure("Treeview.Heading", font=FONT_BOLD, background="#3a3a3a", foreground=EMPHASIS_COLOR)
+    s.configure("Treeview", background=GLASS_BG, foreground=TEXT_COLOR, fieldbackground=GLASS_BG, rowheight=TREE_ROW_HEIGHT, bordercolor=BORDER_COLOR, focuscolor=GLASS_BG)
     s.map("Treeview", background=[('selected', ACCENT_COLOR)])
     s.layout("Treeview", [('Treeview.treearea', {'sticky': 'nswe'})])
-    s.configure("TFrame", background=DARK_BG)
-    s.configure("TLabel", background=DARK_BG, foreground=DARK_FG)
-    s.configure("TEntry", fieldbackground=DARK_FIELD, foreground=DARK_FG, bordercolor=DARK_FIELD)
-    s.configure("Vertical.TScrollbar", background=DARK_BG, troughcolor=DARK_BG, bordercolor=DARK_BG, arrowcolor=DARK_FG)
+    s.configure("TFrame", background=GLASS_BG)
+    s.configure("TLabel", background=GLASS_BG, foreground=TEXT_COLOR)
+    s.configure("TEntry", fieldbackground="#444444", foreground=TEXT_COLOR, bordercolor=BORDER_COLOR)
+    s.configure("Vertical.TScrollbar", background=GLASS_BG, troughcolor=GLASS_BG, bordercolor=GLASS_BG, arrowcolor=TEXT_COLOR)
     s.map("Vertical.TScrollbar",
-              background=[('active', DARK_FIELD), ('!active', DARK_BG)],
-              troughcolor=[('active', DARK_BG), ('!active', DARK_BG)],
-              arrowcolor=[('active', DARK_FG), ('!active', DARK_FG)],
-              bordercolor=[('active', DARK_BG), ('!active', DARK_BG)])
-    MENU_BG = DARK_BG
-    MENU_FG = "white"
+              background=[('active', "#444444"), ('!active', GLASS_BG)],
+              troughcolor=[('active', GLASS_BG), ('!active', GLASS_BG)],
+              arrowcolor=[('active', TEXT_COLOR), ('!active', TEXT_COLOR)],
+              bordercolor=[('active', GLASS_BG), ('!active', GLASS_BG)])
+    MENU_BG = GLASS_BG
+    MENU_FG = TEXT_COLOR
     MENU_ACTIVE_BG = ACCENT_COLOR
     window.columnconfigure(0, weight=1)
     window.rowconfigure(0, weight=0)
@@ -2939,12 +2971,12 @@ def all_in_one_tools():
         button = ctk.CTkButton(
             parent,
             text=t(text_key),
-            fg_color=DARK_BG,
-            hover_color=DARK_FIELD,
+            fg_color=BUTTON_BG,
+            hover_color=BUTTON_HOVER,
             width=50,
-            height=18, 
+            height=18,
             corner_radius=0,
-            font=menu_button_font 
+            font=menu_button_font
         )
         button.pack(side="left", padx=1, pady=0)
         button.bind("<Button-1>", lambda e: show_menu(button, menu_object))
@@ -3019,17 +3051,6 @@ def all_in_one_tools():
     file_menu, file_menu_items, file_menu_add = create_and_store_menu("file_menu")
     file_menu_add("menu.file.load_save", load_save)
     file_menu_add("menu.file.save_changes", save_changes)
-    file_menu_add("menu.file.convert_sav_to_json", open_convert_level_to_json)
-    file_menu_add("menu.file.convert_json_to_sav", open_convert_json_to_level)
-    file_menu_add("menu.file.convert_players_to_json", open_convert_players_to_json)
-    file_menu_add("menu.file.convert_players_to_sav", open_convert_players_to_sav)
-    file_menu_add("menu.file.gamepass_converter", open_gamepass_converter)
-    file_menu_add("menu.file.id_converter", open_id_converter)
-    file_menu_add("menu.file.slot_injector", open_slot_injector)
-    file_menu_add("menu.file.modify_save", open_modify_save)
-    file_menu_add("tool.fix_host_save", open_fix_host_save)
-    file_menu_add("menu.file.character_transfer", open_character_transfer)
-    file_menu_add("menu.file.restore_map", open_restore_map)
     file_menu_add("menu.file.rename_world", rename_world)    
     window.refresh_elements['menus'].append((file_menu, file_menu_items))
     create_menu_button(menu_button_frame, "deletion.menu.file", file_menu)
@@ -3038,7 +3059,8 @@ def all_in_one_tools():
     delete_menu_add("deletion.menu.delete_inactive_bases", delete_inactive_bases)
     delete_menu_add("deletion.menu.delete_duplicate_players", delete_duplicated_players)
     delete_menu_add("deletion.menu.delete_inactive_players", delete_inactive_players_button)
-    delete_menu_add("deletion.menu.delete_unreferenced", delete_unreferenced_data)    
+    delete_menu_add("deletion.menu.delete_unreferenced", delete_unreferenced_data)
+    delete_menu_add("deletion.menu.delete_non_base_map_objs", delete_non_base_map_objects)    
     delete_menu_add("deletion.menu.unlock_private_chests", unlock_all_private_chests)
     delete_menu_add("deletion.menu.remove_invalid_items", remove_invalid_items_from_save)
     delete_menu_add("deletion.menu.remove_invalid_pals", remove_invalid_pals_from_save)
@@ -3070,7 +3092,7 @@ def all_in_one_tools():
     right_header_frame.grid(row=0, column=4, padx=10, pady=0, sticky="e")    
     try:
         from PIL import Image
-        logo_image_path = os.path.join(base_dir, "resources", "PalworldSaveTools.png")
+        logo_image_path = os.path.join(base_dir, "resources", "PalworldSaveTools_Blue.png")
         logo_image = ctk.CTkImage(Image.open(logo_image_path), size=(450, 40))
         logo_label = ctk.CTkLabel(menu_bar_frame, image=logo_image, text="", fg_color="transparent")
         logo_label.grid(row=0, column=2, padx=(0, 10), pady=0, sticky="n")
@@ -3115,18 +3137,18 @@ def all_in_one_tools():
                     update_label.configure(text_color=new_color)
                     window.after(800,pulse_label)
                 pulse_label()
-    result_frame = ctk.CTkFrame(window, fg_color="transparent")
-    result_frame.grid(row=1, column=0, padx=10, pady=0, sticky="ew")
+    result_frame = ctk.CTkFrame(window, fg_color=GLASS_BG, corner_radius=CTK_FRAME_CORNER_RADIUS)
+    result_frame.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
     result_frame.grid_propagate(False)
     result_frame.configure(height=110)
     result_frame.columnconfigure(0, weight=1)
     result_frame.columnconfigure(1, weight=0)
     info_container = ctk.CTkFrame(result_frame, fg_color="transparent")
-    info_container.grid(row=0, column=0, sticky="nsew")
+    info_container.grid(row=0, column=0, sticky="nsew", padx=SPACE_MEDIUM, pady=SPACE_MEDIUM)
     info_container.columnconfigure(0, weight=1)
     info_container.columnconfigure(1, weight=0)
     status_label_frame = ctk.CTkFrame(info_container, fg_color="transparent", width=400)
-    status_label_frame.grid(row=0, column=0, sticky="nw", padx=(0, 10))
+    status_label_frame.grid(row=0, column=0, sticky="nw", padx=(0, SPACE_MEDIUM))
     status_label_frame.columnconfigure(0, weight=1)
     stat_frame, stat_labels, stat_key_labels_to_refresh = create_stats_panel(info_container, s)
     stat_frame.grid(row=0, column=1, sticky="ne")
