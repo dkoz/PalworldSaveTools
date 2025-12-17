@@ -4,14 +4,15 @@ PYTHON_EXE = os.path.join(VENV_DIR, "Scripts", "python.exe") if os.name == "nt" 
 def create_venv():
     if not os.path.exists(VENV_DIR):
         print("Creating virtual environment...")
-        subprocess.check_call([sys.executable, "-m", "pst_venv", VENV_DIR])
+        subprocess.check_call([sys.executable, "-m", "venv", VENV_DIR])
     else:
         print("Virtual environment already exists.")
 def install_deps():
     print("Installing dependencies in venv...")
-    subprocess.check_call([PYTHON_EXE, "-m", "pip", "install", "--upgrade", "pip"])
-    subprocess.check_call([PYTHON_EXE, "-m", "pip", "install", "-e", "."])
-    subprocess.check_call([PYTHON_EXE, "-m", "pip", "install", "cx_Freeze"])
+    subprocess.check_call([PYTHON_EXE, "-m", "pip", "install", "--upgrade", "pip", "setuptools", "wheel"])
+    subprocess.check_call([PYTHON_EXE, "-m", "pip", "install", "PySide6-Essentials", "cx_Freeze"])
+    if os.path.exists("requirements.txt"):
+        subprocess.check_call([PYTHON_EXE, "-m", "pip", "install", "-r", "requirements.txt"])
 def sync_version():
     common_file = os.path.join("Assets", "common.py")
     pyproject_file = "pyproject.toml"
@@ -28,12 +29,13 @@ def sync_version():
         (pyproject_file, r'version\s*=\s*["\'].*?["\']', f'version = "{version}"'),
         (setup_file, r'version\s*=\s*["\'].*?["\']', f'version="{version}"')
     ]:
+        if not os.path.exists(file_path): continue
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
         content = re.sub(pattern, replacement, content)
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(content)
-    print(f"Synchronized version to {version} in pyproject.toml and setup_freeze.py")
+    print(f"Synchronized version to {version}")
 def build_with_cx_freeze():
     print("Running cx_Freeze build...")
     subprocess.check_call([PYTHON_EXE, "setup_freeze.py", "build"])
@@ -57,35 +59,24 @@ def clean_build_artifacts():
                 shutil.rmtree(path,ignore_errors=True)
 def run_upx_on_build():
     build_dir="PST_standalone"
-    if not os.path.exists(build_dir):
-        print("Build folder not found, skipping UPX compression...")
-        return
-    if shutil.which("upx") is None:
-        print("UPX not found on PATH, skipping UPX compression...")
+    if not os.path.exists(build_dir) or shutil.which("upx") is None:
         return
     targets=[]
     skip_names=("vcruntime","msvcp","python3.dll")
     for root,dirs,files in os.walk(build_dir):
         for f in files:
             lf=f.lower()
-            if not (lf.endswith(".exe") or lf.endswith(".dll")):
-                continue
-            if any(k in lf for k in skip_names):
-                continue
+            if not (lf.endswith(".exe") or lf.endswith(".dll")): continue
+            if any(k in lf for k in skip_names): continue
             targets.append(os.path.join(root,f))
-    if not targets:
-        print("No EXE/DLL files found for UPX compression...")
-        return
+    if not targets: return
     targets.sort(key=lambda x: 0 if x.lower().endswith(".exe") else 1)
-    print("Running UPX compression on built binaries...")
+    print("Running UPX compression...")
     cmd=["upx","--best","--lzma","--no-progress"]+targets
-    result=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
-    print("\n".join([l for l in result.stdout.splitlines() if l.strip()]))
-    if result.stderr:
-        print("UPX completed with some warnings (expected):")
-        print(result.stderr)
+    subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
 def get_app_version():
     common_file=os.path.join("Assets","common.py")
+    if not os.path.exists(common_file): return "unknown"
     with open(common_file,"r",encoding="utf-8") as f:
         for line in f:
             if line.strip().startswith("APP_VERSION"):
@@ -94,54 +85,27 @@ def get_app_version():
 def create_release_archive():
     version=get_app_version()
     build_dir="PST_standalone"
-    if not os.path.exists(build_dir):
-        print("Build folder not found, skipping archive...")
-        return
+    if not os.path.exists(build_dir): return
     archive_name=f"PST_standalone_v{version}.7z"
-    if os.path.exists(archive_name):
-        os.remove(archive_name)
-    print(f"Creating 7z Ultra archive: {archive_name}...")
+    if os.path.exists(archive_name): os.remove(archive_name)
+    print(f"Creating 7z archive: {archive_name}...")
     old=os.getcwd()
     os.chdir(build_dir)
     items=os.listdir(".")
     cmd=["7z","a","-t7z","-m0=lzma2","-mx=9","-mfb=273","-md=256m","-ms=on",os.path.join("..",archive_name)]+items
     subprocess.check_call(cmd)
     os.chdir(old)
-    print("7z archive created:",archive_name)
 def main():
     print("="*40)
-    print("PalworldSaveTools Directory Cleaner")
-    print("="*40)
     clean_build_artifacts()
-    print("="*40)
-    print("PalworldSaveTools VENV Builder")
-    print("="*40)
     create_venv()
-    print("="*40)
-    print("PalworldSaveTools VENV Deps")
-    print("="*40)
     install_deps()
-    print("="*40)
-    print("Syncing Version Across Files")
-    print("="*40)
     sync_version()
-    print("="*40)
-    print("PalworldSaveTools Exe Builder")
-    print("="*40)
     build_with_cx_freeze()
-    print("="*40)
-    print("PalworldSaveTools UPX Compressor")
-    print("="*40)
     run_upx_on_build()
-    print("="*40)
-    print("PalworldSaveTools Release Archiver")
-    print("="*40)
     create_release_archive()
-    print("="*40)
-    print("PalworldSaveTools Directory Cleaner")
-    print("="*40)
     clean_build_artifacts()
     print("="*40)
-    print("PalworldSaveTools Exe Builder Completed")
+    print("Build Completed")
     print("="*40)
 if __name__=="__main__": main()
