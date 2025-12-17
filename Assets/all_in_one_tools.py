@@ -2278,7 +2278,7 @@ def unlock_all_private_chests():
     print(msg)
     messagebox.showinfo(t("Unlocked"),msg)
     refresh_all()
-def remove_invalid_items_from_save():
+def remove_invalid_raw_items_from_level():
     import json,os
     folder_path=current_save_path
     if not folder_path:
@@ -2302,55 +2302,100 @@ def remove_invalid_items_from_save():
                     valid_items.add(aid.lower())
     except:
         pass
-    total_before=0
-    total_after=0
-    removed=0
-    def sweep(x):
-        nonlocal total_before,total_after,removed
-        if isinstance(x,dict):
-            if x.get("prop_name")=="Slots" and isinstance(x.get("value"),dict):
-                for s in x["value"].get("values",[]):
-                    if not isinstance(s,dict): continue
-                    raw=s.get("RawData",{})
-                    val=raw.get("value",{})
-                    if isinstance(val,dict):
-                        item=val.get("item")
-                        cnt=val.get("count",0)
-                        if isinstance(item,dict) and cnt>0:
-                            sid=item.get("static_id")
-                            total_before+=1
-                            if isinstance(sid,str) and sid.lower() not in valid_items:
-                                val["count"]=0
-                                removed+=1
-                                print(t("itemclean.removed",sid=sid))
-                            else:
-                                total_after+=1
-            elif "RawData" in x and isinstance(x["RawData"],dict):
-                val=x["RawData"].get("value",{})
-                if isinstance(val,dict):
-                    item=val.get("item")
-                    cnt=val.get("count",0)
-                    if isinstance(item,dict) and cnt>0:
-                        sid=item.get("static_id")
-                        total_before+=1
-                        if isinstance(sid,str) and sid.lower() not in valid_items:
-                            val["count"]=0
-                            removed+=1
-                            print(t("itemclean.removed",sid=sid))
-                        else:
-                            total_after+=1
-            for v in x.values():
-                if isinstance(v,(dict,list)):
-                    sweep(v)
-        elif isinstance(x,list):
-            for v in x:
-                if isinstance(v,(dict,list)):
-                    sweep(v)
-    sweep(wsd)
-    msg=t("itemclean.summary",before=total_before,removed=removed,after=total_after)
+    removed_count=0
+    def clean_recursive(data):
+        nonlocal removed_count
+        if isinstance(data,dict):
+            for key in list(data.keys()):
+                val=data[key]
+                if isinstance(val, (dict, list)):
+                    clean_recursive(val)
+        elif isinstance(data,list):
+            i=len(data)-1
+            while i>=0:
+                item_obj=data[i]
+                if isinstance(item_obj,dict) and "RawData" in item_obj:
+                    raw_val=item_obj["RawData"].get("value",{})
+                    sid=None
+                    if isinstance(raw_val,dict):
+                        if "item" in raw_val and isinstance(raw_val["item"],dict):
+                            sid=raw_val["item"].get("static_id")
+                        elif "id" in raw_val and isinstance(raw_val["id"],dict):
+                            sid=raw_val["id"].get("static_id")
+                    if isinstance(sid,str) and sid.lower() not in valid_items:
+                        print(f"Removing invalid item object: {sid}")
+                        data.pop(i)
+                        removed_count+=1
+                    else:
+                        clean_recursive(item_obj)
+                else:
+                    clean_recursive(item_obj)
+                i-=1
+    clean_recursive(wsd)
+    msg=f"Cleaned Level.sav: Removed {removed_count} invalid item data blocks."
     print(msg)
-    messagebox.showinfo(t("AutoItemCleaner"),msg)
     refresh_all()
+def remove_invalid_items_from_save():
+    import json,os
+    folder_path=current_save_path
+    if not folder_path:
+        messagebox.showerror(t("Error"),t("guild.rebuild.no_save"))
+        return
+    valid_items=set()
+    try:
+        base_dir=os.path.dirname(os.path.abspath(__file__))
+        fp=os.path.join(base_dir,"resources","game_data","itemdata.json")
+        with open(fp,"r",encoding="utf-8") as f:
+            js=json.load(f)
+            for x in js.get("items",[]):
+                aid=x.get("asset")
+                if isinstance(aid,str):
+                    valid_items.add(aid.lower())
+    except:
+        pass
+    players_dir=os.path.join(current_save_path,"Players")
+    if not os.path.exists(players_dir):
+        messagebox.showerror(t("Error"),t("missions.players_folder_not_found",path=current_save_path))
+        return
+    total_files=0
+    fixed_files=0
+    def clean_craft_records(data,filename):
+        changed=False
+        if isinstance(data,dict):
+            if "CraftItemCount" in data and isinstance(data["CraftItemCount"].get("value"),list):
+                old_list=data["CraftItemCount"]["value"]
+                new_list=[]
+                for i in old_list:
+                    key=i.get("key")
+                    if isinstance(key,str) and key.lower() in valid_items:
+                        new_list.append(i)
+                    else:
+                        print(f"[{filename}] Removed invalid craft record: {key}")
+                        changed=True
+                if changed:
+                    data["CraftItemCount"]["value"]=new_list
+            for v in data.values():
+                if clean_craft_records(v,filename):changed=True
+        elif isinstance(data,list):
+            for item in data:
+                if clean_craft_records(item,filename):changed=True
+        return changed
+    for filename in os.listdir(players_dir):
+        if filename.endswith(".sav") and "_dps" not in filename:
+            total_files+=1
+            file_path=os.path.join(players_dir,filename)
+            try:
+                p_json=sav_to_json(file_path)
+                if clean_craft_records(p_json,filename):
+                    json_to_sav(p_json,file_path)
+                    fixed_files+=1
+                    print(f"Successfully updated craft list for {filename}")
+            except Exception as e:
+                print(f"Error processing player file {filename}: {e}")
+    result_msg=f"Processed {total_files} player files. Updated {fixed_files} files."
+    print(result_msg)
+    refresh_all()
+    remove_invalid_raw_items_from_level()
 def remove_invalid_pals_from_save():
     def load_assets(fname,key):
         try:

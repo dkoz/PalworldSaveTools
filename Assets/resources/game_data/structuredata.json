@@ -1285,11 +1285,11 @@
             "asset": "PickupItem_Lotus_Stamina_02"
         },
         {
-            "name": "Speed ​​Lotus (Small)",
+            "name": "Speed Lotus (Small)",
             "asset": "PickupItem_Lotus_Workspeed_01"
         },
         {
-            "name": "Speed ​​Lotus (Large)",
+            "name": "Speed Lotus (Large)",
             "asset": "PickupItem_Lotus_Workspeed_02"
         },
         {
@@ -1779,6 +1779,210 @@
         {
             "name": "Moon Lord Statue",
             "asset": "YakushimaBoss002_Relic"
+        },
+        {
+            "name": "Wooden Triangular Foundation",
+            "asset": "Wooden_TriangleFoundation"
+        },
+        {
+            "name": "Wooden Diagonal Wall",
+            "asset": "Wooden_DiagonalWall"
+        },
+        {
+            "name": "Wooden Triangular Roof",
+            "asset": "Wooden_TriangleRoof"
+        },
+        {
+            "name": "Wooden Corner Roof",
+            "asset": "Wooden_TriangleStairsCorner"
+        },
+        {
+            "name": "Wooden Triangular Wall (Inverted)",
+            "asset": "Wood_TriangleWallReverse"
+        },
+        {
+            "name": "Wooden Pal Passage Entrance",
+            "asset": "Wooden_WallGate"
+        },
+        {
+            "name": "Wooden Slanted Triangular Roof",
+            "asset": "Wooden_SlopedRoofCorner"
+        },
+        {
+            "name": "Wooden Pyramid Roof",
+            "asset": "Wooden_PyramidRoof"
+        },
+        {
+            "name": "Stone Triangular Foundation",
+            "asset": "Stone_TriangleFoundation"
+        },
+        {
+            "name": "Stone Diagonal Wall",
+            "asset": "Stone_DiagonalWall"
+        },
+        {
+            "name": "Stone Triangular Roof",
+            "asset": "Stone_TriangleRoof"
+        },
+        {
+            "name": "Stone Corner Roof",
+            "asset": "Stone_TriangleStairsCorner"
+        },
+        {
+            "name": "Stone Triangular Wall (Inverted)",
+            "asset": "Stone_TriangleWallReverse"
+        },
+        {
+            "name": "Stone Pal Passage Entrance",
+            "asset": "Stone_WallGate"
+        },
+        {
+            "name": "Stone Slanted Triangular Roof",
+            "asset": "Stone_SlopedRoofCorner"
+        },
+        {
+            "name": "Stone Pyramid Roof",
+            "asset": "Stone_PyramidRoof"
+        },
+        {
+            "name": "Metal Triangular Foundation",
+            "asset": "Iron_TriangleFoundation"
+        },
+        {
+            "name": "Metal Diagonal Wall",
+            "asset": "Iron_DiagonalWall"
+        },
+        {
+            "name": "Metal Triangular Roof",
+            "asset": "Iron_TriangleRoof"
+        },
+        {
+            "name": "Metal Corner Roof",
+            "asset": "Iron_TriangleStairsCorner"
+        },
+        {
+            "name": "Metal Triangular Wall (Inverted)",
+            "asset": "Iron_TriangleWallReverse"
+        },
+        {
+            "name": "Metal Pal Passage Entrance",
+            "asset": "Iron_WallGate"
+        },
+        {
+            "name": "Metal Slanted Triangular Roof",
+            "asset": "Iron_SlopedRoofCorner"
+        },
+        {
+            "name": "Metal Pyramid Roof",
+            "asset": "Iron_PyramidRoof"
+        },
+        {
+            "name": "Glass Triangular Foundation",
+            "asset": "Glass_TriangleFoundation"
+        },
+        {
+            "name": "Glass Diagonal Wall",
+            "asset": "Glass_DiagonalWall"
+        },
+        {
+            "name": "Glass Triangular Roof",
+            "asset": "Glass_TriangleRoof"
+        },
+        {
+            "name": "Glass Corner Roof",
+            "asset": "Glass_TriangleStairsCorner"
+        },
+        {
+            "name": "Glass Triangular Wall (Inverted)",
+            "asset": "Glass_TriangleWallReverse"
+        },
+        {
+            "name": "Glass Pal Passage Entrance",
+            "asset": "Glass_WallGate"
+        },
+        {
+            "name": "Glass Slanted Triangular Roof",
+            "asset": "Glass_SlopedRoofCorner"
+        },
+        {
+            "name": "Glass Pyramid Roof",
+            "asset": "Glass_PyramidRoof"
+        },
+        {
+            "name": "Japanese-Style Triangular Foundation",
+            "asset": "JapaneseStyle_TriangleFoundation"
+        },
+        {
+            "name": "Japanese-Style Diagonal Wall",
+            "asset": "JapaneseStyle_DiagonalWall"
+        },
+        {
+            "name": "Japanese-Style Triangular Roof A",
+            "asset": "JapaneseStyle_TriangleRoof_01"
+        },
+        {
+            "name": "Japanese-Style Triangular Roof B",
+            "asset": "JapaneseStyle_TriangleRoof_02"
+        },
+        {
+            "name": "Japanese-Style Corner Roof",
+            "asset": "JapaneseStyle_TriangleStairsCorner_01"
+        },
+        {
+            "name": "Japanese-Style Triangular Wall (Inverted)",
+            "asset": "JapaneseStyle_TriangleWallReverse"
+        },
+        {
+            "name": "Japanese-Style Pal Passage Entrance",
+            "asset": "JapaneseStyle_WallGate"
+        },
+        {
+            "name": "Japanese-Style Slanted Triangular Roof",
+            "asset": "JapaneseStyle_SlopedRoofCorner"
+        },
+        {
+            "name": "Japanese-Style Pyramid Roof",
+            "asset": "JapaneseStyle_PyramidRoof"
+        },
+        {
+            "name": "Clean Triangular Foundation",
+            "asset": "SF_TriangleFoundation"
+        },
+        {
+            "name": "Clean Diagonal Wall",
+            "asset": "SF_DiagonalWall"
+        },
+        {
+            "name": "Clean Triangular Roof",
+            "asset": "SF_TriangleRoof"
+        },
+        {
+            "name": "Clean Corner Roof",
+            "asset": "SF_TriangleStairsCorner"
+        },
+        {
+            "name": "Clean Triangular Wall (Inverted)",
+            "asset": "SF_TriangleWallReverse"
+        },
+        {
+            "name": "Clean Pal Passage Entrance",
+            "asset": "SF_WallGate"
+        },
+        {
+            "name": "Clean Slanted Triangular Roof",
+            "asset": "SF_SlopedRoofCorner"
+        },
+        {
+            "name": "Clean Pyramid Roof",
+            "asset": "SF_PyramidRoof"
+        },
+        {
+            "name": "PalBox_RaidBossArea",
+            "asset": "PalBox_RaidBossArea"
+        },
+        {
+            "name": "Altar_RaidBossArea",
+            "asset": "Altar_RaidBossArea"
         }
     ]
 }

@@ -1283,6 +1283,14 @@
         {
             "name": "Jarl of Feybreak",
             "asset": "GYM_NAME_Viking"
+        },
+        {
+            "name": "Savior",
+            "asset": "Salvation"
+        },
+        {
+            "name": "Blood Is Fuel",
+            "asset": "OctaviaArmorVampire"
         }
     ]
 }

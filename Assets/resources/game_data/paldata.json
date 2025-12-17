@@ -45,6 +45,10 @@
             "asset": "BlueDragon_Ice"
         },
         {
+            "name": "BOSS_BlackPuppy_Ice (Boss)",
+            "asset": "BOSS_BlackPuppy_Ice"
+        },
+        {
             "name": "BOSS_BlueDragon_Ice (Boss)",
             "asset": "BOSS_BlueDragon_Ice"
         },
@@ -53,12 +57,32 @@
             "asset": "BOSS_BluePlatypus_Fire"
         },
         {
+            "name": "BOSS_BlueSkyDragon (Boss)",
+            "asset": "BOSS_BlueSkyDragon"
+        },
+        {
+            "name": "BOSS_BlueWoolRabbit (Boss)",
+            "asset": "BOSS_BlueWoolRabbit"
+        },
+        {
             "name": "BOSS_CactusDoll (Boss)",
             "asset": "BOSS_CactusDoll"
         },
         {
+            "name": "BOSS_CactusDoll_Dark (Boss)",
+            "asset": "BOSS_CactusDoll_Dark"
+        },
+        {
+            "name": "BOSS_CandleWitch (Boss)",
+            "asset": "BOSS_CandleWitch"
+        },
+        {
             "name": "BOSS_CaptainPenguin_Black (Boss)",
             "asset": "BOSS_CaptainPenguin_Black"
+        },
+        {
+            "name": "BOSS_ClioneTwins (Boss)",
+            "asset": "BOSS_ClioneTwins"
         },
         {
             "name": "BOSS_CloverFairy (Boss)",
@@ -67,6 +91,14 @@
         {
             "name": "BOSS_ClownRabbit (Boss)",
             "asset": "BOSS_ClownRabbit"
+        },
+        {
+            "name": "BOSS_DandelionGirl (Boss)",
+            "asset": "BOSS_DandelionGirl"
+        },
+        {
+            "name": "BOSS_DarkFlameFox (Boss)",
+            "asset": "BOSS_DarkFlameFox"
         },
         {
             "name": "BOSS_ElecLizard (Boss)",
@@ -81,12 +113,24 @@
             "asset": "BOSS_ElecSnail"
         },
         {
+            "name": "BOSS_ElecSnail_Fire (Boss)",
+            "asset": "BOSS_ElecSnail_Fire"
+        },
+        {
+            "name": "BOSS_FluffyBird (Boss)",
+            "asset": "BOSS_FluffyBird"
+        },
+        {
             "name": "BOSS_FlyingManta_Thunder (Boss)",
             "asset": "BOSS_FlyingManta_Thunder"
         },
         {
             "name": "BOSS_FoxExorcist (Boss)",
             "asset": "BOSS_FoxExorcist"
+        },
+        {
+            "name": "BOSS_FrozenBear (Boss)",
+            "asset": "BOSS_FrozenBear"
         },
         {
             "name": "BOSS_GhostAnglerfish_Fire (Boss)",
@@ -97,8 +141,16 @@
             "asset": "BOSS_GhostBlackCat"
         },
         {
+            "name": "BOSS_GhostRabbit_Grass (Boss)",
+            "asset": "BOSS_GhostRabbit_Grass"
+        },
+        {
             "name": "BOSS_GrassGolem (Boss)",
             "asset": "BOSS_GrassGolem"
+        },
+        {
+            "name": "BOSS_GrassMinotaur (Boss)",
+            "asset": "BOSS_GrassMinotaur"
         },
         {
             "name": "BOSS_HoodGhost (Boss)",
@@ -107,6 +159,10 @@
         {
             "name": "BOSS_IceNarwhal_Fire (Boss)",
             "asset": "BOSS_IceNarwhal_Fire"
+        },
+        {
+            "name": "BOSS_IceVeilDragon (Boss)",
+            "asset": "BOSS_IceVeilDragon"
         },
         {
             "name": "BOSS_KingCrab (Boss)",
@@ -121,6 +177,10 @@
             "asset": "BOSS_KingWhale"
         },
         {
+            "name": "BOSS_Kirin_Ice (Boss)",
+            "asset": "BOSS_Kirin_Ice"
+        },
+        {
             "name": "BOSS_LanternButler (Boss)",
             "asset": "BOSS_LanternButler"
         },
@@ -131,6 +191,18 @@
         {
             "name": "BOSS_LongCat (Boss)",
             "asset": "BOSS_LongCat"
+        },
+        {
+            "name": "BOSS_LotusDragon (Boss)",
+            "asset": "BOSS_LotusDragon"
+        },
+        {
+            "name": "BOSS_Monkey_Ice (Boss)",
+            "asset": "BOSS_Monkey_Ice"
+        },
+        {
+            "name": "BOSS_MonochromeMushroom (Boss)",
+            "asset": "BOSS_MonochromeMushroom"
         },
         {
             "name": "BOSS_MonochromeQueen (Boss)",
@@ -153,8 +225,20 @@
             "asset": "BOSS_NegativeOctopus_Neutral"
         },
         {
+            "name": "BOSS_NightBlueHorse_Neutral (Boss)",
+            "asset": "BOSS_NightBlueHorse_Neutral"
+        },
+        {
+            "name": "BOSS_OctopusGirl_Neutral (Boss)",
+            "asset": "BOSS_OctopusGirl_Neutral"
+        },
+        {
             "name": "BOSS_OniGhostGirl (Boss)",
             "asset": "BOSS_OniGhostGirl"
+        },
+        {
+            "name": "BOSS_PandaGirl (Boss)",
+            "asset": "BOSS_PandaGirl"
         },
         {
             "name": "BOSS_Penguin_Electric (Boss)",
@@ -165,16 +249,32 @@
             "asset": "BOSS_PyramidTurtle"
         },
         {
+            "name": "BOSS_RedFlowerBird (Boss)",
+            "asset": "BOSS_RedFlowerBird"
+        },
+        {
             "name": "BOSS_RockBeast (Boss)",
             "asset": "BOSS_RockBeast"
+        },
+        {
+            "name": "BOSS_RockBeast_Ice (Boss)",
+            "asset": "BOSS_RockBeast_Ice"
         },
         {
             "name": "BOSS_SamuraiDog (Boss)",
             "asset": "BOSS_SamuraiDog"
         },
         {
+            "name": "BOSS_ScorpionMan_Electric (Boss)",
+            "asset": "BOSS_ScorpionMan_Electric"
+        },
+        {
             "name": "BOSS_Sekhmet (Boss)",
             "asset": "BOSS_Sekhmet"
+        },
+        {
+            "name": "BOSS_SleeveRabbit (Boss)",
+            "asset": "BOSS_SleeveRabbit"
         },
         {
             "name": "BOSS_SmallYeti (Boss)",
@@ -185,12 +285,20 @@
             "asset": "BOSS_SnakeGirl"
         },
         {
+            "name": "BOSS_StrawHatCat (Boss)",
+            "asset": "BOSS_StrawHatCat"
+        },
+        {
             "name": "BOSS_StuffedShark_Fire (Boss)",
             "asset": "BOSS_StuffedShark_Fire"
         },
         {
             "name": "BOSS_SumoDog (Boss)",
             "asset": "BOSS_SumoDog"
+        },
+        {
+            "name": "BOSS_SweetsSheep_Ground (Boss)",
+            "asset": "BOSS_SweetsSheep_Ground"
         },
         {
             "name": "BOSS_SwordCutlassfish (Boss)",
@@ -205,12 +313,20 @@
             "asset": "BOSS_ThiefBird"
         },
         {
+            "name": "BOSS_ThunderDog_Ice (Boss)",
+            "asset": "BOSS_ThunderDog_Ice"
+        },
+        {
             "name": "BOSS_ThunderFluffyBird (Boss)",
             "asset": "BOSS_ThunderFluffyBird"
         },
         {
             "name": "BOSS_VenusFlytrap (Boss)",
             "asset": "BOSS_VenusFlytrap"
+        },
+        {
+            "name": "BOSS_VolcanicTurtle (Boss)",
+            "asset": "BOSS_VolcanicTurtle"
         },
         {
             "name": "Bastigor",
@@ -273,6 +389,10 @@
             "asset": "RAID_NightLady_Dark_2"
         },
         {
+            "name": "BlackPuppy_Ice",
+            "asset": "BlackPuppy_Ice"
+        },
+        {
             "name": "Blazamut",
             "asset": "KingBahamut"
         },
@@ -319,6 +439,14 @@
         {
             "name": "Blue Slime",
             "asset": "YakushimaMonster001_Blue"
+        },
+        {
+            "name": "BlueSkyDragon",
+            "asset": "BlueSkyDragon"
+        },
+        {
+            "name": "BlueWoolRabbit",
+            "asset": "BlueWoolRabbit"
         },
         {
             "name": "Boltmane",
@@ -383,6 +511,14 @@
         {
             "name": "CactusDoll",
             "asset": "CactusDoll"
+        },
+        {
+            "name": "CactusDoll_Dark",
+            "asset": "CactusDoll_Dark"
+        },
+        {
+            "name": "CandleWitch",
+            "asset": "CandleWitch"
         },
         {
             "name": "Caprity",
@@ -477,6 +613,10 @@
             "asset": "BOSS_CuteButterfly"
         },
         {
+            "name": "ClioneTwins",
+            "asset": "ClioneTwins"
+        },
+        {
             "name": "CloverFairy",
             "asset": "CloverFairy"
         },
@@ -535,6 +675,14 @@
         {
             "name": "Daedream (Boss)",
             "asset": "BOSS_DreamDemon"
+        },
+        {
+            "name": "DandelionGirl",
+            "asset": "DandelionGirl"
+        },
+        {
+            "name": "DarkFlameFox",
+            "asset": "DarkFlameFox"
         },
         {
             "name": "Dazemu",
@@ -681,6 +829,10 @@
             "asset": "ElecSnail"
         },
         {
+            "name": "ElecSnail_Fire",
+            "asset": "ElecSnail_Fire"
+        },
+        {
             "name": "Elizabee",
             "asset": "QueenBee"
         },
@@ -805,6 +957,10 @@
             "asset": "BOSS_FlowerRabbit"
         },
         {
+            "name": "FluffyBird",
+            "asset": "FluffyBird"
+        },
+        {
             "name": "FoxExorcist",
             "asset": "FoxExorcist"
         },
@@ -857,6 +1013,10 @@
             "asset": "BOSS_SnowPeafowl"
         },
         {
+            "name": "FrozenBear",
+            "asset": "FrozenBear"
+        },
+        {
             "name": "Fuack",
             "asset": "BluePlatypus"
         },
@@ -899,6 +1059,10 @@
         {
             "name": "GhostBlackCat",
             "asset": "GhostBlackCat"
+        },
+        {
+            "name": "GhostRabbit_Grass",
+            "asset": "GhostRabbit_Grass"
         },
         {
             "name": "Gildane",
@@ -959,6 +1123,10 @@
         {
             "name": "GrassGolem",
             "asset": "GrassGolem"
+        },
+        {
+            "name": "GrassMinotaur",
+            "asset": "GrassMinotaur"
         },
         {
             "name": "Green Slime",
@@ -1025,6 +1193,22 @@
             "asset": "BOSS_WindChimes_Ice"
         },
         {
+            "name": "Hartalis",
+            "asset": "LegendDeer"
+        },
+        {
+            "name": "Hartalis (Boss)",
+            "asset": "BOSS_LegendDeer"
+        },
+        {
+            "name": "Hartalis (Raid)",
+            "asset": "RAID_LegendDeer"
+        },
+        {
+            "name": "Hartalis (Raid)",
+            "asset": "RAID_LegendDeer_2"
+        },
+        {
             "name": "Helzephyr",
             "asset": "HadesBird"
         },
@@ -1067,6 +1251,10 @@
         {
             "name": "HoodGhost",
             "asset": "HoodGhost"
+        },
+        {
+            "name": "IceVeilDragon",
+            "asset": "IceVeilDragon"
         },
         {
             "name": "Icelyn",
@@ -1249,6 +1437,10 @@
             "asset": "BOSS_KingAlpaca_Ice"
         },
         {
+            "name": "Kirin_Ice",
+            "asset": "Kirin_Ice"
+        },
+        {
             "name": "Kitsun",
             "asset": "AmaterasuWolf"
         },
@@ -1317,14 +1509,6 @@
             "asset": "BOSS_LizardMan_Fire"
         },
         {
-            "name": "Legendir",
-            "asset": "LegendDeer"
-        },
-        {
-            "name": "Legendir (Boss)",
-            "asset": "BOSS_LegendDeer"
-        },
-        {
             "name": "Lifmunk",
             "asset": "Carbunclo"
         },
@@ -1335,6 +1519,10 @@
         {
             "name": "LongCat",
             "asset": "LongCat"
+        },
+        {
+            "name": "LotusDragon",
+            "asset": "LotusDragon"
         },
         {
             "name": "Loupmoon",
@@ -1485,6 +1673,14 @@
             "asset": "BOSS_MimicDog"
         },
         {
+            "name": "Monkey_Ice",
+            "asset": "Monkey_Ice"
+        },
+        {
+            "name": "MonochromeMushroom",
+            "asset": "MonochromeMushroom"
+        },
+        {
             "name": "MonochromeQueen",
             "asset": "MonochromeQueen"
         },
@@ -1557,6 +1753,10 @@
             "asset": "BOSS_PoseidonOrca"
         },
         {
+            "name": "NightBlueHorse_Neutral",
+            "asset": "NightBlueHorse_Neutral"
+        },
+        {
             "name": "Nitemary",
             "asset": "GhostRabbit"
         },
@@ -1587,6 +1787,10 @@
         {
             "name": "Nyafia (Boss)",
             "asset": "BOSS_BadCatgirl"
+        },
+        {
+            "name": "OctopusGirl_Neutral",
+            "asset": "OctopusGirl_Neutral"
         },
         {
             "name": "Omascul",
@@ -1635,6 +1839,10 @@
         {
             "name": "Palumba (Boss)",
             "asset": "BOSS_TropicalOstrich"
+        },
+        {
+            "name": "PandaGirl",
+            "asset": "PandaGirl"
         },
         {
             "name": "Pengullet",
@@ -1801,6 +2009,10 @@
             "asset": "YakushimaMonster001_Red"
         },
         {
+            "name": "RedFlowerBird",
+            "asset": "RedFlowerBird"
+        },
+        {
             "name": "Reindrix",
             "asset": "IceDeer"
         },
@@ -1885,6 +2097,10 @@
             "asset": "RockBeast"
         },
         {
+            "name": "RockBeast_Ice",
+            "asset": "RockBeast_Ice"
+        },
+        {
             "name": "Rooby",
             "asset": "FlameBambi"
         },
@@ -1903,6 +2119,10 @@
         {
             "name": "SamuraiDog",
             "asset": "SamuraiDog"
+        },
+        {
+            "name": "ScorpionMan_Electric",
+            "asset": "ScorpionMan_Electric"
         },
         {
             "name": "Sekhmet",
@@ -1985,6 +2205,10 @@
             "asset": "BOSS_WhiteShieldDragon"
         },
         {
+            "name": "SleeveRabbit",
+            "asset": "SleeveRabbit"
+        },
+        {
             "name": "SmallYeti",
             "asset": "SmallYeti"
         },
@@ -2045,6 +2269,10 @@
             "asset": "PREDATOR_NightBlueHorse"
         },
         {
+            "name": "StrawHatCat",
+            "asset": "StrawHatCat"
+        },
+        {
             "name": "SumoDog",
             "asset": "SumoDog"
         },
@@ -2097,6 +2325,10 @@
             "asset": "BOSS_MopKing"
         },
         {
+            "name": "SweetsSheep_Ground",
+            "asset": "SweetsSheep_Ground"
+        },
+        {
             "name": "SwordCutlassfish",
             "asset": "SwordCutlassfish"
         },
@@ -2131,6 +2363,10 @@
         {
             "name": "ThiefBird",
             "asset": "ThiefBird"
+        },
+        {
+            "name": "ThunderDog_Ice",
+            "asset": "ThunderDog_Ice"
         },
         {
             "name": "ThunderFluffyBird",
@@ -2223,6 +2459,10 @@
         {
             "name": "Vixy (Boss)",
             "asset": "BOSS_CuteFox"
+        },
+        {
+            "name": "VolcanicTurtle",
+            "asset": "VolcanicTurtle"
         },
         {
             "name": "Warsect",

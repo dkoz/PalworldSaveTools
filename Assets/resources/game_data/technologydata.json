@@ -789,8 +789,8 @@
             "asset": "FishingRod_02_1"
         },
         {
-            "name": "Katana",
-            "asset": "Katana"
+            "name": "Sword",
+            "asset": "Battle_MeleeWeapon_Sword"
         },
         {
             "name": "Ice Grenade",
@@ -887,6 +887,10 @@
         {
             "name": "GrapplingGun3",
             "asset": "GrapplingGun3"
+        },
+        {
+            "name": "ULTRAKILL Collab Set 1",
+            "asset": "OctaviaSet01"
         },
         {
             "name": "Compound Bow",
@@ -1269,8 +1273,8 @@
             "asset": "Product_Ingot_Grade_03_Steal"
         },
         {
-            "name": "Sword",
-            "asset": "Battle_MeleeWeapon_Sword"
+            "name": "Katana",
+            "asset": "Katana"
         },
         {
             "name": "Pal Metal Pickaxe",
@@ -1657,6 +1661,10 @@
             "asset": "SkillUnlock_BlackPuppy"
         },
         {
+            "name": "ULTRAKILL Collab Set 2",
+            "asset": "OctaviaSet02"
+        },
+        {
             "name": "Advanced Bow",
             "asset": "SFBow"
         },
@@ -1863,6 +1871,10 @@
         {
             "name": "Moonflower Flag Set",
             "asset": "NinjaFlagSet"
+        },
+        {
+            "name": "Hartalis Saddle",
+            "asset": "SkillUnlock_LegendDeer"
         },
         {
             "name": "Wooden Living Room Furniture Set",
