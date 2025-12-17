@@ -1,6 +1,6 @@
 [English](Assets/resources/readme/README.en_US.md) | [简体中文](Assets/resources/readme/README.zh_CN.md) | [Deutsch](Assets/resources/readme/README.de_DE.md) | [Español](Assets/resources/readme/README.es_ES.md) | [Français](Assets/resources/readme/README.fr_FR.md) | [Русский](Assets/resources/readme/README.ru_RU.md) | [日本語](Assets/resources/readme/README.ja_JP.md) | [한국어](Assets/resources/readme/README.ko_KR.md)
 
-![PalworldSaveTools Logo](Assets/resources/PalworldSaveTools_Black.png)
+![PalworldSaveTools Logo](Assets/resources/PalworldSaveTools_Blue.png)
 ---
 - **Contact me on Discord:** Pylar1991
 ---
