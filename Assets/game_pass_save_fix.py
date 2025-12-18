@@ -110,6 +110,16 @@ QComboBox::drop-down {
         glass_layout.addWidget(self.save_frame, 1)
         main_layout.addWidget(glass_frame)
         center_window(self)
+    def find_valid_saves(self, base_path):
+        valid=[]
+        if not os.path.isdir(base_path):return valid
+        for name in os.listdir(base_path):
+            root=os.path.join(base_path,name)
+            level=os.path.join(root,"Level")
+            if not os.path.isdir(level):continue
+            if os.path.isfile(os.path.join(level,"01.sav")):
+                valid.append(root)
+        return valid
     def handle_message(self, message_type: str, title: str, text: str):
         if message_type == "info":
             QMessageBox.information(self, title, text)
@@ -124,17 +134,26 @@ QComboBox::drop-down {
         shutil.rmtree(os.path.join(root_dir, "saves"), ignore_errors=True)
         event.accept()
     def get_save_game_pass(self):
-        if os.path.exists("./saves"): shutil.rmtree("./saves")
-        default_source=os.path.expandvars(r"%LOCALAPPDATA%\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData\wgs")
-        source_folder = QFileDialog.getExistingDirectory(self, "Select your XGP Palworld save folder", default_source)
-        if not source_folder:
-            print("No folder selected.")
+        default=os.path.expandvars(r"%LOCALAPPDATA%\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData\wgs")
+        folder=QFileDialog.getExistingDirectory(self,"Select XGP Save Folder",default)
+        if not folder:return
+        self.xgp_source_folder=folder
+        def is_xgp_container(path):
+            for root,_,files in os.walk(path):
+                for f in files:
+                    if f.lower().startswith("container.") or f.lower().endswith((".dat",".bin")):
+                        return True
+            return False
+        if is_xgp_container(folder):
+            if os.path.exists("./saves"):shutil.rmtree("./saves")
+            threading.Thread(target=self.run_save_extractor,daemon=True).start()
             return
-        global xgp_source_folder
-        xgp_source_folder=source_folder
-        print(f"Using XGP folder: {xgp_source_folder}")
-        save_extractor_done.clear()
-        threading.Thread(target=self.run_save_extractor, daemon=True).start()
+        saves=self.find_valid_saves(folder)
+        if not saves:
+            self.message_signal.emit("critical",t("Error"),t("xgp.err.no_valid_saves"))
+            return
+        self.direct_saves_map={os.path.basename(s):s for s in saves}
+        self.update_combobox_signal.emit(list(self.direct_saves_map.keys()))
     def get_save_steam(self):
         folder = QFileDialog.getExistingDirectory(self, "Select Steam Save Folder to Transfer")
         if not folder: return
@@ -152,16 +171,6 @@ QComboBox::drop-down {
             return len(os.listdir(directory)) == 0
         except: return False
     @staticmethod
-    def find_zip_files(directory):
-        if not os.path.exists(directory): return []
-        return [f for f in os.listdir(directory) if f.endswith(".zip") and f.startswith("palworld_") and GamePassSaveFixWidget.is_valid_zip(os.path.join(directory, f))]
-    @staticmethod
-    def is_valid_zip(zip_file_path):
-        try:
-            with zipfile.ZipFile(zip_file_path, "r") as zip_ref: zip_ref.testzip()
-            return True
-        except: return False
-    @staticmethod
     def unzip_file(zip_file_path, extract_to_folder):
         os.makedirs(extract_to_folder, exist_ok=True)
         print(f"DEBUG: Attempting extraction of {zip_file_path}...")
@@ -173,29 +182,6 @@ QComboBox::drop-down {
         except Exception as e:
             print(f"DEBUG: Error extracting zip file {zip_file_path}: {e}")
             return False
-    def process_zip_files(self):
-        if self.is_folder_empty("./saves"):
-            zip_files = self.find_zip_files("./")
-            if zip_files:
-                print(f"Unzipping {zip_files[0]}...")
-                if self.unzip_file(zip_files[0], "./saves"):
-                    save_extractor_done.set()
-                    self.extraction_complete_signal.emit()
-                else:
-                    self.message_signal.emit("critical", t("Error"), t("xgp.err.unzip_failed"))
-                return
-            print("No save files found on XGP. Reinstall Palworld on GamePass and try again.")
-            self.close()
-        else:
-            save_extractor_done.set()
-            self.extraction_complete_signal.emit()
-    def process_zip_file(self, file_path: str):
-        saves_path = os.path.join(root_dir, "saves")
-        if self.unzip_file(file_path, saves_path):
-            xgp_original_saves_path = os.path.join(root_dir, "XGP_original_saves")
-            os.makedirs(xgp_original_saves_path, exist_ok=True)
-            shutil.copy2(file_path, os.path.join(xgp_original_saves_path, os.path.basename(file_path)))
-            save_extractor_done.set()
     def convert_save_files(self):
         saveFolders = self.list_folders_in_directory("./saves")
         if not saveFolders:
@@ -210,11 +196,22 @@ QComboBox::drop-down {
     def run_save_extractor(self):
         try:
             import xgp_save_extract as extractor
-            zip_file_path = extractor.main()
-            print("Extractor finished successfully")
-            self.process_zip_files()
+            zip_path=extractor.main()
+            if not zip_path or not os.path.isfile(zip_path):
+                raise RuntimeError("Extractor did not return a valid zip")
+            if os.path.exists("./saves"):shutil.rmtree("./saves")
+            if not self.unzip_file(zip_path,"./saves"):
+                self.message_signal.emit("critical",t("Error"),t("xgp.err.unzip_failed"))
+                return
+            saves=self.find_valid_saves("./saves")
+            if not saves:
+                self.message_signal.emit("critical",t("Error"),t("xgp.err.no_valid_saves"))
+                return
+            self.update_combobox_signal.emit([os.path.basename(s) for s in saves])
         except Exception as e:
             print(f"Extractor error: {e}")
+            traceback.print_exc()
+            self.message_signal.emit("critical",t("Error"),t("xgp.err.extract_failed",err=e))
     def convert_sav_JSON(self, saveName):
         save_path = os.path.join(root_dir, "saves", saveName, "Level", "01.sav")
         if not os.path.exists(save_path): return None
@@ -233,49 +230,55 @@ QComboBox::drop-down {
             return None
         return saveName
     def convert_JSON_sav(self, saveName):
-        json_path = os.path.join(root_dir, "saves", saveName, "Level", "01.sav.json")
-        output_path = os.path.join(root_dir, "saves", saveName, "Level.sav")
-        if not os.path.exists(json_path): return
-        try:
+        source_base=getattr(self,"direct_saves_map",{}).get(saveName,os.path.join(root_dir,"saves",saveName))
+        json_path=os.path.join(source_base,"Level","01.sav.json")
+        sav_path=os.path.join(source_base,"Level","01.sav")
+        out_level=os.path.join(source_base,"Level.sav")
+        if os.path.exists(sav_path) and not os.path.exists(json_path):
             from palworld_save_tools.commands import convert
-            old_argv = sys.argv
+            old=sys.argv
             try:
-                sys.argv = ["convert", json_path, "--output", output_path]
+                sys.argv=["convert",sav_path]
                 convert.main()
-                os.remove(json_path)
-                self.move_save_steam(saveName)
-            except Exception as e: print(t("xgp.err.convert_json", err=e))
-            finally: sys.argv = old_argv
-        except ImportError:
-            print("palworld_save_tools module not found. Please ensure it's installed.")
+            finally:sys.argv=old
+        if not os.path.exists(json_path):
+            self.message_signal.emit("critical",t("Error"),t("xgp.err.no_valid_saves"))
+            return
+        from palworld_save_tools.commands import convert
+        old=sys.argv
+        try:
+            sys.argv=["convert",json_path,"--output",out_level]
+            convert.main()
+        finally:sys.argv=old
+        try:os.remove(json_path)
+        except:pass
+        self.move_save_steam(saveName)
     @staticmethod
     def generate_random_name(length=32):
         return "".join(random.choices(string.ascii_uppercase + string.digits, k=length))
     def move_save_steam(self, saveName):
         try:
-            destination_folder = getattr(save_converter_done, "destination_folder", None)
-            if not destination_folder:
-                default_dest = os.path.expandvars(r"%localappdata%\Pal\Saved\SaveGames")
-                initial_dir = default_dest if os.path.exists(default_dest) else root_dir
-                destination_folder = QFileDialog.getExistingDirectory(self, "Select output folder", initial_dir)
-                if not destination_folder: return
-                save_converter_done.destination_folder = destination_folder
-            source_folder = os.path.join(root_dir, "saves", saveName)
-            if not os.path.exists(source_folder):
-                raise FileNotFoundError(t("xgp.err.source_not_found", src=source_folder))
-            def ignore_folders(_, names): return {n for n in names if n in {"Level", "Slot1", "Slot2", "Slot3"}}
-            new_name = self.generate_random_name()
-            xgp_converted_saves_path = os.path.join(root_dir, "XGP_converted_saves")
-            os.makedirs(xgp_converted_saves_path, exist_ok=True)
-            new_converted_target_folder = os.path.join(xgp_converted_saves_path, new_name)
-            shutil.copytree(source_folder, new_converted_target_folder, dirs_exist_ok=True, ignore=ignore_folders)
-            new_target_folder = os.path.join(destination_folder, new_name)
-            shutil.copytree(source_folder, new_target_folder, dirs_exist_ok=True, ignore=ignore_folders)
-            self.message_signal.emit("info", t("Success"), t("xgp.msg.convert_copied", dest=destination_folder))
+            steam_default=os.path.expandvars(r"%localappdata%\Pal\Saved\SaveGames")
+            initial=steam_default if os.path.isdir(steam_default) else root_dir
+            destination=QFileDialog.getExistingDirectory(self,"Select where to place converted save",initial)
+            if not destination:return
+            source_base=getattr(self,"direct_saves_map",{}).get(saveName,os.path.join(root_dir,"saves",saveName))
+            if not os.path.isdir(source_base):
+                raise FileNotFoundError(t("xgp.err.source_not_found",src=source_base))
+            if not os.path.isfile(os.path.join(source_base,"Level.sav")):
+                self.message_signal.emit("critical",t("Error"),t("xgp.err.convert_failed",err="Missing Level.sav in save root"))
+                return
+            def ignore(_,names):return{n for n in names if n in{"Level","Slot1","Slot2","Slot3"}}
+            new_name=self.generate_random_name()
+            xgp_out=os.path.join(root_dir,"XGP_converted_saves")
+            os.makedirs(xgp_out,exist_ok=True)
+            shutil.copytree(source_base,os.path.join(xgp_out,new_name),dirs_exist_ok=True,ignore=ignore)
+            shutil.copytree(source_base,os.path.join(destination,new_name),dirs_exist_ok=True,ignore=ignore)
+            self.message_signal.emit("info",t("Success"),t("xgp.msg.convert_copied",dest=destination))
         except Exception as e:
-            print(t("xgp.err.copy_exception", err=e))
+            print(t("xgp.err.copy_exception",err=e))
             traceback.print_exc()
-            self.message_signal.emit("critical", t("Error"), t("xgp.err.copy_failed", err=e))
+            self.message_signal.emit("critical",t("Error"),t("xgp.err.copy_failed",err=e))
     def transfer_steam_to_gamepass(self, source_folder):
         try:
             import_path = os.path.join(base_dir, "palworld_xgp_import")
