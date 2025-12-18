@@ -2123,7 +2123,7 @@ def open_kill_nearest_base_ui(master=None):
         return
     dlg = KillNearestBaseDialog(master)
     dlg.grab_set()
-EXCLUSIONS_FILE = "deletion_exclusions.json"
+EXCLUSIONS_FILE = "Assets/deletion_exclusions.json"
 exclusions = {}
 def load_exclusions():
     global exclusions
@@ -3124,7 +3124,7 @@ def all_in_one_tools():
                 exclusions[key].remove(val)
         populate_exclusions_trees()
     def save_exclusions_func():
-        with open("deletion_exclusions.json", "w") as f: json.dump(exclusions, f, indent=4)
+        with open(EXCLUSIONS_FILE, "w") as f: json.dump(exclusions, f, indent=4)
         tk.messagebox.showinfo(t("Saved"), t("deletion.saved_exclusions"))
     file_menu, file_menu_items, file_menu_add = create_and_store_menu("file_menu")
     file_menu_add("menu.file.load_save", load_save)
