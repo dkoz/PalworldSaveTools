@@ -297,7 +297,7 @@ def ensure_packaging_tools(venv_py: Path, info_logs: bool = False):
 def install_required_packages(venv_py: Path, info_logs: bool = False) -> bool:
     print_step_working(step_label(3, 4, "Installing required packages"))
 
-    pkgs = ["pyside6", "shiboken6", "packaging"]
+    pkgs = ["PySide6-Essentials", "shiboken6", "packaging"]
     installed = []
     for p in pkgs:
         if check_package_installed(venv_py, p, info_logs=info_logs):
