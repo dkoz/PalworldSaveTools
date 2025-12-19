@@ -601,6 +601,10 @@
             "asset": "ThunderStorm"
         },
         {
+            "name": "Upper Smash",
+            "asset": "Unique_ScorpionMan_Uppercut"
+        },
+        {
             "name": "Flame Funnel",
             "asset": "FlameFunnel"
         },
@@ -611,6 +615,10 @@
         {
             "name": "All Range Thunder",
             "asset": "RangeThunder"
+        },
+        {
+            "name": "Thunder Rail",
+            "asset": "Railbolt"
         },
         {
             "name": "Lethal Laser",
@@ -741,6 +749,10 @@
             "asset": "Unique_Umihebi_Fire_FireWindingTackle"
         },
         {
+            "name": "Predator Mark",
+            "asset": "PredatorLockon"
+        },
+        {
             "name": "Stone Claw",
             "asset": "Unique_WhiteTiger_Ground_IronScratch"
         },
@@ -759,6 +771,10 @@
         {
             "name": "Daring Shadowstorm",
             "asset": "Unique_AmaterasuWolf_Dark_DarkCharge"
+        },
+        {
+            "name": "Stone Beat",
+            "asset": "RockBeat"
         },
         {
             "name": "Lawn Bowling",
@@ -825,6 +841,14 @@
             "asset": "CrossWind"
         },
         {
+            "name": "Freeze Wall",
+            "asset": "IceWall"
+        },
+        {
+            "name": "Smoke Jet",
+            "asset": "Unique_OctopursGirl_InkJet"
+        },
+        {
             "name": "Hydro Spin",
             "asset": "Unique_TentacleTurtle_HydroSpin"
         },
@@ -861,6 +885,18 @@
             "asset": "Unique_IceCrocodile_SpitAttack"
         },
         {
+            "name": "Lock-On Lunge",
+            "asset": "Unique_Yakushima_EyeTossin"
+        },
+        {
+            "name": "Servant Call",
+            "asset": "Unique_Yakushima_SummonServant"
+        },
+        {
+            "name": "Scorching Lantern Sweep",
+            "asset": "Unique_GhostAnglerfish_Fire_SweepBait_Fire"
+        },
+        {
             "name": "Thunderslide",
             "asset": "Unique_CaptainPenguin_Black_BodySlide_Electric"
         },
@@ -871,6 +907,58 @@
         {
             "name": "Dash Kick",
             "asset": "Unique_TropicalOstrich_DashKick"
+        },
+        {
+            "name": "Thalassonic Laser",
+            "asset": "Unique_PoseidonOrca_TorrentLaser"
+        },
+        {
+            "name": "Slime Press (Neutral)",
+            "asset": "Unique_YakushimaMonster001_SlimePress_Normal"
+        },
+        {
+            "name": "Slime Press (Grass)",
+            "asset": "Unique_YakushimaMonster001_SlimePress_Leaf"
+        },
+        {
+            "name": "Slime Press (Water)",
+            "asset": "Unique_YakushimaMonster001_SlimePress_Water"
+        },
+        {
+            "name": "Slime Press (Fire)",
+            "asset": "Unique_YakushimaMonster001_SlimePress_Fire"
+        },
+        {
+            "name": "Slime Press (Dark)",
+            "asset": "Unique_YakushimaMonster001_SlimePress_Dark"
+        },
+        {
+            "name": "Slime Press (Rainbow)",
+            "asset": "Unique_YakushimaMonster001_SlimePress_Rainbow"
+        },
+        {
+            "name": "Ocular Rush",
+            "asset": "Unique_YakushimaBoss001_Small_DemonEyeCharge"
+        },
+        {
+            "name": "Sword Charge",
+            "asset": "Unique_YakushimaMonster002_SwordCharge"
+        },
+        {
+            "name": "Winged Assault",
+            "asset": "Unique_YakushimaMonster003_BatCharge"
+        },
+        {
+            "name": "Sacred Rain",
+            "asset": "Unique_LegendDeer_WarpPillarBurst"
+        },
+        {
+            "name": "Divine Wing",
+            "asset": "Unique_LegendDeer_RadiantWingRush"
+        },
+        {
+            "name": "Purifying Light",
+            "asset": "Unique_LegendDeer_RadiantPurge_Otomo"
         },
         {
             "name": "Radiant Barrage",

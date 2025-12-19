@@ -45,16 +45,12 @@
             "asset": "BlueDragon_Ice"
         },
         {
-            "name": "BOSS_BlackPuppy_Ice (Boss)",
-            "asset": "BOSS_BlackPuppy_Ice"
-        },
-        {
-            "name": "BOSS_BlueDragon_Ice (Boss)",
+            "name": "Azurobe Cryst (Boss)",
             "asset": "BOSS_BlueDragon_Ice"
         },
         {
-            "name": "BOSS_BluePlatypus_Fire (Boss)",
-            "asset": "BOSS_BluePlatypus_Fire"
+            "name": "BOSS_BlackPuppy_Ice (Boss)",
+            "asset": "BOSS_BlackPuppy_Ice"
         },
         {
             "name": "BOSS_BlueSkyDragon (Boss)",
@@ -75,10 +71,6 @@
         {
             "name": "BOSS_CandleWitch (Boss)",
             "asset": "BOSS_CandleWitch"
-        },
-        {
-            "name": "BOSS_CaptainPenguin_Black (Boss)",
-            "asset": "BOSS_CaptainPenguin_Black"
         },
         {
             "name": "BOSS_ClioneTwins (Boss)",
@@ -121,20 +113,12 @@
             "asset": "BOSS_FluffyBird"
         },
         {
-            "name": "BOSS_FlyingManta_Thunder (Boss)",
-            "asset": "BOSS_FlyingManta_Thunder"
-        },
-        {
             "name": "BOSS_FoxExorcist (Boss)",
             "asset": "BOSS_FoxExorcist"
         },
         {
             "name": "BOSS_FrozenBear (Boss)",
             "asset": "BOSS_FrozenBear"
-        },
-        {
-            "name": "BOSS_GhostAnglerfish_Fire (Boss)",
-            "asset": "BOSS_GhostAnglerfish_Fire"
         },
         {
             "name": "BOSS_GhostBlackCat (Boss)",
@@ -155,10 +139,6 @@
         {
             "name": "BOSS_HoodGhost (Boss)",
             "asset": "BOSS_HoodGhost"
-        },
-        {
-            "name": "BOSS_IceNarwhal_Fire (Boss)",
-            "asset": "BOSS_IceNarwhal_Fire"
         },
         {
             "name": "BOSS_IceVeilDragon (Boss)",
@@ -183,10 +163,6 @@
         {
             "name": "BOSS_LanternButler (Boss)",
             "asset": "BOSS_LanternButler"
-        },
-        {
-            "name": "BOSS_LazyCatfish_Gold (Boss)",
-            "asset": "BOSS_LazyCatfish_Gold"
         },
         {
             "name": "BOSS_LongCat (Boss)",
@@ -221,10 +197,6 @@
             "asset": "BOSS_MushroomLady"
         },
         {
-            "name": "BOSS_NegativeOctopus_Neutral (Boss)",
-            "asset": "BOSS_NegativeOctopus_Neutral"
-        },
-        {
             "name": "BOSS_NightBlueHorse_Neutral (Boss)",
             "asset": "BOSS_NightBlueHorse_Neutral"
         },
@@ -239,10 +211,6 @@
         {
             "name": "BOSS_PandaGirl (Boss)",
             "asset": "BOSS_PandaGirl"
-        },
-        {
-            "name": "BOSS_Penguin_Electric (Boss)",
-            "asset": "BOSS_Penguin_Electric"
         },
         {
             "name": "BOSS_PyramidTurtle (Boss)",
@@ -289,10 +257,6 @@
             "asset": "BOSS_StrawHatCat"
         },
         {
-            "name": "BOSS_StuffedShark_Fire (Boss)",
-            "asset": "BOSS_StuffedShark_Fire"
-        },
-        {
             "name": "BOSS_SumoDog (Boss)",
             "asset": "BOSS_SumoDog"
         },
@@ -303,10 +267,6 @@
         {
             "name": "BOSS_SwordCutlassfish (Boss)",
             "asset": "BOSS_SwordCutlassfish"
-        },
-        {
-            "name": "BOSS_TentacleTurtle_Ground (Boss)",
-            "asset": "BOSS_TentacleTurtle_Ground"
         },
         {
             "name": "BOSS_ThiefBird (Boss)",
@@ -573,6 +533,10 @@
             "asset": "FlyingManta_Thunder"
         },
         {
+            "name": "Celaray Lux (Boss)",
+            "asset": "BOSS_FlyingManta_Thunder"
+        },
+        {
             "name": "Celesdir",
             "asset": "WhiteDeer"
         },
@@ -801,6 +765,10 @@
             "asset": "LazyCatfish_Gold"
         },
         {
+            "name": "Dumud Gild (Boss)",
+            "asset": "BOSS_LazyCatfish_Gold"
+        },
+        {
             "name": "Eikthyrdeer",
             "asset": "Deer"
         },
@@ -941,6 +909,10 @@
             "asset": "StuffedShark_Fire"
         },
         {
+            "name": "Finsider Ignis (Boss)",
+            "asset": "BOSS_StuffedShark_Fire"
+        },
+        {
             "name": "Flambelle",
             "asset": "LavaGirl"
         },
@@ -1029,6 +1001,10 @@
             "asset": "BluePlatypus_Fire"
         },
         {
+            "name": "Fuack Ignis (Boss)",
+            "asset": "BOSS_BluePlatypus_Fire"
+        },
+        {
             "name": "Fuddler",
             "asset": "CuteMole"
         },
@@ -1055,6 +1031,10 @@
         {
             "name": "Ghangler Ignis",
             "asset": "GhostAnglerfish_Fire"
+        },
+        {
+            "name": "Ghangler Ignis (Boss)",
+            "asset": "BOSS_GhostAnglerfish_Fire"
         },
         {
             "name": "GhostBlackCat",
@@ -1407,6 +1387,10 @@
         {
             "name": "Killamari Primo",
             "asset": "NegativeOctopus_Neutral"
+        },
+        {
+            "name": "Killamari Primo (Boss)",
+            "asset": "BOSS_NegativeOctopus_Neutral"
         },
         {
             "name": "KingCrab",
@@ -1857,6 +1841,10 @@
             "asset": "Penguin_Electric"
         },
         {
+            "name": "Pengullet Lux (Boss)",
+            "asset": "BOSS_Penguin_Electric"
+        },
+        {
             "name": "Penking",
             "asset": "CaptainPenguin"
         },
@@ -1867,6 +1855,10 @@
         {
             "name": "Penking Lux",
             "asset": "CaptainPenguin_Black"
+        },
+        {
+            "name": "Penking Lux (Boss)",
+            "asset": "BOSS_CaptainPenguin_Black"
         },
         {
             "name": "Petallia",
@@ -2405,6 +2397,10 @@
             "asset": "TentacleTurtle_Ground"
         },
         {
+            "name": "Turtacle Terra (Boss)",
+            "asset": "BOSS_TentacleTurtle_Ground"
+        },
+        {
             "name": "Univolt",
             "asset": "Kirin"
         },
@@ -2491,6 +2487,10 @@
         {
             "name": "Whalaska Ignis",
             "asset": "IceNarwhal_Fire"
+        },
+        {
+            "name": "Whalaska Ignis (Boss)",
+            "asset": "BOSS_IceNarwhal_Fire"
         },
         {
             "name": "Wixen",

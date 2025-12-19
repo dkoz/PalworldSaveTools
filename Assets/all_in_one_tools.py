@@ -244,8 +244,13 @@ def load_save(path=None):
     log_folder = os.path.join(base_path, "Scan Save Logger")
     if os.path.exists(log_folder): shutil.rmtree(log_folder)
     os.makedirs(log_folder, exist_ok=True)
+    guild_name_map = {}
+    if srcGuildMapping:
+        for gid_uuid, gdata in srcGuildMapping.GroupSaveDataMap.items():
+            g_name = gdata['value']['RawData']['value'].get('guild_name', "Unnamed Guild")
+            guild_name_map[str(gid_uuid).lower()] = g_name
     player_pals_count = {}
-    count_pals_found(data_source, player_pals_count, log_folder)
+    count_pals_found(data_source, player_pals_count, log_folder, current_save_path, sav_to_json, guild_name_map)
     PLAYER_PAL_COUNTS = player_pals_count     
     def count_owned_pals(level_json):
         owned_count = {}
@@ -318,12 +323,7 @@ def load_save(path=None):
             total_caught += caught
             total_owned += owned
         logger.info("")
-    non_owner_log = os.path.join(log_folder, "non_owner_pals.log")
-    try:
-        with open(non_owner_log,"r",encoding="utf-8") as f:
-            first_line = f.readline()
-            total_worker_dropped = int(first_line.split()[0])
-    except: total_worker_dropped = 0
+    total_worker_dropped = PLAYER_PAL_COUNTS.get("worker_dropped", 0)
     logger.info("="*60)
     logger.info("********** PST_STATS_BEGIN **********")
     logger.info(t("stats.header"))
@@ -356,8 +356,8 @@ def safe_str(s):
     return s.encode('utf-8', 'replace').decode('utf-8')
 def sanitize_filename(name):
     return ''.join(c if c.isalnum() or c in (' ', '_', '-', '(', ')') else '_' for c in name)
-def count_pals_found(data, player_pals_count, log_folder):
-    import os,json,logging
+def count_pals_found(data, player_pals_count, log_folder, current_save_path, sav_to_json, guild_name_map):
+    import os,json,logging,shutil
     from collections import defaultdict
     base_dir=os.path.dirname(os.path.abspath(__file__))
     def load_map(fname,key):
@@ -373,127 +373,112 @@ def count_pals_found(data, player_pals_count, log_folder):
     PASSMAP=load_map("passivedata.json","passives")
     SKILLMAP=load_map("skilldata.json","skills")
     NAMEMAP={**PALMAP,**NPCMAP}
-    owner_pals_info=defaultdict(list)
-    non_owner_pals_info=[]
+    owner_pals_grouped=defaultdict(lambda: defaultdict(list))
+    player_containers={}
     owner_nicknames={}
-    base_id_groups=defaultdict(list)
-    missing_assets={"Pals":set(),"Passives":set(),"Skills":set()}
-    for key,value in data.items():
-        if key=="CharacterSaveParameterMap":
-            raw_list=value.get("value",[])
-            for itm in raw_list:
-                rdv=itm.get("value",{}).get("RawData",{})
+    players_dir=os.path.join(current_save_path,"Players")
+    if os.path.exists(players_dir):
+        for filename in os.listdir(players_dir):
+            if filename.endswith(".sav") and "_dps" not in filename:
                 try:
-                    if "custom_type" in rdv and rdv["custom_type"]==".worldSaveData.CharacterSaveParameterMap.Value.RawData" and "IsPlayer" in rdv["value"]["object"]["SaveParameter"]["value"]:
-                        uid=itm.get("key",{}).get("PlayerUId",{}).get("value")
-                        nn=rdv["value"]["object"]["SaveParameter"]["value"].get("NickName",{}).get("value","Unknown")
-                        if uid: owner_nicknames[uid]=nn
+                    p_json=sav_to_json(os.path.join(players_dir,filename))
+                    p_prop=p_json.get("properties",{}).get("SaveData",{}).get("value",{})
+                    p_uid_raw=filename.replace(".sav","")
+                    p_uid=f"{p_uid_raw[0:8]}-{p_uid_raw[8:12]}-{p_uid_raw[12:16]}-{p_uid_raw[16:20]}-{p_uid_raw[20:32]}".lower()
+                    p_box=p_prop.get("PalStorageContainerId",{}).get("value",{}).get("ID",{}).get("value")
+                    p_party=p_prop.get("OtomoCharacterContainerId",{}).get("value",{}).get("ID",{}).get("value")
+                    if p_box and p_party:
+                        player_containers[p_uid]={"Party":str(p_party).lower(),"PalBox":str(p_box).lower()}
                 except:
                     pass
     cmap=data.get("CharacterSaveParameterMap",{}).get("value",[])
+    for itm in cmap:
+        try:
+            raw_p=itm.get("value",{}).get("RawData",{}).get("value",{}).get("object",{}).get("SaveParameter",{}).get("value",{})
+            if "IsPlayer" in raw_p:
+                uid=itm.get("key",{}).get("PlayerUId",{}).get("value")
+                nn=raw_p.get("NickName",{}).get("value","Unknown")
+                if uid: owner_nicknames[str(uid).lower()]=nn
+        except:
+            pass
+    guild_bases=defaultdict(set)
     for item in cmap:
         rawf=item.get("value",{}).get("RawData",{}).get("value",{})
         raw=rawf.get("object",{}).get("SaveParameter",{}).get("value",{})
-        if not isinstance(raw,dict): continue
+        if not isinstance(raw,dict) or "IsPlayer" in raw: continue
         inst=item.get("key",{}).get("InstanceId",{}).get("value")
-        gid=rawf.get("group_id","Unknown")
-        uid=raw.get("OwnerPlayerUId",{}).get("value")
+        gid=str(rawf.get("group_id","Unknown")).lower()
+        uid_val=raw.get("OwnerPlayerUId",{}).get("value")
+        u_str=str(uid_val).lower() if uid_val else "00000000-0000-0000-0000-000000000000"
+        is_worker=(u_str=="00000000-0000-0000-0000-000000000000")
+        base=str(raw.get("SlotId",{}).get("value",{}).get("ContainerId",{}).get("value",{}).get("ID",{}).get("value")).lower()
+        if is_worker: guild_bases[gid].add(base)
+        target_id=u_str if not is_worker else f"WORKER_{gid}_{base}"
+        if is_worker and target_id not in owner_nicknames: owner_nicknames[target_id]=f"Base_{base}"
         cid=raw.get("CharacterID",{}).get("value","")
-        if cid and cid.lower()!="none" and cid.lower() not in NAMEMAP:
-            missing_assets["Pals"].add(cid)
         name=NAMEMAP.get(cid.lower(),cid)
         lvl=extract_value(raw,"Level",1)
         rk=extract_value(raw,"Rank",1)
-        base=raw.get("SlotId",{}).get("value",{}).get("ContainerId",{}).get("value",{}).get("ID",{}).get("value")
         gv=raw.get("Gender",{}).get("value",{}).get("value","")
         ginfo={"EPalGenderType::Male":"Male","EPalGenderType::Female":"Female"}.get(gv,"Unknown")
-        pskills=[]
-        for s in raw.get("PassiveSkillList",{}).get("value",{}).get("values",[]):
-            sl=s.lower()
-            if sl not in PASSMAP: missing_assets["Passives"].add(s)
-            pskills.append(PASSMAP.get(sl,s))
-        pstr=", ".join(pskills) if pskills else "None"
-        active=[]
-        for w in raw.get("EquipWaza",{}).get("value",{}).get("values",[]):
-            wid=w.split("::")[-1]
-            wl=wid.lower()
-            if wl not in SKILLMAP: missing_assets["Skills"].add(wid)
-            active.append(SKILLMAP.get(wl,wid))
-        astr=", ".join(active) if active else "None"
-        learned=[]
-        for w in raw.get("MasteredWaza",{}).get("value",{}).get("values",[]):
-            wid=w.split("::")[-1]
-            wl=wid.lower()
-            if wl not in SKILLMAP: missing_assets["Skills"].add(wid)
-            learned.append(SKILLMAP.get(wl,wid))
-        lstr=", ".join(learned) if learned else "None"
-        rh=int(extract_value(raw,"Rank_HP",0))*3
-        ra=int(extract_value(raw,"Rank_Attack",0))*3
-        rd=int(extract_value(raw,"Rank_Defence",0))*3
-        rc=int(extract_value(raw,"Rank_CraftSpeed",0))*3
-        iv_str=f"HP: {extract_value(raw,'Talent_HP','0')} (+{rh}%), ATK: {extract_value(raw,'Talent_Shot','0')} (+{ra}%), DEF: {extract_value(raw,'Talent_Defense','0')} (+{rd}%), Work: (+{rc}%)"
+        pskills=[PASSMAP.get(s.lower(),s) for s in raw.get("PassiveSkillList",{}).get("value",{}).get("values",[])]
+        active=[SKILLMAP.get(w.split("::")[-1].lower(),w.split("::")[-1]) for w in raw.get("EquipWaza",{}).get("value",{}).get("values",[])]
+        learned=[SKILLMAP.get(w.split("::")[-1].lower(),w.split("::")[-1]) for w in raw.get("MasteredWaza",{}).get("value",{}).get("values",[])]
+        rh,ra,rd=int(extract_value(raw,"Rank_HP",0))*3,int(extract_value(raw,"Rank_Attack",0))*3,int(extract_value(raw,"Rank_Defence",0))*3
+        iv_str=f"HP: {extract_value(raw,'Talent_HP','0')} (+{rh}%), ATK: {extract_value(raw,'Talent_Shot','0')} (+{ra}%), DEF: {extract_value(raw,'Talent_Defense','0')} (+{rd}%)"
         nick=raw.get("NickName",{}).get("value","Unknown")
         dn=f"{name} (Nickname: {nick})" if nick!="Unknown" else name
         info=(f"\n[{dn}]\n"
               f"  Level: {lvl} | Rank: {rk} | Gender: {ginfo}\n"
               f"  IVs:      {iv_str}\n"
-              f"  Passives: {pstr}\n"
-              f"  Active:   {astr}\n"
-              f"  Learned:  {lstr}\n"
+              f"  Passives: {', '.join(pskills) if pskills else 'None'}\n"
+              f"  Active:   {', '.join(active) if active else 'None'}\n"
+              f"  Learned:  {', '.join(learned) if learned else 'None'}\n"
               f"  IDs:      Container: {base} | Instance: {inst} | Guild: {gid}\n")
-        if not uid:
-            if name.strip().lower()!="none" and name.strip()!="":
-                non_owner_pals_info.append(info)
-                base_id_groups[base].append(info)
-                continue
-        owner_pals_info[uid].append(info)
-        player_pals_count[uid]=player_pals_count.get(uid,0)+1
-    if any(missing_assets.values()):
-        mf=os.path.join(log_folder,"missing_assets.log")
-        try:
-            with open(mf,'w',encoding='utf-8',errors='replace') as f:
-                for k,v in missing_assets.items():
-                    if v:
-                        f.write(f"--- Missing {k} ({len(v)}) ---\n")
-                        for x in sorted(list(v)): f.write(f"{x}\n")
-                        f.write("\n")
-        except: pass
-    if non_owner_pals_info:
-        nf=os.path.join(log_folder,"non_owner_pals.log")
-        try:
-            with open(nf,'w',encoding='utf-8',errors='replace') as f:
-                f.write(f"{len(non_owner_pals_info)} Non-Owner Pals\n")
-                f.write("="*40+"\n")
-                for bid,pals in base_id_groups.items():
-                    f.write(f"\nContainerID: {bid} (Count: {len(pals)})\n")
-                    f.write("-" * 40 + "\n")
-                    f.write("".join(pals))
-        except: pass
-    for uid,pals in owner_pals_info.items():
+        lbl="Base Worker"
+        if not is_worker and u_str in player_containers:
+            if base==player_containers[u_str]["Party"]: lbl="Current Party"
+            elif base==player_containers[u_str]["PalBox"]: lbl="PalBox Storage"
+        owner_pals_grouped[target_id][lbl].append(info)
+        if is_worker: player_pals_count["worker_dropped"]=player_pals_count.get("worker_dropped",0)+1
+        else: player_pals_count[u_str]=player_pals_count.get(u_str,0)+1
+    for uid,containers in owner_pals_grouped.items():
         pname=owner_nicknames.get(uid,'Unknown')
         sname=sanitize_filename(pname.encode('utf-8','replace').decode('utf-8'))
-        lf=os.path.join(log_folder,f"({sname})({uid}).log")
-        lname=''.join(c if c.isalnum() or c in ('_','-') else '_' for c in f"logger_{uid}")
+        pal_count=sum(len(p) for p in containers.values())
+        if uid.startswith("WORKER_"):
+            parts=uid.split("_")
+            g_id,b_id=parts[1],parts[2]
+            b_count=len(guild_bases[g_id])
+            g_name=sanitize_filename(guild_name_map.get(g_id,"Unknown Guild"))
+            g_dir=os.path.join(log_folder,"Guilds",f"({g_id})_({g_name})_({b_count})")
+            os.makedirs(g_dir,exist_ok=True)
+            lf=os.path.join(g_dir,f"({b_id})_({pal_count}).log")
+        else:
+            p_dir=os.path.join(log_folder,"Players")
+            os.makedirs(p_dir,exist_ok=True)
+            lf=os.path.join(p_dir,f"({uid})_({sname})_({pal_count}).log")
+        lname=''.join(c if c.isalnum() or c in ('_','-') else '_' for c in f"lg_{uid}")
         lg=logging.getLogger(lname)
-        lg.setLevel(logging.INFO)
-        lg.propagate=False
+        lg.setLevel(logging.INFO); lg.propagate=False
         if not lg.hasHandlers():
             try:
                 h=logging.FileHandler(lf,mode='w',encoding='utf-8',errors='replace')
                 h.setFormatter(logging.Formatter('%(message)s'))
                 lg.addHandler(h)
             except: continue
-        lg.info(f"{pname}'s {len(pals)} Pals")
-        lg.info("="*40)
-        for p_block in sorted(pals):
-            lg.info(p_block)
-            lg.info("-" * 20)
-    for uid in owner_pals_info.keys():
-        lg=logging.getLogger(''.join(c if c.isalnum() or c in ('_','-') else '_' for c in f"logger_{uid}"))
+        lg.info(f"{pname}'s {pal_count} Pals\n"+"="*40)
+        prio=["Current Party","PalBox Storage","Base Worker"]
+        sorted_keys=prio+sorted([k for k in containers.keys() if k not in prio])
+        for label in sorted_keys:
+            if label in containers:
+                lg.info(f"\n{label} (Count: {len(containers[label])})\n"+"-"*40)
+                for p_block in sorted(containers[label]):
+                    lg.info(p_block); lg.info("-" * 20)
+    for uid in owner_pals_grouped.keys():
+        lg=logging.getLogger(''.join(c if c.isalnum() or c in ('_','-') else '_' for c in f"lg_{uid}"))
         for h in lg.handlers[:]:
-            h.flush()
-            h.close()
-            lg.removeHandler(h)
+            h.flush(); h.close(); lg.removeHandler(h)
 def process_dps_save(player_uid, nickname, dps_file_path, log_folder):
     try:
         with open(dps_file_path, "rb") as f:
