@@ -63,7 +63,7 @@ base=None
 if sys.platform=="win32": base="Console"
 setup(
     name="PalworldSaveTools",
-    version="1.1.34",
+    version="1.1.35",
     description="All-in-one tool for fixing/trans ferring/editing Palworld saves",
     options={"build_exe":build_exe_options},
     executables=[
