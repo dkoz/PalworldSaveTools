@@ -52,38 +52,7 @@ def restore_map():
             super().__init__()
             self.setWindowTitle(t("tool.restore_map"))
             self.setFixedSize(640, 320)
-            self.setStyleSheet("""
-QDialog {
-    background: qlineargradient(spread:pad, x1:0.0, y1:0.0, x2:1.0, y2:1.0,
-                stop:0 #07080a, stop:0.5 #08101a, stop:1 #05060a);
-    color: #dfeefc;
-    font-family: "Segoe UI", Roboto, Arial;
-}
-QFrame#glass {
-    background: rgba(18,20,24,0.65);
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.04);
-    padding: 14px;
-}
-QLabel {
-    color: #dfeefc;
-}
-QPushButton {
-    background-color: #555555;
-    color: white;
-    padding: 8px;
-    border-radius: 6px;
-    min-width: 120px;
-}
-QPushButton:hover {
-    background-color: #666666;
-}
-QPushButton:disabled {
-    background-color: #333333;
-    color: #888888;
-    border: 1px solid #444444;
-}
-""")
+            self.load_styles()
             try:
                 if ICON_PATH and os.path.exists(ICON_PATH):
                     self.setWindowIcon(QIcon(ICON_PATH))
@@ -151,6 +120,20 @@ QPushButton:disabled {
             QTimer.singleShot(2000, self.accept)
         def on_no(self):
             self.reject()
+        def load_styles(self):
+            user_cfg_path = os.path.join(get_assets_directory(), "data", "configs", "user.cfg")
+            theme = "dark"
+            if os.path.exists(user_cfg_path):
+                try:
+                    with open(user_cfg_path, "r") as f:
+                        data = json.load(f)
+                    theme = data.get("theme", "dark")
+                except:
+                    pass
+            qss_path = os.path.join(get_assets_directory(), "data", "gui", f"{theme}mode.qss")
+            if os.path.exists(qss_path):
+                with open(qss_path, "r") as f:
+                    self.setStyleSheet(f.read())
     dialog = RestoreMapDialog()
     return dialog
 def main():

@@ -26,43 +26,25 @@ def convert_steam_id():
     steam_id_from_local = get_steam_id_from_local()
     dialog = QDialog()
     dialog.setWindowTitle(t("steamid.title"))
-    dialog.setStyleSheet("""
-QDialog {
-    background: qlineargradient(spread:pad, x1:0.0, y1:0.0, x2:1.0, y2:1.0,
-                stop:0 #07080a, stop:0.5 #08101a, stop:1 #05060a);
-    color: #dfeefc;
-    font-family: "Segoe UI", Roboto, Arial;
-}
-QFrame#glass {
-    background: rgba(18,20,24,0.65);
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.04);
-    padding: 10px;
-}
-QPushButton {
-    background-color: #555555;
-    color: white;
-    padding: 6px;
-    border-radius: 4px;
-}
-QPushButton:hover {
-    background-color: #666666;
-}
-QLineEdit {
-    background-color: rgba(255,255,255,0.1);
-    color: white;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 4px;
-    padding: 4px;
-}
-QLabel {
-    color: #dfeefc;
-}
-""")
     try:
         dialog.setWindowIcon(QIcon(ICON_PATH))
     except:
         pass
+    def load_styles(widget):
+        user_cfg_path = os.path.join(get_assets_directory(), "data", "configs", "user.cfg")
+        theme = "dark"
+        if os.path.exists(user_cfg_path):
+            try:
+                with open(user_cfg_path, "r") as f:
+                    data = json.load(f)
+                theme = data.get("theme", "dark")
+            except:
+                pass
+        qss_path = os.path.join(get_assets_directory(), "data", "gui", f"{theme}mode.qss")
+        if os.path.exists(qss_path):
+            with open(qss_path, "r") as f:
+                widget.setStyleSheet(f.read())
+    load_styles(dialog)
     main_layout = QVBoxLayout(dialog)
     main_layout.setContentsMargins(14, 14, 14, 14)
     main_layout.setSpacing(12)

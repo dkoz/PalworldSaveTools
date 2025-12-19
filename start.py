@@ -212,7 +212,7 @@ _current_step = 0
 _worker_thread: Optional[threading.Thread] = None
 
 def get_config_value(key: str, default=None):
-    config_path = PROJECT_DIR / "Assets" / "resources" / "i18n" / "config.json"
+    config_path = PROJECT_DIR / "Assets" / "data" / "configs" / "config.json"
     try:
         with open(config_path, 'r') as f:
             config = json.load(f)
@@ -266,6 +266,22 @@ if GUI_AVAILABLE:
 
     _signals: Optional[WorkerSignals] = None
 
+def load_splash_styles():
+    user_cfg_path = os.path.join(PROJECT_DIR, "Assets", "data", "configs", "user.cfg")
+    theme = "dark"
+    if os.path.exists(user_cfg_path):
+        try:
+            with open(user_cfg_path, "r") as f:
+                data = json.load(f)
+            theme = data.get("theme", "dark")
+        except:
+            pass
+    qss_path = os.path.join(PROJECT_DIR, "Assets", "data", "gui", f"{theme}mode.qss")
+    if os.path.exists(qss_path):
+        with open(qss_path, "r") as f:
+            return f.read()
+    return DARK_STYLE_SPLASH  # fallback
+
 def build_splash_ui():
     """
     Create splash with:
@@ -279,7 +295,7 @@ def build_splash_ui():
     container = QWidget(None, Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
     container.setAttribute(Qt.WA_TranslucentBackground, True)
     container.setFixedSize(600, 320)
-    container.setStyleSheet(DARK_STYLE_SPLASH)
+    container.setStyleSheet(load_splash_styles())
 
     frame = QFrame(container)
     frame.setObjectName("glass")

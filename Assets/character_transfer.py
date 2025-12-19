@@ -157,6 +157,7 @@ class CharacterTransferWindow(QWidget):
     message_signal = Signal(str, str)
     def __init__(self):
         super().__init__()
+        self.setObjectName("central")
         self.source_player_list = None
         self.target_player_list = None
         self.source_level_path_label = None
@@ -175,53 +176,7 @@ class CharacterTransferWindow(QWidget):
     def setup_ui(self):
         self.setWindowTitle(t("tool.character_transfer"))
         self.setFixedSize(1200, 640)
-        self.setStyleSheet("""
-QWidget {
-    background: qlineargradient(spread:pad, x1:0.0, y1:0.0, x2:1.0, y2:1.0,
-                stop:0 #07080a, stop:0.5 #08101a, stop:1 #05060a);
-    color: #dfeefc;
-    font-family: "Segoe UI", Roboto, Arial;
-}
-QFrame#glass {
-    background: rgba(18,20,24,0.78);
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.04);
-    padding: 12px;
-}
-QLabel { color: #dfeefc; background-color: #121418; }
-QLineEdit {
-    background-color: #333333;
-    color: #dfeefc;
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 8px;
-    padding: 8px;
-}
-QPushButton {
-    background-color: #555555;
-    color: white;
-    padding: 8px 14px;
-    border-radius: 8px;
-    min-width: 120px;
-}
-QPushButton:hover { background-color: #666666; }
-QTreeWidget {
-    background-color: #222222;
-    color: #dfeefc;
-    border-radius: 12px;
-    padding: 6px;
-    border: 1px solid rgba(255,255,255,0.04);
-}
-QHeaderView::section {
-    background-color: #333333;
-    color: #dfeefc;
-    padding: 8px;
-    border: none;
-    height: 28px;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-}
-QTreeView::item:hover { background: #333333; }
-""")
+        self.load_styles()
         try:
             if ICON_PATH and os.path.exists(ICON_PATH):
                 self.setWindowIcon(QIcon(ICON_PATH))
@@ -330,6 +285,20 @@ QTreeView::item:hover { background: #333333; }
         glass_layout.addWidget(tip_label)
         main_layout.addWidget(glass_frame)
         center_window(self)
+    def load_styles(self):
+        user_cfg_path = os.path.join(get_assets_directory(), "data", "configs", "user.cfg")
+        theme = "dark"
+        if os.path.exists(user_cfg_path):
+            try:
+                with open(user_cfg_path, "r") as f:
+                    data = json.load(f)
+                theme = data.get("theme", "dark")
+            except:
+                pass
+        qss_path = os.path.join(get_assets_directory(), "data", "gui", f"{theme}mode.qss")
+        if os.path.exists(qss_path):
+            with open(qss_path, "r") as f:
+                self.setStyleSheet(f.read())
     def filter_treeview(self, tree, query, is_source):
         query = query.lower()
         for i in range(tree.topLevelItemCount()):

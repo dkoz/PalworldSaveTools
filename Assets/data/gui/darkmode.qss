@@ -1,0 +1,252 @@
+/* Background gradient */
+QWidget#central {
+    background: qlineargradient(spread:pad, x1:0.0, y1:0.0, x2:1.0, y2:1.0,
+                stop:0 #07080a, stop:0.5 #08101a, stop:1 #05060a);
+    color: #dfeefc;
+    font-family: "Segoe UI", Roboto, Arial;
+}
+
+/* Version chip */
+QLabel#versionChip {
+    background: rgba(125,211,252,0.08);
+    border: 1px solid rgba(125,211,252,0.12);
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 17px;
+    color: #7DD3FC;
+}
+
+/* PULSE STYLE: Applied when the pulse="true" dynamic property is set */
+QLabel#versionChip[pulse="true"] {
+    background: #FFD24D; /* Bright Gold/Amber for pulsing */
+    border: 1px solid #FFD24D;
+    color: #000000; /* Contrast text color */
+}
+
+/* Game version chip */
+QLabel#gameVersionChip {
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.12);
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 17px;
+    color: #22C55E;
+}
+
+/* Control chips */
+QPushButton#controlChip {
+    background: rgba(128,128,128,0.1);
+    border: 1px solid rgba(128,128,128,0.2);
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 20px;
+    color: #ffffff;
+    text-align: center;
+}
+QPushButton#controlChip:hover {
+    background: rgba(128,128,128,0.2);
+    border: 1px solid rgba(128,128,128,0.3);
+}
+
+/* Scroll area */
+QScrollArea {
+    border-radius: 10px;
+}
+
+/* Card */
+QFrame#glass {
+    background: rgba(18,20,24,0.65);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.04);
+    padding: 10px;
+}
+
+/* Content widget */
+QWidget#contentWidget {
+    background: rgba(18,20,24,0.65);
+    border-radius: 10px;
+}
+
+/* Title area */
+QLabel#title {
+    font-size: 20px;
+    font-weight: 800;
+    color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #7DD3FC, stop:1 #A78BFA);
+    letter-spacing: 1px;
+}
+
+/* Tool widget (composite row) */
+QWidget.toolRow {
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.04);
+    border-radius: 8px;
+    padding: 4px;
+    margin: 4px 0px;
+}
+QWidget.toolRow:hover {
+    background: rgba(37,150,190,0.1);
+    border: 2px solid #2596be;
+}
+
+
+/* Tool button tightened */
+QPushButton.toolCard {
+    background: transparent;
+    border: none;
+    text-align: left;
+    padding: 4px 6px;
+    font-weight: 600;
+    min-height: 40px;
+    color: #E6EDF3;
+}
+QPushButton.toolCard:hover {
+    background: transparent;
+    color: #AEE9FF;
+}
+
+/* Icon label */
+QLabel.toolIcon {
+    background: rgba(255,255,255,0.02);
+    border-radius: 6px;
+    padding: 4px;
+    min-width: 30px;
+    min-height: 30px;
+    max-width: 30px;
+    max-height: 30px;
+}
+
+/* Category title */
+QLabel.categoryTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+}
+
+/* Header buttons */
+QToolButton#hdrBtn {
+    border: none;
+    background: transparent;
+    padding: 6px;
+    margin-left: 6px;
+}
+QToolButton#hdrBtn:hover {
+    background: rgba(255,255,255,0.02);
+    border-radius: 6px;
+}
+
+/* Footer */
+QStatusBar {
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    border-top: 1px solid rgba(255,255,255,0.02);
+}
+
+/* Menu */
+QMenu {
+    background: qlineargradient(spread:pad, x1:0.0, y1:0.0, x2:1.0, y2:1.0,
+                stop:0 rgba(10,12,16,0.95), stop:0.5 rgba(12,16,22,0.95), stop:1 rgba(8,10,14,0.95));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    font-size: 16px;
+    color: #dfeefc;
+}
+QMenu::item {
+    padding: 8px 12px;
+    background: transparent;
+    border-radius: 4px;
+}
+QMenu::item:selected {
+    background: rgba(125,211,252,0.3);
+}
+QMenu::item:disabled {
+    color: rgba(255,255,255,0.4);
+}
+QMenu::separator {
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 4px 0px;
+}
+
+/* General QPushButton */
+QPushButton {
+    background-color: #555555;
+    color: white;
+    padding: 6px;
+    border-radius: 4px;
+}
+QPushButton:hover {
+    background-color: #666666;
+}
+
+/* QLineEdit */
+QLineEdit {
+    background-color: rgba(255,255,255,0.1);
+    color: #dfeefc;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 4px;
+}
+
+/* QLabel */
+QLabel {
+    color: #dfeefc;
+}
+
+/* QComboBox */
+QComboBox {
+    background-color: #444444;
+    color: #dfeefc;
+    border: 1px solid #555555;
+    padding: 4px;
+    border-radius: 4px;
+}
+QComboBox::drop-down {
+    border: none;
+}
+
+/* QTreeWidget */
+QTreeWidget {
+    background: transparent;
+    color: #dfeefc;
+}
+QTreeWidget QHeaderView::section {
+    background-color: #2a2d33;
+    color: #dfeefc;
+    padding: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    height: 28px;
+}
+QFrame#treePanel {
+    background-color: transparent;
+}
+
+QTreeWidget QHeaderView::section:hover {
+    background-color: rgba(37,99,235,0.2);
+}
+
+/* QProgressBar */
+QProgressBar {
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 8px;
+    height: 14px;
+    text-align: center;
+    background: rgba(18,20,24,0.60);
+    color: #dfeefc;
+}
+QProgressBar::chunk {
+    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #7DD3FC, stop:1 #A78BFA);
+    border-radius: 8px;
+}
+
+/* QCheckBox */
+QCheckBox {
+    color: #dfeefc;
+}
+
+/* QDialog */
+QDialog {
+    background: qlineargradient(spread:pad, x1:0.0, y1:0.0, x2:1.0, y2:1.0,
+                stop:0 #07080a, stop:0.5 #08101a, stop:1 #05060a);
+    color: #dfeefc;
+    font-family: "Segoe UI", Roboto, Arial;
+}

@@ -22,53 +22,11 @@ class GamePassSaveFixWidget(QWidget):
         self.extraction_complete_signal.connect(self.start_conversion)
         self.message_signal.connect(self.handle_message)
         self.setup_ui()
+        self.load_styles()
     def setup_ui(self):
         self.setWindowTitle(t("xgp.title.converter"))
         self.setFixedSize(600, 200)
-        self.setStyleSheet("""
-QWidget {
-    background: qlineargradient(spread:pad, x1:0.0, y1:0.0, x2:1.0, y2:1.0,
-                stop:0 #07080a, stop:0.5 #08101a, stop:1 #05060a);
-    color: #dfeefc;
-    font-family: "Segoe UI", Roboto, Arial;
-}
-QFrame#glass {
-    background: rgba(18,20,24,0.65);
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.04);
-    padding: 10px;
-}
-QPushButton {
-    background-color: #555555;
-    color: white;
-    padding: 6px;
-    border-radius: 4px;
-}
-QPushButton:hover {
-    background-color: #666666;
-}
-QLineEdit {
-    background-color: rgba(255,255,255,0.1);
-    color: white;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 4px;
-    padding: 4px;
-}
-QLabel {
-    color: #dfeefc;
-    background-color: rgba(18,20,24,0);
-}
-QComboBox {
-    background-color: #444444;
-    color: white;
-    border: 1px solid #555555;
-    padding: 4px;
-    border-radius: 4px;
-}
-QComboBox::drop-down {
-    border: none;
-}
-""")
+        self.setObjectName("central")
         try:
             if ICON_PATH and os.path.exists(ICON_PATH):
                 self.setWindowIcon(QIcon(ICON_PATH))
@@ -82,8 +40,12 @@ QComboBox::drop-down {
         glass_layout = QVBoxLayout(glass_frame)
         glass_layout.setContentsMargins(12, 12, 12, 12)
         glass_layout.addStretch(1)
+        title_label = QLabel(t("xgp.title.converter"))
+        title_label.setFont(QFont("Segoe UI", 16, QFont.Bold))
+        title_label.setAlignment(Qt.AlignCenter)
+        glass_layout.addWidget(title_label)
         desc_label = QLabel(t("xgp.ui.description") if hasattr(t, '__call__') else "Select an option to convert your Palworld saves:")
-        desc_label.setFont(QFont("Segoe UI", 13))
+        desc_label.setFont(QFont("Segoe UI", 12))
         desc_label.setAlignment(Qt.AlignCenter)
         desc_label.setWordWrap(True)
         glass_layout.addWidget(desc_label)
@@ -327,6 +289,20 @@ QComboBox::drop-down {
             button_layout.addWidget(button)
             button_layout.addStretch()
             layout.addLayout(button_layout)
+    def load_styles(self):
+        user_cfg_path = os.path.join(get_assets_directory(), "data", "configs", "user.cfg")
+        theme = "dark"
+        if os.path.exists(user_cfg_path):
+            try:
+                with open(user_cfg_path, "r") as f:
+                    data = json.load(f)
+                theme = data.get("theme", "dark")
+            except:
+                pass
+        qss_path = os.path.join(get_assets_directory(), "data", "gui", f"{theme}mode.qss")
+        if os.path.exists(qss_path):
+            with open(qss_path, "r") as f:
+                self.setStyleSheet(f.read())
 def center_window(win):
     screen = QApplication.primaryScreen().availableGeometry()
     size = win.sizeHint()

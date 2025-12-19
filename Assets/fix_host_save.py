@@ -205,89 +205,26 @@ def center_window(win):
     geo=win.frameGeometry()
     geo.moveCenter(screen.center())
     win.move(geo.topLeft())
-class FixHostSaveWindow(QMainWindow):
+class FixHostSaveWindow(QWidget):
     def __init__(self):
         super().__init__()
+        self.setObjectName("central")
         self.setWindowTitle(t("Fix Host Save - GUID Migrator"))
-        self.setGeometry(100, 100, 1200, 640)
-        self.setAttribute(Qt.WA_QuitOnClose, False)
+        self.setFixedSize(1200, 640)
         try:
             self.setWindowIcon(QIcon(ICON_PATH))
         except:
             pass
-        self.setStyleSheet("""
-QMainWindow {
-    background: qlineargradient(spread:pad, x1:0.0, y1:0.0, x2:1.0, y2:1.0,
-                stop:0 #07080a, stop:0.5 #08101a, stop:1 #05060a);
-    color: #dfeefc;
-    font-family: "Segoe UI", Roboto, Arial;
-}
-QFrame#glass {
-    background: rgba(18,20,24,0.78);
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.04);
-    padding: 12px;
-}
-QLineEdit {
-    background-color: rgba(255,255,255,0.05);
-    color: #dfeefc;
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 8px;
-    padding: 8px;
-}
-QPushButton {
-    background-color: #555555;
-    color: white;
-    padding: 8px 14px;
-    border-radius: 8px;
-    min-width: 100px;
-}
-QPushButton#MigrateButton {
-    background-color: #007bff;
-    border: 1px solid #0056b3;
-    min-width: 140px;
-}
-QPushButton:hover { background-color: #666666; }
-QPushButton:disabled {
-    background-color: #333333;
-    color: #888888;
-    border: 1px solid #444444;
-}
-QLabel { color: #dfeefc; }
+        self.load_styles()
 
-QFrame#treePanel {
-    background: rgba(255,255,255,0.03);
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.04);
-}
-
-/* Rounded tables (transparent background) */
-QTreeWidget {
-    background: transparent;
-    color: #dfeefc;
-}
-QHeaderView::section {
-    background-color: rgba(255,255,255,0.04);
-    color: #dfeefc;
-    padding: 8px;
-    border: none;
-    height: 28px;
-}
-
-/* Slight hover for rows */
-QTreeView::item:hover { background: rgba(255,255,255,0.02); }
-""")
-
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
-        main_layout = QVBoxLayout(central_widget)
-        main_layout.setContentsMargins(16, 16, 16, 16)
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(14, 14, 14, 14)
         main_layout.setSpacing(12)
         glass_frame = QFrame()
         glass_frame.setObjectName("glass")
         glass_layout = QVBoxLayout(glass_frame)
         glass_layout.setContentsMargins(12, 12, 12, 12)
-        glass_layout.setSpacing(14)
+        glass_layout.setSpacing(12)
         file_row = QHBoxLayout()
         file_label = QLabel(t('Select Level.sav file:'))
         file_label.setFont(QFont("Segoe UI", 10, QFont.Bold))
@@ -307,6 +244,7 @@ QTreeView::item:hover { background: rgba(255,255,255,0.02); }
         trees_layout.setSpacing(14)
         old_panel = QFrame()
         old_panel.setObjectName("treePanel")
+        old_panel.setStyleSheet("QFrame { background-color: transparent; }")
         old_panel_layout = QVBoxLayout(old_panel)
         old_panel_layout.setContentsMargins(8, 8, 8, 8)
         old_panel_layout.setSpacing(8)
@@ -331,6 +269,7 @@ QTreeView::item:hover { background: rgba(255,255,255,0.02); }
         trees_layout.addWidget(old_panel, 1)
         new_panel = QFrame()
         new_panel.setObjectName("treePanel")
+        new_panel.setStyleSheet("QFrame { background-color: transparent; }")
         new_panel_layout = QVBoxLayout(new_panel)
         new_panel_layout.setContentsMargins(8, 8, 8, 8)
         new_panel_layout.setSpacing(8)
@@ -388,6 +327,20 @@ QTreeView::item:hover { background: rgba(255,255,255,0.02); }
             self.target_result_label.setText(t("Target Player: {name} ({guid})", name=values[1], guid=values[0]))
         else:
             self.target_result_label.setText(t("Target Player: N/A"))
+    def load_styles(self):
+        user_cfg_path = os.path.join(get_assets_directory(), "data", "configs", "user.cfg")
+        theme = "dark"
+        if os.path.exists(user_cfg_path):
+            try:
+                with open(user_cfg_path, "r") as f:
+                    data = json.load(f)
+                theme = data.get("theme", "dark")
+            except:
+                pass
+        qss_path = os.path.join(get_assets_directory(), "data", "gui", f"{theme}mode.qss")
+        if os.path.exists(qss_path):
+            with open(qss_path, "r") as f:
+                self.setStyleSheet(f.read())
 def fix_host_save():
     window = FixHostSaveWindow()
     return window

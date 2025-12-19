@@ -15,7 +15,7 @@ except Exception:
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QComboBox, QFrame, QScrollArea, QMessageBox, QToolButton, QStyle, QStatusBar,
-    QSpacerItem, QSizePolicy, QGraphicsOpacityEffect, QGraphicsDropShadowEffect
+    QSpacerItem, QSizePolicy, QGraphicsOpacityEffect, QGraphicsDropShadowEffect, QDialog, QCheckBox, QMenu
 )
 from PySide6.QtGui import QPixmap, QIcon, QFont, QFontDatabase, QCursor, QColor, QPalette
 from PySide6.QtCore import Qt, QTimer, QSize, QPropertyAnimation, QEasingCurve, QPoint
@@ -300,138 +300,7 @@ def load_tool_icons():
         return data if isinstance(data, dict) else {}
     except Exception:
         return {}
-DARK_STYLE = r"""
-/* Background gradient */
-QWidget#central {
-    background: qlineargradient(spread:pad, x1:0.0, y1:0.0, x2:1.0, y2:1.0,
-                stop:0 #07080a, stop:0.5 #08101a, stop:1 #05060a);
-    color: #dfeefc;
-    font-family: "Segoe UI", Roboto, Arial;
-}
 
-/* Card */
-QFrame#glass {
-    background: rgba(18,20,24,0.65);
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.04);
-    padding: 10px;
-}
-
-/* Title area */
-QLabel#title {
-    font-size: 20px;
-    font-weight: 800;
-    color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #7DD3FC, stop:1 #A78BFA);
-    letter-spacing: 1px;
-}
-
-/* Small version chip */
-QLabel#versionChip {
-    background: rgba(125,211,252,0.08);
-    border: 1px solid rgba(125,211,252,0.12);
-    padding: 6px 10px;
-    border-radius: 10px;
-    font-size: 17px;
-    color: #7DD3FC;
-}
-
-/* PULSE STYLE: Applied when the pulse="true" dynamic property is set */
-QLabel#versionChip[pulse="true"] {
-    background: #FFD24D; /* Bright Gold/Amber for pulsing */
-    border: 1px solid #FFD24D;
-    color: #000000; /* Contrast text color */
-}
-
-/* Game version chip */
-QLabel#gameVersionChip {
-    background: rgba(34,197,94,0.08);
-    border: 1px solid rgba(34,197,94,0.12);
-    padding: 6px 10px;
-    border-radius: 10px;
-    font-size: 17px;
-    color: #22C55E;
-}
-
-/* Tool widget (composite row) */
-QWidget.toolRow {
-    background: transparent;
-    border: 2px solid rgba(255,255,255,0.04);
-    border-radius: 8px;
-    padding: 4px;
-    margin: 4px 0px;
-}
-QWidget.toolRow:hover {
-    border: 2px solid rgba(125,211,252,0.65);
-    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
-                stop:0 rgba(10,20,28,0.45), stop:1 rgba(20,12,30,0.28));
-}
-
-/* Tool button tightened */
-QPushButton.toolCard {
-    background: transparent;
-    border: none;
-    text-align: left;
-    padding: 4px 6px;
-    font-weight: 600;
-    min-height: 40px;
-    color: #E6EDF3;
-}
-QPushButton.toolCard:hover {
-    color: #AEE9FF;
-}
-
-/* Icon label */
-QLabel.toolIcon {
-    background: rgba(255,255,255,0.02);
-    border-radius: 6px;
-    padding: 4px;
-    min-width: 30px;
-    min-height: 30px;
-    max-width: 30px;
-    max-height: 30px;
-}
-
-/* Category title */
-QLabel.categoryTitle {
-    font-size: 15px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.9);
-}
-
-/* Header buttons */
-QToolButton#hdrBtn {
-    border: none;
-    background: transparent;
-    padding: 6px;
-    margin-left: 6px;
-}
-QToolButton#hdrBtn:hover {
-    background: rgba(255,255,255,0.02);
-    border-radius: 6px;
-}
-
-/* Footer */
-QStatusBar {
-    background: transparent;
-    color: rgba(255,255,255,0.6);
-    border-top: 1px solid rgba(255,255,255,0.02);
-}
-
-/* Control chips */
-QPushButton#controlChip {
-    background: rgba(128,128,128,0.1);
-    border: 1px solid rgba(128,128,128,0.2);
-    padding: 6px 10px;
-    border-radius: 10px;
-    font-size: 18px;
-    color: #ffffff;
-    text-align: center;
-}
-QPushButton#controlChip:hover {
-    background: rgba(128,128,128,0.2);
-    border: 1px solid rgba(128,128,128,0.3);
-}
-"""
 class MenuGUI(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -440,7 +309,7 @@ class MenuGUI(QMainWindow):
         tv, _ = get_versions()
         self.setWindowTitle(t("app.title", version=tv))
         self._default_width = 1050
-        self.setStyleSheet(DARK_STYLE)
+        self.is_dark_mode = True
         self._drag_pos = None
         font_path = os.path.join(get_assets_path(), "resources", "HackNerdFont-Regular.ttf")
         if os.path.exists(font_path):
@@ -460,7 +329,19 @@ class MenuGUI(QMainWindow):
         self.lang_combo = None
         self.debug_mode = bool(os.environ.get("PST_DEBUG", False))
         self.tool_icons = load_tool_icons()
+        self.lang_map = {
+            "English": "en_US",
+            "Chinese": "zh_CN",
+            "Russian": "ru_RU",
+            "French": "fr_FR",
+            "Spanish": "es_ES",
+            "German": "de_DE",
+            "Japanese": "ja_JP",
+            "Korean": "ko_KR"
+        }
+        self.load_user_settings()
         self.setup_ui()
+        self.update_logo()
         self._fit_window_to_listing()
         self.effect = QGraphicsOpacityEffect(self)
         self.setGraphicsEffect(self.effect)
@@ -470,6 +351,25 @@ class MenuGUI(QMainWindow):
         self.animation.setStartValue(0)
         self.animation.setEndValue(1)
         self.animation.setEasingCurve(QEasingCurve.InOutQuad)
+    def load_user_settings(self):
+        user_cfg_path = os.path.join(get_assets_path(), "data", "configs", "user.cfg")
+        default_settings = {"theme": "dark", "show_icons": True, "language": "en_US"}
+        if os.path.exists(user_cfg_path):
+            try:
+                with open(user_cfg_path, "r") as f:
+                    self.user_settings = json.load(f)
+            except:
+                self.user_settings = default_settings.copy()
+                with open(user_cfg_path, "w") as f:
+                    json.dump(self.user_settings, f)
+        else:
+            self.user_settings = default_settings.copy()
+            with open(user_cfg_path, "w") as f:
+                json.dump(self.user_settings, f)
+        self.is_dark_mode = self.user_settings.get("theme", "dark") == "dark"
+        set_language(self.user_settings["language"])
+        load_resources(self.user_settings["language"])
+        self.load_styles()
     def start_fade_in(self):
         self.animation.start()
     def center_window(self):
@@ -492,19 +392,10 @@ class MenuGUI(QMainWindow):
         top_h = QHBoxLayout()
         top_h.setSpacing(8)
         logo_container = QHBoxLayout()
-        title_label = QLabel()
-        title_label.setObjectName("title")
-        logo_path = os.path.join(get_assets_path(), "resources", "PalworldSaveTools_Blue.png")
-        if os.path.exists(logo_path):
-            pixmap = QPixmap(logo_path)
-            if not pixmap.isNull():
-                scaled_pixmap = pixmap.scaledToHeight(44, Qt.SmoothTransformation)
-                title_label.setPixmap(scaled_pixmap)
-                title_label.setFixedSize(scaled_pixmap.size())
-        else:
-            title_label.setText("PALWORLD SAVE TOOLS")
-            title_label.setFont(QFont("", 16, QFont.Bold))
-        logo_container.addWidget(title_label)
+        self.title_label = QLabel()
+        self.title_label.setObjectName("title")
+        logo_container.addWidget(self.title_label)
+        self.update_logo()
         logo_container.addSpacing(8)
         self.app_version_label = QLabel(f"{nf.icons['nf-cod-github']} {tools_version}")
         self.app_version_label.setObjectName("versionChip")
@@ -526,12 +417,18 @@ class MenuGUI(QMainWindow):
         self.warn_btn.clicked.connect(self._show_warnings)
         self.warn_btn.setIconSize(QSize(26, 26))
         top_h.addWidget(self.warn_btn)
-        self.lang_combo = QComboBox()
-        values = [t(f'lang.{code}') for code in ["zh_CN","en_US","ru_RU","fr_FR","es_ES","de_DE","ja_JP","ko_KR"]]
-        self.lang_combo.addItems(values)
-        self.lang_combo.setFixedWidth(93)
-        self.lang_combo.currentTextChanged.connect(self.on_language_change_cmd)
-        top_h.addWidget(self.lang_combo)
+        dropdown_btn = QPushButton(nf.icons['nf-md-menu'])
+        dropdown_btn.setObjectName("controlChip")
+        dropdown_btn.setFlat(True)
+        dropdown_btn.setToolTip(t("Menu"))
+        menu = QMenu()
+        action_toggle = menu.addAction(nf.icons['nf-md-theme_light_dark'] + " " + t("Toggle Theme"))
+        menu.addSeparator()
+        action_settings = menu.addAction(nf.icons['nf-md-cog'] + " " + t("Settings"))
+        action_toggle.triggered.connect(self.toggle_theme)
+        action_settings.triggered.connect(self.show_settings)
+        dropdown_btn.clicked.connect(lambda: menu.exec(dropdown_btn.mapToGlobal(QPoint(0, dropdown_btn.height()))))
+        top_h.addWidget(dropdown_btn)
         minimize_btn = QPushButton(nf.icons['nf-md-circle_medium'])
         minimize_btn.setObjectName("controlChip")
         minimize_btn.setFlat(True)
@@ -578,7 +475,9 @@ class MenuGUI(QMainWindow):
         content_h.addWidget(left_frame, 1)
         content_h.addWidget(right_frame, 1)
         scroll = QScrollArea()
+        scroll.setObjectName("mainScrollArea")
         content_widget = QWidget()
+        content_widget.setObjectName("contentWidget")
         content_widget.setLayout(content_h)
         scroll.setWidgetResizable(True)
         scroll.setWidget(content_widget)
@@ -590,7 +489,7 @@ class MenuGUI(QMainWindow):
         self._populate_tool_buttons()
         self.refresh_texts()
     def _make_tool_row(self, label_text: str, tooltip_text: str, icon_path: str = None, icon_qicon: QIcon = None, icon_size: QSize = QSize(24,24)):
-        show_icons = get_config_value("showiconinlist", True)
+        show_icons = self.user_settings.get("show_icons", True)
         container = QWidget()
         container.setProperty("class", "toolRow")
         layout = QHBoxLayout(container)
@@ -633,7 +532,7 @@ class MenuGUI(QMainWindow):
     def _get_tool_icon(self, tool_key: str) -> QIcon:
         if tool_key in self.tool_icons:
             icon_name = self.tool_icons[tool_key]
-            icon_path = os.path.join(get_assets_path(), "resources", "i18n", "icon", f"{icon_name}.ico")
+            icon_path = os.path.join(get_assets_path(), "data", "icon", f"{icon_name}.ico")
             if os.path.exists(icon_path):
                 return QIcon(icon_path)
         if ICON_PATH and os.path.exists(ICON_PATH):
@@ -740,26 +639,7 @@ class MenuGUI(QMainWindow):
         for container, btn, key, cat, idx in self.tool_widgets:
             btn.setText(t(key))
             btn.setToolTip(t(key))
-        try:
-            self.lang_combo.currentTextChanged.disconnect(self.on_language_change_cmd)
-        except Exception:
-            pass
-        current_lang = get_language()
-        values = [t(f'lang.{code}') for code in ["zh_CN","en_US","ru_RU","fr_FR","es_ES","de_DE","ja_JP","ko_KR"]]
-        self.lang_combo.clear()
-        self.lang_combo.addItems(values)
-        try:
-            self.lang_combo.setCurrentText(t(f'lang.{current_lang}'))
-        except Exception:
-            pass
-        self.lang_combo.currentTextChanged.connect(self.on_language_change_cmd)
-    def on_language_change_cmd(self, choice):
-        sel = choice
-        lang_map = {t(f'lang.{code}'): code for code in ["zh_CN","en_US","ru_RU","fr_FR","es_ES","de_DE","ja_JP","ko_KR"]}
-        lang = lang_map.get(sel, "zh_CN")
-        set_language(lang)
-        load_resources(lang)
-        self.refresh_texts()
+
     def _show_warnings(self):
         warnings = [
             (t("notice.backup"), {}),
@@ -801,6 +681,93 @@ class MenuGUI(QMainWindow):
         import webbrowser
         webbrowser.open(url)
         self.status.showMessage(f"Opening GitHub release page: {url}")
+    def load_styles(self):
+        assets_path = os.path.join(get_assets_path(), "data", "gui")
+        mode_file = "darkmode.qss" if self.is_dark_mode else "lightmode.qss"
+        with open(os.path.join(assets_path, mode_file), "r") as f:
+            mode_qss = f.read()
+        self.setStyleSheet(mode_qss)
+    def toggle_theme(self):
+        self.is_dark_mode = not self.is_dark_mode
+        self.load_styles()
+        self.update_logo()
+    def update_theme_toggle_icon(self):
+        self.theme_toggle.setToolTip("Switch to light mode" if self.is_dark_mode else "Switch to dark mode")
+    def update_logo(self):
+        logo_name = "PalworldSaveTools_Black.png" if not self.is_dark_mode else "PalworldSaveTools_Blue.png"
+        logo_path = os.path.join(get_assets_path(), "resources", logo_name)
+        if os.path.exists(logo_path):
+            pixmap = QPixmap(logo_path)
+            if not pixmap.isNull():
+                scaled_pixmap = pixmap.scaledToHeight(44, Qt.SmoothTransformation)
+                self.title_label.setPixmap(scaled_pixmap)
+                self.title_label.setFixedSize(scaled_pixmap.size())
+        else:
+            self.title_label.setText("PALWORLD SAVE TOOLS")
+            self.title_label.setFont(QFont("", 16, QFont.Bold))
+    def set_theme(self, mode):
+        self.is_dark_mode = mode == "dark"
+        self.user_settings["theme"] = mode
+        user_cfg_path = os.path.join(get_assets_path(), "data", "configs", "user.cfg")
+        with open(user_cfg_path, "w") as f:
+            json.dump(self.user_settings, f)
+        self.load_styles()
+        self.update_logo()
+    def show_settings(self):
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Settings")
+        layout = QVBoxLayout(dialog)
+        user_cfg_path = os.path.join(get_assets_path(), "data", "configs", "user.cfg")
+        settings = self.user_settings.copy()
+        theme_layout = QHBoxLayout()
+        theme_label = QLabel("Theme:")
+        theme_combo = QComboBox()
+        theme_combo.addItems(["dark", "light"])
+        theme_combo.setCurrentText(settings.get("theme", "dark"))
+        theme_combo.currentTextChanged.connect(lambda: self._auto_save_settings(dialog, theme_combo, show_icons_cb, lang_combo))
+        theme_layout.addWidget(theme_label)
+        theme_layout.addWidget(theme_combo)
+        layout.addLayout(theme_layout)
+        show_icons_cb = QCheckBox("Show icons in tool list")
+        show_icons_cb.setChecked(settings.get("show_icons", True))
+        show_icons_cb.stateChanged.connect(lambda: self._auto_save_settings(dialog, theme_combo, show_icons_cb, lang_combo))
+        layout.addWidget(show_icons_cb)
+        lang_layout = QHBoxLayout()
+        lang_label = QLabel("Language:")
+        lang_combo = QComboBox()
+        lang_combo.addItems(self.lang_map.keys())
+        current_lang_code = settings.get("language", "en_US")
+        current_lang_name = next((name for name, code in self.lang_map.items() if code == current_lang_code), "English")
+        lang_combo.setCurrentText(current_lang_name)
+        lang_combo.currentTextChanged.connect(lambda: self._auto_save_settings(dialog, theme_combo, show_icons_cb, lang_combo))
+        lang_layout.addWidget(lang_label)
+        lang_layout.addWidget(lang_combo)
+        layout.addLayout(lang_layout)
+        dialog.exec()
+    def _preview_show_icons(self, show):
+        self.user_settings["show_icons"] = show
+        self._populate_tool_buttons()
+    def _auto_save_settings(self, dialog, theme_combo, show_icons_cb, lang_combo):
+        settings = {
+            "theme": theme_combo.currentText(),
+            "show_icons": show_icons_cb.isChecked(),
+            "language": self.lang_map.get(lang_combo.currentText(), "en_US")
+        }
+        self.user_settings = settings
+        user_cfg_path = os.path.join(get_assets_path(), "data", "configs", "user.cfg")
+        with open(user_cfg_path, "w") as f:
+            json.dump(settings, f)
+        old_dark = self.is_dark_mode
+        self.is_dark_mode = settings["theme"] == "dark"
+        if self.is_dark_mode != old_dark:
+            self.load_styles()
+            dialog.setStyleSheet(self.styleSheet())
+            self.update_logo()
+        if settings["language"] != self.user_settings.get("language"):
+            set_language(settings["language"])
+            load_resources(settings["language"])
+            self.refresh_texts()
+        self._populate_tool_buttons()
     def _fit_window_to_listing(self):
         per_row = 55
         header_h = 80

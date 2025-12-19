@@ -6,7 +6,7 @@ from typing import Dict, Any
 _LANG: str = "zh_CN"
 _RES: Dict[str, Dict[str, str]] = {}
 _BASE: str = os.path.dirname(__file__)
-_CFG: str = os.path.join(_BASE, "config.json")
+_CFG: str = os.path.join(os.path.dirname(os.path.dirname(_BASE)), "data", "configs", "config.json")
 _SUPPORTED_LANGS = ["en_US", "zh_CN", "ru_RU", "fr_FR", "es_ES", "de_DE", "ja_JP", "ko_KR"]
 
 def _load_json(path: str) -> Dict[str, Any]:

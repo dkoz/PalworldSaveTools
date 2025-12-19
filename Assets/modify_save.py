@@ -2,6 +2,21 @@ from import_libs import *
 from PySide6.QtWidgets import QSizePolicy, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QScrollArea, QMainWindow, QWidget, QComboBox, QLineEdit, QFileDialog, QApplication, QFrame, QProgressBar
 from PySide6.QtGui import QIcon, QPixmap, QFont
 from PySide6.QtCore import Qt, QTimer
+
+def load_styles(widget):
+    user_cfg_path = os.path.join(get_assets_directory(), "data", "configs", "user.cfg")
+    theme = "dark"
+    if os.path.exists(user_cfg_path):
+        try:
+            with open(user_cfg_path, "r") as f:
+                data = json.load(f)
+            theme = data.get("theme", "dark")
+        except:
+            pass
+    qss_path = os.path.join(get_assets_directory(), "data", "gui", f"{theme}mode.qss")
+    if os.path.exists(qss_path):
+        with open(qss_path, "r") as f:
+            widget.setStyleSheet(f.read())
 def _format_bytes(num:int)->str:
     for unit in("B","KB","MB","GB"):
         if num<1024 or unit=="GB":
@@ -188,42 +203,7 @@ def _build_selector_window():
             win.setWindowIcon(QIcon(ico_path))
     except Exception as e:
         print(f"Error setting icon: {e}")
-    win.setStyleSheet("""
-QDialog {
-    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1,
-                stop:0 #07080a, stop:0.5 #08101a, stop:1 #05060a);
-    color: #dfeefc;
-    font-family: "Segoe UI", Roboto, Arial;
-}
-QFrame#glass {
-    background: rgba(18,20,24,0.68);
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.04);
-    padding: 12px;
-}
-QLabel { color: #dfeefc; }
-QPushButton {
-    background-color: #444444;
-    color: white;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #666666;
-    min-width: 140px;
-}
-QPushButton:hover { background-color: #555555; }
-QPushButton:pressed { background-color: #333333; }
-QProgressBar {
-    background: rgba(18,20,24,0.65);
-    border: 1px solid rgba(255,255,255,0.04);
-    border-radius: 6px;
-    text-align: center;
-    color: white;
-}
-QProgressBar::chunk {
-    background: rgba(34,197,94,0.8);
-    border-radius: 4px;
-}
-""")
+    load_styles(win)
     main = QVBoxLayout(win)
     main.setContentsMargins(12, 12, 12, 12)
     glass = QFrame()
@@ -367,29 +347,13 @@ class MenuGUI(QMainWindow):
         self.setWindowTitle(t("app.title"))
         self.setFixedWidth(820)
         self.setMinimumHeight(540)
-        self.setStyleSheet("""
-            QMainWindow {
-                background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1,
-                    stop:0 #07080a, stop:0.5 #08101a, stop:1 #05060a);
-                color: #dfeefc;
-                font-family: "Segoe UI", Roboto, Arial;
-            }
-            QLabel { color: #dfeefc; }
-            QPushButton {
-                background-color: #555555;
-                color: white;
-                padding: 8px;
-                border-radius: 6px;
-            }
-            QPushButton:hover { background-color: #666666; }
-            QComboBox { background-color: #444444; color: #dfeefc; border-radius: 6px; padding: 4px; }
-        """)
         self.info_labels = []
         self.category_frames = []
         self.tool_buttons = []
         self.lang_combo = None
         self.setup_ui()
         self._add_pal_tools_button()
+        load_styles(self)
     def setup_ui(self):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)

@@ -29,49 +29,7 @@ class SlotNumUpdaterApp(QDialog):
         super().__init__()
         self.setWindowTitle(t("tool.slot_injector"))
         self.setFixedSize(560, 280)
-        self.setStyleSheet("""
-QDialog {
-    background: qlineargradient(spread:pad, x1:0.0, y1:0.0, x2:1.0, y2:1.0,
-                stop:0 #07080a, stop:0.5 #08101a, stop:1 #05060a);
-    color: #dfeefc;
-    font-family: "Segoe UI", Roboto, Arial;
-}
-QFrame#glass {
-    background: rgba(18,20,24,0.68);
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.04);
-    padding: 12px;
-}
-QLabel {
-    color: #dfeefc;
-    font-size: 12px;
-}
-QLineEdit {
-    background-color: rgba(255,255,255,0.04);
-    color: #dfeefc;
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 8px;
-    padding: 6px;
-}
-QPushButton {
-    background-color: #555555;
-    color: white;
-    padding: 8px 14px;
-    border-radius: 8px;
-    min-width: 100px;
-}
-QPushButton#ApplyButton {
-    background-color: #007bff;
-    border: 1px solid #0056b3;
-    min-width: 140px;
-}
-QPushButton:hover { background-color: #666666; }
-QPushButton:disabled {
-    background-color: #333333;
-    color: #888888;
-    border: 1px solid #444444;
-}
-""")
+        self.load_styles()
         try:
             if ICON_PATH and os.path.exists(ICON_PATH):
                 self.setWindowIcon(QIcon(ICON_PATH))
@@ -170,6 +128,20 @@ QPushButton:disabled {
         backup_whole_directory(os.path.dirname(filepath), "Backups/Slot Injector")
         json_to_sav(level_json, filepath)
         QMessageBox.information(self, t("success.title"), t("slot.success_msg", count=total_players, new=new_value))
+    def load_styles(self):
+        user_cfg_path = os.path.join(get_assets_directory(), "data", "configs", "user.cfg")
+        theme = "dark"
+        if os.path.exists(user_cfg_path):
+            try:
+                with open(user_cfg_path, "r") as f:
+                    data = json.load(f)
+                theme = data.get("theme", "dark")
+            except:
+                pass
+        qss_path = os.path.join(get_assets_directory(), "data", "gui", f"{theme}mode.qss")
+        if os.path.exists(qss_path):
+            with open(qss_path, "r") as f:
+                self.setStyleSheet(f.read())
 def slot_injector():
     app = QApplication.instance()
     if app is None:
