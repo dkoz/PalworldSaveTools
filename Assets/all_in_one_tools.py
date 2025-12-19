@@ -216,133 +216,84 @@ def load_save(path=None):
     build_player_levels()
     all_in_one_tools.loaded_json = loaded_level_json
     data_source = loaded_level_json["properties"]["worldSaveData"]["value"]
-    reduce_memory = False
-    if 'args' in globals() and hasattr(args, "reduce_memory"):
-        reduce_memory = args.reduce_memory
+    reduce_memory = True
     try:
-        srcGuildMapping = MappingCacheObject.get(data_source, use_mp=not reduce_memory)
+        srcGuildMapping = MappingCacheObject.get(data_source, use_mp=True)
         if srcGuildMapping._worldSaveData.get('GroupSaveDataMap') is None:
             srcGuildMapping.GroupSaveDataMap = {}
     except Exception as e:
         messagebox.showerror(t("error.title"), t("error.guild_mapping_failed", err=e))
         srcGuildMapping = None
     base_guild_lookup = {}
+    guild_name_map = {}
     if srcGuildMapping:
         for gid_uuid, gdata in srcGuildMapping.GroupSaveDataMap.items():
             gid = str(gid_uuid)
             guild_name = gdata['value']['RawData']['value'].get('guild_name', "Unnamed Guild")
+            guild_name_map[gid.lower()] = guild_name
             for base_id_uuid in gdata['value']['RawData']['value'].get('base_ids', []):
-                base_id = str(base_id_uuid)
-                base_guild_lookup[base_id] = {
-                    "GuildName": guild_name,
-                    "GuildID": gid
-                }
+                base_guild_lookup[str(base_id_uuid)] = {"GuildName": guild_name, "GuildID": gid}
     print(t("loading.done"))
-    stats = get_current_stats()
-    for k,v in stats.items():
-        print(f"Total {k}: {v}")
     log_folder = os.path.join(base_path, "Scan Save Logger")
     if os.path.exists(log_folder): shutil.rmtree(log_folder)
     os.makedirs(log_folder, exist_ok=True)
-    guild_name_map = {}
-    if srcGuildMapping:
-        for gid_uuid, gdata in srcGuildMapping.GroupSaveDataMap.items():
-            g_name = gdata['value']['RawData']['value'].get('guild_name', "Unnamed Guild")
-            guild_name_map[str(gid_uuid).lower()] = g_name
     player_pals_count = {}
     count_pals_found(data_source, player_pals_count, log_folder, current_save_path, sav_to_json, guild_name_map)
     PLAYER_PAL_COUNTS = player_pals_count     
     def count_owned_pals(level_json):
         owned_count = {}
-        char_map = level_json.get('properties', {}).get('worldSaveData', {}).get('value', {}).get('CharacterSaveParameterMap', {}).get('value', [])
-        for item in char_map:
-            try:
-                raw_data = item.get('value', {}).get('RawData', {}).get('value', {}).get('object', {}).get('SaveParameter', {}).get('value', {})
-                owner_uid = raw_data.get('OwnerPlayerUId', {}).get('value')
-                if owner_uid:
-                    owned_count[owner_uid] = owned_count.get(owner_uid,0)+1
-            except: continue
+        try:
+            char_map = level_json["properties"]["worldSaveData"]["value"]["CharacterSaveParameterMap"]["value"]
+            for item in char_map:
+                try:
+                    owner_uid = item["value"]["RawData"]["value"]["object"]["SaveParameter"]["value"]["OwnerPlayerUId"]["value"]
+                    if owner_uid:
+                        owned_count[owner_uid] = owned_count.get(owner_uid, 0) + 1
+                except (KeyError, TypeError): continue
+        except (KeyError, TypeError): pass
         return owned_count
     owned_counts = count_owned_pals(loaded_level_json)
     scan_log_path = os.path.join(log_folder, "scan_save.log")
     logger = logging.getLogger('LoadSaveLogger')
     logger.setLevel(logging.DEBUG)
     fh = logging.FileHandler(scan_log_path, encoding='utf-8')
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(message)s')
-    fh.setFormatter(formatter)
-    ch.setFormatter(formatter)
+    fh.setFormatter(logging.Formatter('%(message)s'))
     logger.addHandler(fh)
-    logger.addHandler(ch)
-    def format_duration(seconds):
-        seconds = int(seconds)
-        if seconds < 60: return f"{seconds}s ago"
-        m, s = divmod(seconds, 60)
-        if m < 60: return f"{m}m {s}s ago"
-        h, m = divmod(m, 60)
-        if h < 24: return f"{h}h {m}m ago"
-        d, h = divmod(h, 24)
-        return f"{d}d {h}h ago"
-    tick = loaded_level_json['properties']['worldSaveData']['value']['GameTimeSaveData']['value']['RealDateTimeTicks']['value']
-    total_players = total_caught = total_owned = total_bases = total_worker_dropped = active_guilds = 0
-    for gid, gdata in (srcGuildMapping.GroupSaveDataMap.items() if srcGuildMapping else []):
-        players = gdata['value']['RawData']['value'].get('players', [])
-        if not players: continue
-        active_guilds += 1
-        total_bases += len(gdata['value']['RawData']['value'].get('base_ids', []))
-        total_worker_dropped += gdata['value']['RawData']['value'].get('worker_count',0) + gdata['value']['RawData']['value'].get('dropped_count',0)
-        guild_name = gdata['value']['RawData']['value'].get('guild_name', "Unnamed Guild")
-        guild_leader = players[0].get('player_info', {}).get('player_name', "Unknown") if players else "Unknown"
-        logger.info("="*60)
-        logger.info("")
-        logger.info(f"Guild: {guild_name} | Guild Leader: {guild_leader} | Guild ID: {gid}")
-        logger.info(f"Base Locations: {len(gdata['value']['RawData']['value'].get('base_ids', []))}")
-        for i, base_id in enumerate(gdata['value']['RawData']['value'].get('base_ids', []), 1):
-            basecamp = None
-            new_coords = None
-            rawdata_xyz = None
-            try:
+    tick = data_source['GameTimeSaveData']['value']['RealDateTimeTicks']['value']
+    total_players = total_caught = total_owned = total_bases = 0
+    active_guilds = 0
+    if srcGuildMapping:
+        for gid, gdata in srcGuildMapping.GroupSaveDataMap.items():
+            raw_val = gdata['value']['RawData']['value']
+            players = raw_val.get('players', [])
+            if not players: continue
+            active_guilds += 1
+            base_ids = raw_val.get('base_ids', [])
+            total_bases += len(base_ids)
+            guild_name = raw_val.get('guild_name', "Unnamed Guild")
+            guild_leader = players[0].get('player_info', {}).get('player_name', "Unknown")
+            logger.info(f"Guild: {guild_name} | Leader: {guild_leader} | ID: {gid}")
+            for i, base_id in enumerate(base_ids, 1):
                 basecamp = srcGuildMapping.BaseCampMapping.get(toUUID(base_id))
                 if basecamp:
-                    offset = basecamp['value']['RawData']['value']['transform']['translation']
-                    new_coords = palworld_coord.sav_to_map(offset['x'], offset['y'], new=True)
-                    rawdata_xyz = (offset['x'], offset['y'], offset['z'])
-            except: pass
-            new_coords_str = f"{int(new_coords[0])}, {int(new_coords[1])}" if new_coords else "unknown"
-            rawdata_str = f"{rawdata_xyz[0]}, {rawdata_xyz[1]}, {rawdata_xyz[2]}" if rawdata_xyz else "unknown"
-            logger.info(f"Base {i}: Base ID: {base_id} | {new_coords_str} | RawData: {rawdata_str}")
-        results = [top_process_player(p, playerdir, log_folder) for p in players]
-        for uid, pname, uniques, caught, encounters in results:
-            level = player_levels.get(str(uid).replace('-', ''), '?') if uid else '?'
-            owned = owned_counts.get(uid, 0)
-            last = next((p.get('player_info', {}).get('last_online_real_time') for p in players if p.get('player_uid')==uid), None)
-            lastseen = "Unknown" if last is None else format_duration((tick - int(last))/1e7)
-            logger.info(f"Player: {pname} | UID: {uid} | Level: {level} | Caught: {caught} | Owned: {owned} | Encounters: {encounters} | Uniques: {uniques} | Last Online: {lastseen}")
-            total_players += 1
-            total_caught += caught
-            total_owned += owned
-        logger.info("")
-    total_worker_dropped = PLAYER_PAL_COUNTS.get("worker_dropped", 0)
-    logger.info("="*60)
-    logger.info("********** PST_STATS_BEGIN **********")
-    logger.info(t("stats.header"))
-    logger.info(f"{t('stats.total_players')}: {total_players}")
-    logger.info(f"{t('stats.total_caught')}: {total_caught}")
-    logger.info(f"{t('stats.total_overall')}: {total_owned + total_worker_dropped}")
-    logger.info(f"{t('stats.total_owned')}: {total_owned}")
-    logger.info(f"{t('stats.total_workers')}: {total_worker_dropped}")
-    logger.info(f"{t('stats.total_guilds')}: {active_guilds}")
-    logger.info(f"{t('stats.total_bases')}: {total_bases}")
-    logger.info(t("stats.header"))
-    logger.info("********** PST_STATS_END ************")
-    logger.info("="*60)
-    logger.info(t("stats.header"))
+                    translation = basecamp['value']['RawData']['value']['transform']['translation']
+                    tx, ty, tz = translation['x'], translation['y'], translation['z']
+                    old_c = palworld_coord.sav_to_map(tx, ty, new=False)
+                    new_c = palworld_coord.sav_to_map(tx, ty, new=True)
+                    logger.info(f"Base {i}: ID: {base_id} | Old: {int(old_c[0])},{int(old_c[1])} | New: {int(new_c[0])},{int(new_c[1])} | Raw: {tx},{ty},{tz}")
+            results = [top_process_player(p, playerdir, log_folder) for p in players]
+            for uid, pname, uniques, caught, encounters in results:
+                level = player_levels.get(str(uid).replace('-', ''), '?')
+                owned = owned_counts.get(uid, 0)
+                last = next((p.get('player_info', {}).get('last_online_real_time') for p in players if p.get('player_uid')==uid), None)
+                lastseen = "Unknown" if last is None else f"{(tick - int(last))//10000000}s ago"
+                logger.info(f"Player: {pname} | UID: {uid} | Level: {level} | Caught: {caught} | Owned: {owned} | Seen: {lastseen}")
+                total_players += 1
+                total_caught += caught
+                total_owned += owned
     for h in logger.handlers[:]:
         logger.removeHandler(h)
         h.close()
-    t2 = time.perf_counter()
-    print(t("stats.loaded_time", sec=f"{t2 - t0:.2f}"))
     refresh_all()
     refresh_stats("Before")
 def extract_value(data, key, default_value=''):

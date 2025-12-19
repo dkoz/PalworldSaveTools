@@ -10,3 +10,5 @@ Pal Logger/
 PST_standalone/
 build/
 PalworldSaveTools.egg-info/
+Assets/data/configs/
+pst_venv/
