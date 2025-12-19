@@ -1,0 +1,880 @@
+{
+    "skills": [
+        {
+            "name": "Hydro Jet",
+            "asset": "AquaJet"
+        },
+        {
+            "name": "Aqua Gun",
+            "asset": "WaterGun"
+        },
+        {
+            "name": "Bubble Blast",
+            "asset": "BubbleShot"
+        },
+        {
+            "name": "Acid Rain",
+            "asset": "AcidRain"
+        },
+        {
+            "name": "Aqua Burst",
+            "asset": "WaterBall"
+        },
+        {
+            "name": "Surfing Slam",
+            "asset": "Unique_BluePlatypus_Toboggan"
+        },
+        {
+            "name": "Hydro Laser",
+            "asset": "HydroPump"
+        },
+        {
+            "name": "Intimidate",
+            "asset": "Intimidate"
+        },
+        {
+            "name": "Punch",
+            "asset": "Human_Punch"
+        },
+        {
+            "name": "Air Cannon",
+            "asset": "AirCanon"
+        },
+        {
+            "name": "Chicken Rush",
+            "asset": "Unique_ChickenPal_ChickenPeck"
+        },
+        {
+            "name": "Power Shot",
+            "asset": "PowerShot"
+        },
+        {
+            "name": "Roly Poly",
+            "asset": "Unique_SheepBall_Roll"
+        },
+        {
+            "name": "Punch Flurry",
+            "asset": "Unique_PinkCat_CatPunch"
+        },
+        {
+            "name": "Fluffy Tackle",
+            "asset": "Unique_Alpaca_Tackle"
+        },
+        {
+            "name": "Fierce Fang",
+            "asset": "Unique_Garm_Bite"
+        },
+        {
+            "name": "Antler Uppercut",
+            "asset": "Unique_Deer_PushupHorn"
+        },
+        {
+            "name": "Reckless Charge",
+            "asset": "Unique_Boar_Tackle"
+        },
+        {
+            "name": "Gale Claw",
+            "asset": "Unique_Eagle_GlidingNail"
+        },
+        {
+            "name": "Cat Press",
+            "asset": "Unique_NaughtyCat_CatPress"
+        },
+        {
+            "name": "Tornado Attack",
+            "asset": "Unique_HawkBird_Storm"
+        },
+        {
+            "name": "Power Bomb",
+            "asset": "PowerBall"
+        },
+        {
+            "name": "Muscle Slam",
+            "asset": "Unique_SakuraSaurus_SideTackle"
+        },
+        {
+            "name": "Ground Pound",
+            "asset": "Unique_Gorilla_GroundPunch"
+        },
+        {
+            "name": "Cloud Tempest",
+            "asset": "Unique_FengyunDeeper_CloudTempest"
+        },
+        {
+            "name": "Kingly Slam",
+            "asset": "Unique_KingAlpaca_BodyPress"
+        },
+        {
+            "name": "Spear Thrust",
+            "asset": "Unique_SaintCentaur_OneSpearRushes"
+        },
+        {
+            "name": "Pal Blast",
+            "asset": "HyperBeam"
+        },
+        {
+            "name": "Implode",
+            "asset": "SelfDestruct"
+        },
+        {
+            "name": "Bee Quiet",
+            "asset": "SelfDestruct_Bee"
+        },
+        {
+            "name": "Megaton Implode",
+            "asset": "SelfExplosion"
+        },
+        {
+            "name": "Wind Cutter",
+            "asset": "WindCutter"
+        },
+        {
+            "name": "Seed Machine Gun",
+            "asset": "SeedMachinegun"
+        },
+        {
+            "name": "Botanical Smash",
+            "asset": "Unique_FlowerDinosaur_Whip"
+        },
+        {
+            "name": "Multicutter",
+            "asset": "SpecialCutter"
+        },
+        {
+            "name": "Seed Mine",
+            "asset": "SeedMine"
+        },
+        {
+            "name": "Focus Shot",
+            "asset": "Unique_RobinHood_BowSnipe"
+        },
+        {
+            "name": "Spinning Staff",
+            "asset": "Unique_QueenBee_SpinLance"
+        },
+        {
+            "name": "Grass Tornado",
+            "asset": "GrassTornado"
+        },
+        {
+            "name": "Crushing Punch",
+            "asset": "Unique_GrassPanda_MusclePunch"
+        },
+        {
+            "name": "Spine Vine",
+            "asset": "RootAttack"
+        },
+        {
+            "name": "Solar Blast",
+            "asset": "SolarBeam"
+        },
+        {
+            "name": "Ice Missile",
+            "asset": "EnergyShot"
+        },
+        {
+            "name": "Ice Missile",
+            "asset": "IceMissile"
+        },
+        {
+            "name": "Icicle Cutter",
+            "asset": "IceBlade"
+        },
+        {
+            "name": "Freezing Charge",
+            "asset": "Unique_IceDeer_IceHorn"
+        },
+        {
+            "name": "Iceberg",
+            "asset": "BlizzardLance"
+        },
+        {
+            "name": "Emperor Slide",
+            "asset": "Unique_CaptainPenguin_BodySlide"
+        },
+        {
+            "name": "Crystal Breath",
+            "asset": "FrostBreath"
+        },
+        {
+            "name": "Frost Burst",
+            "asset": "Unique_VolcanicMonster_Ice_IceAttack"
+        },
+        {
+            "name": "Crystal Wing",
+            "asset": "Unique_IceHorse_IceBladeAttack"
+        },
+        {
+            "name": "Blizzard Spike",
+            "asset": "IcicleThrow"
+        },
+        {
+            "name": "Ignis Blast",
+            "asset": "FireBlast"
+        },
+        {
+            "name": "Spirit Fire",
+            "asset": "FireSeed"
+        },
+        {
+            "name": "Blazing Horn",
+            "asset": "Unique_FlameBuffalo_FlameHorn"
+        },
+        {
+            "name": "Flare Arrow",
+            "asset": "FlareArrow"
+        },
+        {
+            "name": "Iaigiri",
+            "asset": "Unique_Ronin_Iai"
+        },
+        {
+            "name": "Ignis Breath",
+            "asset": "Flamethrower"
+        },
+        {
+            "name": "Hellfire Claw",
+            "asset": "Unique_Baphomet_SwallowKite"
+        },
+        {
+            "name": "Daring Flames",
+            "asset": "Unique_AmaterasuWolf_FireCharge"
+        },
+        {
+            "name": "Flare Storm",
+            "asset": "FlareTornado"
+        },
+        {
+            "name": "Ignis Charge",
+            "asset": "Unique_FireKirin_Tackle"
+        },
+        {
+            "name": "Volcanic Burst",
+            "asset": "Unique_VolcanicMonster_MagmaAttack"
+        },
+        {
+            "name": "Ignis Rage",
+            "asset": "Inferno"
+        },
+        {
+            "name": "Phoenix Flare",
+            "asset": "Unique_Horus_FlareBird"
+        },
+        {
+            "name": "Fire Ball",
+            "asset": "FireBall"
+        },
+        {
+            "name": "Cross Lightning",
+            "asset": "CrossThunder"
+        },
+        {
+            "name": "Thunder Rain",
+            "asset": "ThunderRain"
+        },
+        {
+            "name": "Spark Blast",
+            "asset": "SpreadPulse"
+        },
+        {
+            "name": "Shockwave",
+            "asset": "ElecWave"
+        },
+        {
+            "name": "Electric Ball",
+            "asset": "ThunderBall"
+        },
+        {
+            "name": "Plasma Funnel",
+            "asset": "ThunderFunnel"
+        },
+        {
+            "name": "Lock-on Laser",
+            "asset": "LockonLaser"
+        },
+        {
+            "name": "Lightning Claw",
+            "asset": "Unique_ElecPanda_ElecScratch"
+        },
+        {
+            "name": "Lightning Streak",
+            "asset": "LineThunder"
+        },
+        {
+            "name": "Blast Punch",
+            "asset": "Unique_GrassPanda_Electric_ElectricPunch"
+        },
+        {
+            "name": "Tri-Lightning",
+            "asset": "ThreeThunder"
+        },
+        {
+            "name": "Lightning Gale",
+            "asset": "Unique_Kirin_LightningTackle"
+        },
+        {
+            "name": "Kerauno",
+            "asset": "Unique_ThunderDragonMan_ThunderSwordAttack"
+        },
+        {
+            "name": "Lightning Strike",
+            "asset": "LightningStrike"
+        },
+        {
+            "name": "Lightning Bolt",
+            "asset": "Thunderbolt"
+        },
+        {
+            "name": "Bog Blast",
+            "asset": "MudShot"
+        },
+        {
+            "name": "Stone Blast",
+            "asset": "StoneShotgun"
+        },
+        {
+            "name": "Shell Spin",
+            "asset": "Unique_DrillGame_ShellAttack"
+        },
+        {
+            "name": "Stone Cannon",
+            "asset": "ThrowRock"
+        },
+        {
+            "name": "Giga Horn",
+            "asset": "Unique_HerculesBeetle_BeetleTackle"
+        },
+        {
+            "name": "Sand Tornado",
+            "asset": "SandTornado"
+        },
+        {
+            "name": "Spinning Roundhouse",
+            "asset": "Unique_Anubis_LowRoundKick"
+        },
+        {
+            "name": "Earth Impact",
+            "asset": "Unique_Grassmammoth_Earthquake"
+        },
+        {
+            "name": "Forceful Charge",
+            "asset": "Unique_Anubis_Tackle"
+        },
+        {
+            "name": "Ground Smash",
+            "asset": "Unique_Anubis_GroundPunch"
+        },
+        {
+            "name": "Rock Lance",
+            "asset": "RockLance"
+        },
+        {
+            "name": "Dragon Cannon",
+            "asset": "DragonCanon"
+        },
+        {
+            "name": "Dragon Burst",
+            "asset": "DragonWave"
+        },
+        {
+            "name": "Draconic Breath",
+            "asset": "DragonBreath"
+        },
+        {
+            "name": "Mystic Whirlwind",
+            "asset": "Unique_FairyDragon_FairyTornado"
+        },
+        {
+            "name": "Beam Comet",
+            "asset": "Unique_JetDragon_JumpBeam"
+        },
+        {
+            "name": "Dragon Meteor",
+            "asset": "DragonMeteor"
+        },
+        {
+            "name": "Poison Fog",
+            "asset": "PoisonFog"
+        },
+        {
+            "name": "Poison Blast",
+            "asset": "PoisonShot"
+        },
+        {
+            "name": "Dark Ball",
+            "asset": "DarkBall"
+        },
+        {
+            "name": "Shadow Burst",
+            "asset": "DarkWave"
+        },
+        {
+            "name": "Phantom Peck",
+            "asset": "Unique_DarkCrow_TelePoke"
+        },
+        {
+            "name": "Jumping Claw",
+            "asset": "Unique_Werewolf_Scratch"
+        },
+        {
+            "name": "Spirit Flame",
+            "asset": "GhostFlame"
+        },
+        {
+            "name": "Dark Charge",
+            "asset": "Unique_FireKirin_Dark_DarkTossin"
+        },
+        {
+            "name": "Nightmare Ball",
+            "asset": "ShadowBall"
+        },
+        {
+            "name": "Psycho Gravity",
+            "asset": "Psychokinesis"
+        },
+        {
+            "name": "Twin Spears",
+            "asset": "Unique_BlackCentaur_TwoSpearRushes"
+        },
+        {
+            "name": "Dark Laser",
+            "asset": "DarkLaser"
+        },
+        {
+            "name": "Divine Disaster",
+            "asset": "Unique_BlackGriffon_TackleLaser"
+        },
+        {
+            "name": "Dark Whisp",
+            "asset": "DarkLegion"
+        },
+        {
+            "name": "Rocket Slam",
+            "asset": "Unique_WeaselDragon_FlyingTackle"
+        },
+        {
+            "name": "Rockburst",
+            "asset": "Tremor"
+        },
+        {
+            "name": "Diamond Rain",
+            "asset": "DiamondFall"
+        },
+        {
+            "name": "Beam Slicer",
+            "asset": "BeamSlicer"
+        },
+        {
+            "name": "Nightmare Bloom",
+            "asset": "Unique_NightLady_WarpBeam"
+        },
+        {
+            "name": "Flame Waltz",
+            "asset": "Unique_NightLady_FlameNightmare"
+        },
+        {
+            "name": "Comet Strike",
+            "asset": "Commet"
+        },
+        {
+            "name": "Umbral Surge",
+            "asset": "DarkPulse"
+        },
+        {
+            "name": "Dark Cannon",
+            "asset": "DarkCanon"
+        },
+        {
+            "name": "Dark Arrow",
+            "asset": "DarkArrow"
+        },
+        {
+            "name": "Apocalypse",
+            "asset": "Apocalypse"
+        },
+        {
+            "name": "Nightmare Ray",
+            "asset": "Unique_NightLady_WarpBeam_Straight"
+        },
+        {
+            "name": "Jumping Stinger",
+            "asset": "Unique_DarkScorpion_Pierce"
+        },
+        {
+            "name": "Star Mine",
+            "asset": "StarMine"
+        },
+        {
+            "name": "Earth Dash",
+            "asset": "Unique_FeatherOstrich_Tossin"
+        },
+        {
+            "name": "Circle Vine",
+            "asset": "RootLance"
+        },
+        {
+            "name": "Polykeraunos",
+            "asset": "Unique_ThunderDragonMan_NumerousSwordAttack"
+        },
+        {
+            "name": "Magna Crush",
+            "asset": "Unique_KingBahamut_AirCrash"
+        },
+        {
+            "name": "Splash",
+            "asset": "LineGeyser"
+        },
+        {
+            "name": "Charge Cannon",
+            "asset": "ChargeCanon"
+        },
+        {
+            "name": "Brawn Impact",
+            "asset": "Unique_KingBahamut_ArmSmash"
+        },
+        {
+            "name": "Ground Cutter",
+            "asset": "Unique_WingGolem_RoundCutter"
+        },
+        {
+            "name": "Blast Cannon",
+            "asset": "BlastCanon"
+        },
+        {
+            "name": "Comet Barrage",
+            "asset": "ThreeCommet"
+        },
+        {
+            "name": "Meteorain",
+            "asset": "CommetRain"
+        },
+        {
+            "name": "Volcanic Rain",
+            "asset": "Eruption"
+        },
+        {
+            "name": "Heavy Thunder Tank",
+            "asset": "Unique_ElecPanda_GatlingAttack"
+        },
+        {
+            "name": "Bountiful Protection",
+            "asset": "Unique_LilyQueen_LilyHealing"
+        },
+        {
+            "name": "Holy Burst",
+            "asset": "HolyBlast"
+        },
+        {
+            "name": "Evil Slash",
+            "asset": "Unique_DarkAlien_JumpScractch"
+        },
+        {
+            "name": "Moonlight Beam",
+            "asset": "Unique_MoonQueen_MoonBeam"
+        },
+        {
+            "name": "Flame Wall",
+            "asset": "FlameWall"
+        },
+        {
+            "name": "Air Blade",
+            "asset": "AirBlade"
+        },
+        {
+            "name": "Seigetsu Blade",
+            "asset": "Unique_MoonQueen_MoonBlade"
+        },
+        {
+            "name": "Wholehearted Stance",
+            "asset": "Unique_SifuDog_Counter"
+        },
+        {
+            "name": "Curtain Splash",
+            "asset": "WallSplash"
+        },
+        {
+            "name": "TriSpark",
+            "asset": "TriSpark"
+        },
+        {
+            "name": "Thunderstorm",
+            "asset": "ThunderStorm"
+        },
+        {
+            "name": "Flame Funnel",
+            "asset": "FlameFunnel"
+        },
+        {
+            "name": "Sand Twister",
+            "asset": "SandTwister"
+        },
+        {
+            "name": "All Range Thunder",
+            "asset": "RangeThunder"
+        },
+        {
+            "name": "Lethal Laser",
+            "asset": "ShokeiLaser"
+        },
+        {
+            "name": "Poison Shower",
+            "asset": "BubbleShower"
+        },
+        {
+            "name": "Icicle Bullet",
+            "asset": "IciclePierce"
+        },
+        {
+            "name": "Double Blizzard Spike",
+            "asset": "DoubleIcicleThrow"
+        },
+        {
+            "name": "Absolute Frost",
+            "asset": "IceAge"
+        },
+        {
+            "name": "Raid Cutter",
+            "asset": "RaidCutter"
+        },
+        {
+            "name": "Wind Edge",
+            "asset": "WindEdge"
+        },
+        {
+            "name": "Flare Twister",
+            "asset": "FlareTwister"
+        },
+        {
+            "name": "Raging Flame Wave",
+            "asset": "Unique_Horus_PerfectStorm"
+        },
+        {
+            "name": "Divine Disaster II",
+            "asset": "Unique_BlackGriffon_TackleLaser2"
+        },
+        {
+            "name": "Seigetsu Flash",
+            "asset": "Unique_MoonQueen_IceMoonBlade"
+        },
+        {
+            "name": "Icicle Line",
+            "asset": "IcicleLine"
+        },
+        {
+            "name": "Volcanic Fang",
+            "asset": "Unique_Manticore_InfernoStrike"
+        },
+        {
+            "name": "Lightning Dive",
+            "asset": "Unique_ThunderBird_ThunderStorm"
+        },
+        {
+            "name": "Wind Barrier",
+            "asset": "Unique_LilyQueen_WindBarrier"
+        },
+        {
+            "name": "Firefist Breathstorm",
+            "asset": "Unique_BlackMetalDragon_FirePunch"
+        },
+        {
+            "name": "Leaping Roundhouse",
+            "asset": "Unique_GrassRabbitMan_GrassRoundKick"
+        },
+        {
+            "name": "Snow Bowling",
+            "asset": "Unique_Yeti_SnowBall"
+        },
+        {
+            "name": "Slither Slam",
+            "asset": "Unique_Umihebi_WindingTackle"
+        },
+        {
+            "name": "Needle Spear",
+            "asset": "Unique_SoldierBee_NeedleLance"
+        },
+        {
+            "name": "Rush Beak",
+            "asset": "Unique_RedArmorBird_TriplePeck"
+        },
+        {
+            "name": "Beckon Lightning",
+            "asset": "Unique_ThunderDog_InazumaShorai"
+        },
+        {
+            "name": "Spirit Dash",
+            "asset": "Unique_GhostBeast_Tossin"
+        },
+        {
+            "name": "Flame Breath",
+            "asset": "Unique_BirdDragon_FireBreath"
+        },
+        {
+            "name": "Blizzard Claw",
+            "asset": "Unique_WhiteTiger_IceScratch"
+        },
+        {
+            "name": "Satellite Bit",
+            "asset": "Unique_DarkMechaDragon_SetFunnel"
+        },
+        {
+            "name": "Omega Laser",
+            "asset": "Unique_DarkMechaDragon_FunnelLaser"
+        },
+        {
+            "name": "Astral Ray",
+            "asset": "Unique_DarkMechaDragon_ConvergentBeam"
+        },
+        {
+            "name": "Beam Slash",
+            "asset": "Unique_DarkMechaDragon_BeamSlash"
+        },
+        {
+            "name": "Cosmic Meteor",
+            "asset": "Unique_DarkMechaDragon_WarpComet"
+        },
+        {
+            "name": "Tempest Blizzard",
+            "asset": "Unique_BirdDragon_Ice_IceBreath"
+        },
+        {
+            "name": "Magma Serpent",
+            "asset": "Unique_Umihebi_Fire_FireWindingTackle"
+        },
+        {
+            "name": "Stone Claw",
+            "asset": "Unique_WhiteTiger_Ground_IronScratch"
+        },
+        {
+            "name": "Thunder Tempest",
+            "asset": "Unique_FengyunDeeper_Electric_ThunderTempest"
+        },
+        {
+            "name": "Snow Claw",
+            "asset": "Unique_Werewolf_Ice_SnowScratch"
+        },
+        {
+            "name": "Phoenix Tide",
+            "asset": "Unique_Horus_Water_AquaStorm"
+        },
+        {
+            "name": "Daring Shadowstorm",
+            "asset": "Unique_AmaterasuWolf_Dark_DarkCharge"
+        },
+        {
+            "name": "Lawn Bowling",
+            "asset": "Unique_Yeti_Grass_GrassBall"
+        },
+        {
+            "name": "Glacial Impact",
+            "asset": "Unique_SnowTigerBeastman_SnowImpact"
+        },
+        {
+            "name": "Webstrike Impact",
+            "asset": "Unique_PurpleSpider_SpiderRaid"
+        },
+        {
+            "name": "Frost Talon",
+            "asset": "Unique_SnowTigerBeastman_TrampleSlash"
+        },
+        {
+            "name": "Soul Drain",
+            "asset": "Unique_MysteryMask_LifeSteal"
+        },
+        {
+            "name": "Grudge Barrage",
+            "asset": "Unique_GrimGirl_BrutalMachete"
+        },
+        {
+            "name": "Aegis Charge",
+            "asset": "Unique_WhiteShieldDragon_ShieldTackle"
+        },
+        {
+            "name": "Bolt Blink",
+            "asset": "Unique_BlueThunderHorse_FlashDash"
+        },
+        {
+            "name": "Holy Nova",
+            "asset": "Unique_WhiteDeer_HolyPillar"
+        },
+        {
+            "name": "Lethal Step",
+            "asset": "Unique_NightBlueHorse_DeathStep"
+        },
+        {
+            "name": "Crash Dash",
+            "asset": "Unique_GoldenHorse_StoneDash"
+        },
+        {
+            "name": "Geyser Gush",
+            "asset": "SeaGush"
+        },
+        {
+            "name": "Aqua Surge",
+            "asset": "RipTide"
+        },
+        {
+            "name": "Hydro Slicer",
+            "asset": "HydroSlicer"
+        },
+        {
+            "name": "Torrential Blast",
+            "asset": "DiversionLaser"
+        },
+        {
+            "name": "Crosswind",
+            "asset": "CrossWind"
+        },
+        {
+            "name": "Hydro Spin",
+            "asset": "Unique_TentacleTurtle_HydroSpin"
+        },
+        {
+            "name": "Konoha Flip",
+            "asset": "Unique_LeafMomonga_SomerSault"
+        },
+        {
+            "name": "High Breach",
+            "asset": "Unique_IceNarwhal_JumpingHorn"
+        },
+        {
+            "name": "Lantern Sweep",
+            "asset": "Unique_GhostAnglerfish_SweepBait"
+        },
+        {
+            "name": "Trigger Happy",
+            "asset": "Unique_StuffedShark_HiddenWeapon"
+        },
+        {
+            "name": "Dark Shot",
+            "asset": "GravityShot"
+        },
+        {
+            "name": "Thunder Spear",
+            "asset": "ThunderSpear"
+        },
+        {
+            "name": "Reflect Leaf",
+            "asset": "ReflectiveShuriken"
+        },
+        {
+            "name": "Chaotic Spray",
+            "asset": "Unique_IceCrocodile_SpitAttack"
+        },
+        {
+            "name": "Thunderslide",
+            "asset": "Unique_CaptainPenguin_Black_BodySlide_Electric"
+        },
+        {
+            "name": "Deep Breath",
+            "asset": "Unique_Plesiosaur_LongBreath"
+        },
+        {
+            "name": "Dash Kick",
+            "asset": "Unique_TropicalOstrich_DashKick"
+        },
+        {
+            "name": "Radiant Barrage",
+            "asset": "RadiantBarrage"
+        }
+    ]
+}

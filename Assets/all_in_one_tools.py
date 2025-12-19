@@ -371,14 +371,13 @@ def count_pals_found(data, player_pals_count, log_folder):
     PALMAP=load_map("paldata.json","pals")
     NPCMAP=load_map("npcdata.json","npcs")
     PASSMAP=load_map("passivedata.json","passives")
+    SKILLMAP=load_map("skilldata.json","skills")
     NAMEMAP={**PALMAP,**NPCMAP}
-    PASSIVE_NAMES=PASSMAP
     owner_pals_info=defaultdict(list)
     non_owner_pals_info=[]
-    non_owner_pals_info_with_base=[]
     owner_nicknames={}
     base_id_groups=defaultdict(list)
-    base_count=defaultdict(int)
+    missing_assets={"Pals":set(),"Passives":set(),"Skills":set()}
     for key,value in data.items():
         if key=="CharacterSaveParameterMap":
             raw_list=value.get("value",[])
@@ -400,6 +399,8 @@ def count_pals_found(data, player_pals_count, log_folder):
         gid=rawf.get("group_id","Unknown")
         uid=raw.get("OwnerPlayerUId",{}).get("value")
         cid=raw.get("CharacterID",{}).get("value","")
+        if cid and cid.lower()!="none" and cid.lower() not in NAMEMAP:
+            missing_assets["Pals"].add(cid)
         name=NAMEMAP.get(cid.lower(),cid)
         lvl=extract_value(raw,"Level",1)
         rk=extract_value(raw,"Rank",1)
@@ -408,47 +409,67 @@ def count_pals_found(data, player_pals_count, log_folder):
         ginfo={"EPalGenderType::Male":"Male","EPalGenderType::Female":"Female"}.get(gv,"Unknown")
         pskills=[]
         for s in raw.get("PassiveSkillList",{}).get("value",{}).get("values",[]):
-            ps=s.lower()
-            pskills.append(PASSIVE_NAMES.get(ps,s))
-        pstr=", Skills: "+", ".join(pskills) if pskills else ""
+            sl=s.lower()
+            if sl not in PASSMAP: missing_assets["Passives"].add(s)
+            pskills.append(PASSMAP.get(sl,s))
+        pstr=", ".join(pskills) if pskills else "None"
+        active=[]
+        for w in raw.get("EquipWaza",{}).get("value",{}).get("values",[]):
+            wid=w.split("::")[-1]
+            wl=wid.lower()
+            if wl not in SKILLMAP: missing_assets["Skills"].add(wid)
+            active.append(SKILLMAP.get(wl,wid))
+        astr=", ".join(active) if active else "None"
+        learned=[]
+        for w in raw.get("MasteredWaza",{}).get("value",{}).get("values",[]):
+            wid=w.split("::")[-1]
+            wl=wid.lower()
+            if wl not in SKILLMAP: missing_assets["Skills"].add(wid)
+            learned.append(SKILLMAP.get(wl,wid))
+        lstr=", ".join(learned) if learned else "None"
         rh=int(extract_value(raw,"Rank_HP",0))*3
         ra=int(extract_value(raw,"Rank_Attack",0))*3
         rd=int(extract_value(raw,"Rank_Defence",0))*3
         rc=int(extract_value(raw,"Rank_CraftSpeed",0))*3
-        tstr=f"HP IV: {extract_value(raw,'Talent_HP','0')}({rh}%), ATK IV: {extract_value(raw,'Talent_Shot','0')}({ra}%), DEF IV: {extract_value(raw,'Talent_Defense','0')}({rd}%), Work Speed: ({rc}%)"
+        iv_str=f"HP: {extract_value(raw,'Talent_HP','0')} (+{rh}%), ATK: {extract_value(raw,'Talent_Shot','0')} (+{ra}%), DEF: {extract_value(raw,'Talent_Defense','0')} (+{rd}%), Work: (+{rc}%)"
         nick=raw.get("NickName",{}).get("value","Unknown")
-        nickstr=f", {nick}" if nick!="Unknown" else ""
-        info=f"{name}{nickstr}, Level: {lvl}, Rank: {rk}, Gender: {ginfo}, {tstr}{pstr}, ContainerID: {base}, InstanceID: {inst}, GuildID: {gid}"
-        base_count[base]+=1
+        dn=f"{name} (Nickname: {nick})" if nick!="Unknown" else name
+        info=(f"\n[{dn}]\n"
+              f"  Level: {lvl} | Rank: {rk} | Gender: {ginfo}\n"
+              f"  IVs:      {iv_str}\n"
+              f"  Passives: {pstr}\n"
+              f"  Active:   {astr}\n"
+              f"  Learned:  {lstr}\n"
+              f"  IDs:      Container: {base} | Instance: {inst} | Guild: {gid}\n")
         if not uid:
-            na=info.split(",")[0].strip()
-            if na!="None":
+            if name.strip().lower()!="none" and name.strip()!="":
                 non_owner_pals_info.append(info)
-                non_owner_pals_info_with_base.append(f"{info} (ContainerID: {base})")
                 base_id_groups[base].append(info)
                 continue
         owner_pals_info[uid].append(info)
         player_pals_count[uid]=player_pals_count.get(uid,0)+1
+    if any(missing_assets.values()):
+        mf=os.path.join(log_folder,"missing_assets.log")
+        try:
+            with open(mf,'w',encoding='utf-8',errors='replace') as f:
+                for k,v in missing_assets.items():
+                    if v:
+                        f.write(f"--- Missing {k} ({len(v)}) ---\n")
+                        for x in sorted(list(v)): f.write(f"{x}\n")
+                        f.write("\n")
+        except: pass
     if non_owner_pals_info:
         nf=os.path.join(log_folder,"non_owner_pals.log")
         try:
             with open(nf,'w',encoding='utf-8',errors='replace') as f:
-                tot=len(non_owner_pals_info_with_base)
-                f.write(f"{tot} Non-Owner Pals\n")
-                f.write("-"*(len(str(tot))+len(" Non-Owner Pals"))+"\n")
+                f.write(f"{len(non_owner_pals_info)} Non-Owner Pals\n")
+                f.write("="*40+"\n")
                 for bid,pals in base_id_groups.items():
-                    cnt=len(pals)
-                    f.write(f"ContainerID: {bid} (Count: {cnt})\n")
-                    f.write("-"*(len(f"ContainerID: {bid} (Count: {cnt})"))+"\n")
-                    f.write("\n".join(pals)+"\n\n")
-        except:
-            pass
+                    f.write(f"\nContainerID: {bid} (Count: {len(pals)})\n")
+                    f.write("-" * 40 + "\n")
+                    f.write("".join(pals))
+        except: pass
     for uid,pals in owner_pals_info.items():
-        pb=defaultdict(list)
-        for p in pals:
-            if "ContainerID:" in p:
-                bid=p.split("ContainerID:")[1].split(",")[0].strip()
-                pb[bid if bid else "Unknown"].append(p)
         pname=owner_nicknames.get(uid,'Unknown')
         sname=sanitize_filename(pname.encode('utf-8','replace').decode('utf-8'))
         lf=os.path.join(log_folder,f"({sname})({uid}).log")
@@ -461,20 +482,14 @@ def count_pals_found(data, player_pals_count, log_folder):
                 h=logging.FileHandler(lf,mode='w',encoding='utf-8',errors='replace')
                 h.setFormatter(logging.Formatter('%(message)s'))
                 lg.addHandler(h)
-            except:
-                continue
-        cnt=sum(len(x) for x in pb.values())
-        lg.info(f"{pname}'s {cnt} Pals")
-        lg.info("-"*(len(pname)+len(f"'s {cnt} Pals")))
-        for bid,pp in pb.items():
-            lg.info(f"ContainerID: {bid}")
-            lg.info("----------------")
-            sp=[safe_str(x) for x in sorted(pp)]
-            lg.info("\n".join(sp))
-            lg.info("----------------")
+            except: continue
+        lg.info(f"{pname}'s {len(pals)} Pals")
+        lg.info("="*40)
+        for p_block in sorted(pals):
+            lg.info(p_block)
+            lg.info("-" * 20)
     for uid in owner_pals_info.keys():
-        lname=''.join(c if c.isalnum() or c in ('_','-') else '_' for c in f"logger_{uid}")
-        lg=logging.getLogger(lname)
+        lg=logging.getLogger(''.join(c if c.isalnum() or c in ('_','-') else '_' for c in f"logger_{uid}"))
         for h in lg.handlers[:]:
             h.flush()
             h.close()
@@ -2123,7 +2138,7 @@ def open_kill_nearest_base_ui(master=None):
         return
     dlg = KillNearestBaseDialog(master)
     dlg.grab_set()
-EXCLUSIONS_FILE = "deletion_exclusions.json"
+EXCLUSIONS_FILE = r"Assets\deletion_exclusions.json"
 exclusions = {}
 def load_exclusions():
     global exclusions
