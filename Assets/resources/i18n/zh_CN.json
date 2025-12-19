@@ -450,5 +450,6 @@
 "map_obj.deleting_orphan": "正在删除孤立/非基地地图对象 ID: {instance_id} ({object_name}) - 原因: {reason}",
 "map_obj.deleted_summary": "已删除 {deleted_count} 个孤立/非基地地图对象。剩余 {remaining_count} 个地图对象。",
 "deletion.menu.remove_invalid_structures": "删除所有无效建筑",
-"deletion.menu.remove_invalid_structures_summary": "已删除 {deleted_count} 个无效的建筑地图对象。剩余 {remaining_count} 个建筑。"
+"deletion.menu.remove_invalid_structures_summary": "已删除 {deleted_count} 个无效的建筑地图对象。剩余 {remaining_count} 个建筑。",
+"deletion.menu.remove_invalid_skins_summary": "已从 Level.sav 中删除 {removed_level_skins} 个皮肤条目。已清理 {fixed_player_files} 个玩家文件。"
 }

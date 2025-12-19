@@ -447,5 +447,6 @@
 "map_obj.deleting_orphan": "УДАЛЕНИЕ осиротевшего/внебазового объекта карты ID: {instance_id} ({object_name}) - ПРИЧИНА: {reason}",
 "map_obj.deleted_summary": "Удалено {deleted_count} осиротевших/внебазовых объектов карты. Осталось {remaining_count} объектов карты.",
 "deletion.menu.remove_invalid_structures": "Удалить все недопустимые строения",
-"deletion.menu.remove_invalid_structures_summary": "Удалено {deleted_count} недопустимых объектов карты строений. Осталось {remaining_count} строений."
+"deletion.menu.remove_invalid_structures_summary": "Удалено {deleted_count} недопустимых объектов карты строений. Осталось {remaining_count} строений.",
+"deletion.menu.remove_invalid_skins_summary": "Удалено {removed_level_skins} записей скинов из Level.sav. Очищено {fixed_player_files} файлов игроков."
 }

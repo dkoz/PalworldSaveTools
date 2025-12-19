@@ -2123,7 +2123,7 @@ def open_kill_nearest_base_ui(master=None):
         return
     dlg = KillNearestBaseDialog(master)
     dlg.grab_set()
-EXCLUSIONS_FILE = "Assets/deletion_exclusions.json"
+EXCLUSIONS_FILE = "deletion_exclusions.json"
 exclusions = {}
 def load_exclusions():
     global exclusions
@@ -2277,6 +2277,61 @@ def unlock_all_private_chests():
     msg=t("chest.unlocked_summary",count=count)
     print(msg)
     messagebox.showinfo(t("Unlocked"),msg)
+    refresh_all()
+def delete_all_skins():
+    import os
+    folder_path=current_save_path
+    if not folder_path:
+        messagebox.showerror(t("Error"),t("guild.rebuild.no_save"))
+        return
+    global loaded_level_json
+    removed_level_skins=0
+    def clean_level_skins(data):
+        nonlocal removed_level_skins
+        if isinstance(data,dict):
+            if "SkinName" in data:
+                del data["SkinName"]
+                removed_level_skins+=1
+            if "SkinAppliedCharacterId" in data:
+                del data["SkinAppliedCharacterId"]
+            for v in list(data.values()):
+                clean_level_skins(v)
+        elif isinstance(data,list):
+            for item in data:
+                clean_level_skins(item)
+    try:
+        wsd=loaded_level_json["properties"]["worldSaveData"]["value"]
+        clean_level_skins(wsd)
+    except:
+        pass
+    players_dir=os.path.join(current_save_path,"Players")
+    fixed_player_files=0
+    if os.path.exists(players_dir):
+        for filename in os.listdir(players_dir):
+            if filename.endswith(".sav") and "_dps" not in filename:
+                file_path=os.path.join(players_dir,filename)
+                try:
+                    p_json=sav_to_json(file_path)
+                    changed=False
+                    def remove_skin_info(data):
+                        nonlocal changed
+                        if isinstance(data,dict):
+                            if "SkinInventoryInfo" in data:
+                                del data["SkinInventoryInfo"]
+                                changed=True
+                            for v in list(data.values()):
+                                remove_skin_info(v)
+                        elif isinstance(data,list):
+                            for item in data:
+                                remove_skin_info(item)
+                    remove_skin_info(p_json)
+                    if changed:
+                        json_to_sav(p_json,file_path)
+                        fixed_player_files+=1
+                except:
+                    pass
+    msg=t("deletion.menu.remove_invalid_skins_summary",removed_level_skins=removed_level_skins,fixed_player_files=fixed_player_files)
+    print(msg)
     refresh_all()
 def delete_invalid_structure_map_objects():
     global loaded_level_json
@@ -3124,7 +3179,7 @@ def all_in_one_tools():
                 exclusions[key].remove(val)
         populate_exclusions_trees()
     def save_exclusions_func():
-        with open(EXCLUSIONS_FILE, "w") as f: json.dump(exclusions, f, indent=4)
+        with open("deletion_exclusions.json", "w") as f: json.dump(exclusions, f, indent=4)
         tk.messagebox.showinfo(t("Saved"), t("deletion.saved_exclusions"))
     file_menu, file_menu_items, file_menu_add = create_and_store_menu("file_menu")
     file_menu_add("menu.file.load_save", load_save)
@@ -3143,6 +3198,7 @@ def all_in_one_tools():
     delete_menu_add("deletion.menu.remove_invalid_items", remove_invalid_items_from_save)
     delete_menu_add("deletion.menu.remove_invalid_structures", delete_invalid_structure_map_objects)
     delete_menu_add("deletion.menu.remove_invalid_pals", remove_invalid_pals_from_save)
+    delete_menu_add("deletion.menu.delete_all_skins", delete_all_skins)
     delete_menu_add("deletion.menu.reset_missions", fix_missions)
     delete_menu_add("deletion.menu.reset_anti_air", reset_anti_air_turrets)
     delete_menu_add("deletion.menu.generate_killnearestbase", open_kill_nearest_base_ui)

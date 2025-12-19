@@ -450,5 +450,6 @@
 "map_obj.deleting_orphan": "ELIMINANDO Objeto de Mapa Huérfano/No Base ID: {instance_id} ({object_name}) - RAZÓN: {reason}",
 "map_obj.deleted_summary": "Se eliminaron {deleted_count} objetos de mapa huérfanos/no base. Quedan {remaining_count} objetos de mapa.",
 "deletion.menu.remove_invalid_structures": "Eliminar todas las estructuras inválidas",
-"deletion.menu.remove_invalid_structures_summary": "Se eliminaron {deleted_count} objetos de mapa de estructuras inválidas. Quedan {remaining_count} estructuras."
+"deletion.menu.remove_invalid_structures_summary": "Se eliminaron {deleted_count} objetos de mapa de estructuras inválidas. Quedan {remaining_count} estructuras.",
+"deletion.menu.remove_invalid_skins_summary": "Se eliminaron {removed_level_skins} entradas de apariencia de Level.sav. Se limpiaron {fixed_player_files} archivos de jugador."
 }

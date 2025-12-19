@@ -450,5 +450,6 @@
 "map_obj.deleting_orphan": "孤立した/非拠点マップオブジェクト ID: {instance_id} ({object_name}) を削除 - 理由: {reason}",
 "map_obj.deleted_summary": "{deleted_count} 個の孤立した/非拠点マップオブジェクトを削除しました。残り {remaining_count} 個のマップオブジェクト。",
 "deletion.menu.remove_invalid_structures": "すべての無効な構造物を削除",
-"deletion.menu.remove_invalid_structures_summary": "{deleted_count} 個の無効な構造物マップオブジェクトを削除しました。残りの構造物は {remaining_count} 個です。"
+"deletion.menu.remove_invalid_structures_summary": "{deleted_count} 個の無効な構造物マップオブジェクトを削除しました。残りの構造物は {remaining_count} 個です。",
+"deletion.menu.remove_invalid_skins_summary": "Level.sav から {removed_level_skins} 件のスキンデータを削除しました。{fixed_player_files} 件のプレイヤーファイルを修正しました。"
 }

@@ -450,5 +450,6 @@
 "map_obj.deleting_orphan": "SUPPRESSION de l'Objet de Carte Orphelin/Hors-Base ID : {instance_id} ({object_name}) - RAISON : {reason}",
 "map_obj.deleted_summary": "{deleted_count} objets de carte orphelins/hors-base supprimés. {remaining_count} objets de carte restants.",
 "deletion.menu.remove_invalid_structures": "Supprimer toutes les structures invalides",
-"deletion.menu.remove_invalid_structures_summary": "{deleted_count} objets de carte de structure invalides supprimés. {remaining_count} structures restantes."
+"deletion.menu.remove_invalid_structures_summary": "{deleted_count} objets de carte de structure invalides supprimés. {remaining_count} structures restantes.",
+"deletion.menu.remove_invalid_skins_summary": "{removed_level_skins} entrées de skin supprimées de Level.sav. {fixed_player_files} fichiers joueur nettoyés."
 }

@@ -451,5 +451,6 @@
 "map_obj.deleting_orphan": "고아/비-거점 지도 오브젝트 ID: {instance_id} ({object_name}) 삭제 - 사유: {reason}",
 "map_obj.deleted_summary": "고아/비-거점 지도 오브젝트 {deleted_count}개 삭제. 남은 지도 오브젝트: {remaining_count}개.",
 "deletion.menu.remove_invalid_structures": "모든 유효하지 않은 구조물 제거",
-"deletion.menu.remove_invalid_structures_summary": "{deleted_count}개의 유효하지 않은 구조물 맵 오브젝트를 삭제했습니다. {remaining_count}개의 구조물이 남았습니다."
+"deletion.menu.remove_invalid_structures_summary": "{deleted_count}개의 유효하지 않은 구조물 맵 오브젝트를 삭제했습니다. {remaining_count}개의 구조물이 남았습니다.",
+"deletion.menu.remove_invalid_skins_summary": "Level.sav에서 {removed_level_skins}개의 스킨 항목을 삭제했습니다. {fixed_player_files}개의 플레이어 파일을 정리했습니다."
 }
