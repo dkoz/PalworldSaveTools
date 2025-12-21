@@ -25,7 +25,7 @@ class GamePassSaveFixWidget(QWidget):
         self.load_styles()
     def setup_ui(self):
         self.setWindowTitle(t("xgp.title.converter"))
-        self.setFixedSize(600, 200)
+        self.setMinimumSize(600, 200)
         self.setObjectName("central")
         try:
             if ICON_PATH and os.path.exists(ICON_PATH):
@@ -69,7 +69,7 @@ class GamePassSaveFixWidget(QWidget):
         save_layout = QVBoxLayout(self.save_frame)
         save_layout.setContentsMargins(0, 0, 0, 0)
         save_layout.setSpacing(12)
-        glass_layout.addWidget(self.save_frame, 1)
+        glass_layout.addWidget(self.save_frame)
         main_layout.addWidget(glass_frame)
         center_window(self)
     def find_valid_saves(self, base_path):
@@ -274,9 +274,8 @@ class GamePassSaveFixWidget(QWidget):
             combo_layout.addStretch()
             combobox = QComboBox()
             combobox.setFont(QFont("Segoe UI", 10))
-            combobox.setMaximumWidth(400)
+            combobox.setMinimumWidth(400)
             combobox.addItems(saves)
-            combobox.setCurrentText(t("xgp.ui.choose_save"))
             combo_layout.addWidget(combobox)
             combo_layout.addStretch()
             layout.addLayout(combo_layout)
@@ -284,11 +283,14 @@ class GamePassSaveFixWidget(QWidget):
             button_layout.addStretch()
             button = QPushButton(t("xgp.ui.convert"))
             button.setFont(QFont("Segoe UI", 10))
-            button.setMaximumWidth(250)
+            button.setFixedWidth(250)
             button.clicked.connect(lambda: self.convert_JSON_sav(combobox.currentText()))
             button_layout.addWidget(button)
             button_layout.addStretch()
             layout.addLayout(button_layout)
+        QApplication.processEvents()
+        self.adjustSize()
+        center_window(self)
     def load_styles(self):
         user_cfg_path = os.path.join(get_assets_directory(), "data", "configs", "user.cfg")
         theme = "dark"
