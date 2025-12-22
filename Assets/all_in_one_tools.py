@@ -3069,6 +3069,7 @@ def clone_base_complete(loaded_level_json, source_base_id, target_guild_id, offs
     base_camp_data = data.get("BaseCampSaveData", {}).get("value", [])
     char_containers = data.get("CharacterContainerSaveData", {}).get("value", [])
     item_containers = data.get("ItemContainerSaveData", {}).get("value", [])
+    dynamic_item_data = data.get("DynamicItemSaveData", {}).get("value", {}).get("values", [])
     map_objs = data.get("MapObjectSaveData", {}).get("value", {}).get("values", [])
     char_map = data.get("CharacterSaveParameterMap", {}).get("value", [])
     work_root = data.get("WorkSaveData", {})
@@ -3246,6 +3247,26 @@ def clone_base_complete(loaded_level_json, source_base_id, target_guild_id, offs
                             nic = _deep(src_ic)
                             nic["key"]["ID"]["value"] = new_cid
                             if "instance_id" in nic.get("value", {}): nic["value"]["instance_id"] = new_cid
+                            item_slots = nic["value"]["Slots"]["value"].get("values", [])
+                            cleaned_slots = []
+                            for slot in item_slots:
+                                slot_raw = slot.get("RawData", {}).get("value", {})
+                                item_meta = slot_raw.get("item", {})
+                                s_id = str(item_meta.get("static_id", ""))
+                                if s_id.startswith("PalEgg_"):
+                                    continue
+                                dyn_id = item_meta.get("dynamic_id", {})
+                                old_local_id = _s(dyn_id.get("local_id_in_created_world", z))
+                                if old_local_id != _s(z):
+                                    new_local_id = _new_uuid()
+                                    dyn_id["local_id_in_created_world"] = new_local_id
+                                    source_dyn = next((d for d in dynamic_item_data if _s(d["RawData"]["value"]["id"]["local_id_in_created_world"]) == old_local_id), None)
+                                    if source_dyn:
+                                        new_dyn = _deep(source_dyn)
+                                        new_dyn["RawData"]["value"]["id"]["local_id_in_created_world"] = new_local_id
+                                        dynamic_item_data.append(new_dyn)
+                                cleaned_slots.append(slot)
+                            nic["value"]["Slots"]["value"]["values"] = cleaned_slots
                             item_containers.append(nic)
                     elif "CharacterContainer" in str(mod.get("key", "")):
                         src_cc = next((c for c in char_containers if _s(c.get("key",{}).get("ID",{}).get("value")) == old_cid), None)
@@ -3284,7 +3305,8 @@ def export_base_json(loaded_level_json, source_base_id):
     src_id_str=_s(source_base_id)
     src_base_entry=next((b for b in base_camp_data if _s(b.get("key"))==src_id_str),None)
     if not src_base_entry: return None
-    export_data={"base_camp":copy.deepcopy(src_base_entry),"map_objects":[],"characters":[],"item_containers":[],"char_containers":[],"works":[]}
+    export_data={"base_camp":copy.deepcopy(src_base_entry),"map_objects":[],"characters":[],"item_containers":[],"char_containers":[],"works":[],"dynamic_items":[]}
+    all_dyn_items = data.get("DynamicItemSaveData", {}).get("value", {}).get("values", [])
     try:
         src_worker_container_id=_s(src_base_entry["value"]["WorkerDirector"]["value"]["RawData"]["value"]["container_id"])
         w_cont=next((c for c in char_containers if _s(c.get("key",{}).get("ID",{}).get("value"))==src_worker_container_id),None)
@@ -3309,7 +3331,21 @@ def export_base_json(loaded_level_json, source_base_id):
                 cid=_s(raw_mod.get("target_container_id",""))
                 if "ItemContainer" in str(mod.get("key","")):
                     ic=next((c for c in item_containers if _s(c.get("key",{}).get("ID",{}).get("value"))==cid),None)
-                    if ic: export_data["item_containers"].append(copy.deepcopy(ic))
+                    if ic:
+                        nic = copy.deepcopy(ic)
+                        item_slots = nic["value"]["Slots"]["value"].get("values", [])
+                        cleaned_slots = []
+                        for slot in item_slots:
+                            s_raw = slot.get("RawData", {}).get("value", {})
+                            s_id = str(s_raw.get("item", {}).get("static_id", ""))
+                            if s_id.startswith("PalEgg_"): continue
+                            loc_id = _s(s_raw.get("item", {}).get("dynamic_id", {}).get("local_id_in_created_world", "00000000-0000-0000-0000-000000000000"))
+                            if loc_id != "00000000-0000-0000-0000-000000000000":
+                                d_entry = next((d for d in all_dyn_items if _s(d["RawData"]["value"]["id"]["local_id_in_created_world"]) == loc_id), None)
+                                if d_entry: export_data["dynamic_items"].append(copy.deepcopy(d_entry))
+                            cleaned_slots.append(slot)
+                        nic["value"]["Slots"]["value"]["values"] = cleaned_slots
+                        export_data["item_containers"].append(nic)
                 elif "CharacterContainer" in str(mod.get("key","")):
                     cc=next((c for c in char_containers if _s(c.get("key",{}).get("ID",{}).get("value"))==cid),None)
                     if cc: export_data["char_containers"].append(copy.deepcopy(cc))
@@ -3319,6 +3355,15 @@ def export_base_json(loaded_level_json, source_base_id):
         if wr and _s(wr.get("base_camp_id_belong_to",""))==src_id_str: export_data["works"].append(copy.deepcopy(we))
     return export_data
 def import_base_json(loaded_level_json, exported_data, target_guild_id, offset=(8000,0,0), collision_threshold=5000):
+    if "dynamic_items" not in exported_data:
+            msg = "Warning: Cannot use this outdated export data due to broken data. Please re-export your base again."
+            print(msg)
+            try:
+                import tkinter.messagebox as mb
+                mb.showwarning("Outdated Blueprint", msg)
+            except:
+                pass
+            return
     import uuid,copy,math
     from palworld_save_tools.archive import UUID as PalUUID
     try:_deep=fast_deepcopy
@@ -3353,6 +3398,7 @@ def import_base_json(loaded_level_json, exported_data, target_guild_id, offset=(
     base_camp_data=data.get("BaseCampSaveData",{}).get("value",[])
     char_containers=data.get("CharacterContainerSaveData",{}).get("value",[])
     item_containers=data.get("ItemContainerSaveData",{}).get("value",[])
+    dynamic_item_data=data.get("DynamicItemSaveData",{}).get("value",{}).get("values",[])
     map_objs=data.get("MapObjectSaveData",{}).get("value",{}).get("values",[])
     char_map=data.get("CharacterSaveParameterMap",{}).get("value",[])
     work_root=data.get("WorkSaveData",{})
@@ -3470,7 +3516,7 @@ def import_base_json(loaded_level_json, exported_data, target_guild_id, offset=(
                 worker_id_map[old_inst]=new_inst
                 s_raw["instance_id"]=new_inst
                 new_slots.append(slot)
-        ncnt["value"]["Slots"]["value"]["values"]=new_slots
+        ncnt["value"]["Slots"]["value"]["values"] = new_slots
         char_containers.append(ncnt)
     for old_iid,new_iid in worker_id_map.items():
         char_entry=next((c for c in exported_data.get("characters",[]) if _s(c["key"]["InstanceId"]["value"])==old_iid),None)
@@ -3535,6 +3581,25 @@ def import_base_json(loaded_level_json, exported_data, target_guild_id, offset=(
                             nic=_deep(src_ic)
                             nic["key"]["ID"]["value"]=new_cid
                             if "instance_id" in nic.get("value",{}): nic["value"]["instance_id"]=new_cid
+                            item_slots = nic["value"]["Slots"]["value"].get("values", [])
+                            cleaned_slots = []
+                            for slot in item_slots:
+                                slot_raw = slot.get("RawData", {}).get("value", {})
+                                item_meta = slot_raw.get("item", {})
+                                s_id = str(item_meta.get("static_id", ""))
+                                if s_id.startswith("PalEgg_"): continue
+                                dyn_id = item_meta.get("dynamic_id", {})
+                                old_local_id = _s(dyn_id.get("local_id_in_created_world", z))
+                                if old_local_id != _s(z):
+                                    new_local_id = _new_uuid()
+                                    dyn_id["local_id_in_created_world"] = new_local_id
+                                    source_dyn = next((d for d in exported_data.get("dynamic_items", []) if _s(d["RawData"]["value"]["id"]["local_id_in_created_world"]) == old_local_id), None)
+                                    if source_dyn:
+                                        new_dyn = _deep(source_dyn)
+                                        new_dyn["RawData"]["value"]["id"]["local_id_in_created_world"] = new_local_id
+                                        dynamic_item_data.append(new_dyn)
+                                cleaned_slots.append(slot)
+                            nic["value"]["Slots"]["value"]["values"] = cleaned_slots
                             item_containers.append(nic)
                     elif "CharacterContainer" in str(mod.get("key", "")):
                         src_cc=next((c for c in exported_data.get("char_containers",[]) if _s(c.get("key",{}).get("ID",{}).get("value"))==old_cid),None)
@@ -3547,6 +3612,13 @@ def import_base_json(loaded_level_json, exported_data, target_guild_id, offset=(
             except: pass
         map_objs.append(no)
     return True
+def is_old_blueprint(exported_data):
+    if not isinstance(exported_data, dict): return True
+    return "dynamic_items" not in exported_data
+def validate_blueprint_version(exported_data):
+    if is_old_blueprint(exported_data):
+        return False, "This blueprint was created with an older version of the tool. Please re-export the base to ensure all fixes are applied."
+    return True, "Blueprint is up to date."
 def all_in_one_tools():
     global window, stat_labels, guild_tree, base_tree, player_tree, guild_members_tree
     global guild_search_var, base_search_var, player_search_var, guild_members_search_var

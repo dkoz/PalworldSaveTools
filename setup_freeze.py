@@ -24,13 +24,31 @@ def find_pyside6_assets():
     except: pass
     return None
 build_exe_options={
-    "packages":["pygame","loguru","os","sys","subprocess","pathlib","shutil","matplotlib","pandas","customtkinter","cityhash","tkinter","json","uuid","time","datetime","struct","enum","collections","itertools","math","zlib","gzip","zipfile","threading","multiprocessing","io","base64","binascii","hashlib","hmac","secrets","ssl","socket","urllib","http","email","mimetypes","tempfile","glob","fnmatch","argparse","configparser","logging","traceback","warnings","weakref","string","random","re","copy","ctypes","functools","gc","importlib","PIL","numpy","ooz","pickle","tarfile","csv","pprint","code","platform","fontTools","PySide6.QtCore","PySide6.QtGui","PySide6.QtWidgets","nerdfont"],
-    "excludes":["test","unittest","pdb","tkinter.test","lib2to3","distutils","setuptools","pip","wheel","venv","ensurepip","msgpack"],
-    "include_files":[("Assets/","Assets/"),("readme.md","readme.md"),("license","license")],
+    "packages":[
+        "pygame","loguru","subprocess","pathlib","shutil","matplotlib","pandas",
+        "customtkinter","cityhash","tkinter","json","uuid","time","datetime",
+        "struct","enum","collections","itertools","math","zlib","gzip","zipfile",
+        "threading","multiprocessing","io","base64","binascii","hashlib","hmac",
+        "secrets","ssl","socket","urllib","http","email","mimetypes","tempfile",
+        "glob","fnmatch","argparse","configparser","logging","traceback",
+        "warnings","weakref","string","random","re","copy","ctypes","functools",
+        "gc","importlib","PIL","numpy","ooz","pickle","tarfile","csv","pprint",
+        "code","platform","fontTools","PySide6.QtCore","PySide6.QtGui",
+        "PySide6.QtWidgets","nerdfont","unittest","unittest.mock"
+    ],
+    "excludes":[
+        "test","pdb","tkinter.test","lib2to3","distutils",
+        "setuptools","pip","wheel","venv","ensurepip","msgpack"
+    ],
+    "include_files":[
+        ("Assets/","Assets/"),
+        ("readme.md","readme.md"),
+        ("license","license")
+    ],
     "zip_include_packages":[],
     "zip_exclude_packages":["*"],
     "build_exe":"PST_standalone",
-    "optimize": 0
+    "optimize":0
 }
 ctk_a=find_customtkinter_assets()
 if ctk_a: build_exe_options["include_files"].append(ctk_a)
@@ -42,5 +60,12 @@ setup(
     name="PalworldSaveTools",
     version="1.1.38",
     options={"build_exe":build_exe_options},
-    executables=[Executable("menu.py",base="Console" if sys.platform=="win32" else None,target_name="PalworldSaveTools.exe",icon="Assets/resources/pal.ico")]
+    executables=[
+        Executable(
+            "menu.py",
+            base="Console" if sys.platform=="win32" else None,
+            target_name="PalworldSaveTools.exe",
+            icon="Assets/resources/pal.ico"
+        )
+    ]
 )
