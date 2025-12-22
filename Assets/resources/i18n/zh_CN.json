@@ -452,5 +452,15 @@
 "deletion.menu.remove_invalid_structures": "删除所有无效建筑",
 "deletion.menu.remove_invalid_structures_summary": "已删除 {deleted_count} 个无效的建筑地图对象。剩余 {remaining_count} 个建筑。",
 "deletion.menu.remove_invalid_skins_summary": "已从 Level.sav 中删除 {removed_level_skins} 个皮肤条目。已清理 {fixed_player_files} 个玩家文件。",
-"deletion.menu.delete_all_skins": "删除所有皮肤"
+"deletion.menu.delete_all_skins": "删除所有皮肤",
+"deletion.menu.reset_dungeons": "重置地下城",
+"reset_dungeons.reset_success": "成功重置地下城",
+"reset_dungeons.none_found": "未找到地下城数据",
+"export.base": "导出基地",
+"import.base": "导入基地",
+"clone.base": "克隆基地",
+"delete.base": "删除基地",
+"button.export": "导出基地",
+"button.import": "导入基地",
+"delete.guild": "删除公会"
 }

@@ -452,5 +452,15 @@
 "deletion.menu.remove_invalid_structures": "Supprimer toutes les structures invalides",
 "deletion.menu.remove_invalid_structures_summary": "{deleted_count} objets de carte de structure invalides supprimés. {remaining_count} structures restantes.",
 "deletion.menu.remove_invalid_skins_summary": "{removed_level_skins} entrées de skin supprimées de Level.sav. {fixed_player_files} fichiers joueur nettoyés.",
-"deletion.menu.delete_all_skins": "Supprimer tous les skins"
+"deletion.menu.delete_all_skins": "Supprimer tous les skins",
+"deletion.menu.reset_dungeons": "Réinitialiser les donjons",
+"reset_dungeons.reset_success": "Donjons réinitialisés avec succès",
+"reset_dungeons.none_found": "Données de donjon introuvables",
+"export.base": "Exporter la Base",
+"import.base": "Importer la Base",
+"clone.base": "Cloner la Base",
+"delete.base": "Supprimer la Base",
+"button.export": "Exporter la Base",
+"button.import": "Importer la Base",
+"delete.guild": "Supprimer la Guilde"
 }

@@ -452,5 +452,15 @@
 "deletion.menu.remove_invalid_structures": "Alle ungültigen Strukturen entfernen",
 "deletion.menu.remove_invalid_structures_summary": "{deleted_count} ungültige Struktur-Kartenobjekte gelöscht. {remaining_count} Strukturen verbleiben.",
 "deletion.menu.remove_invalid_skins_summary": "{removed_level_skins} Skin-Einträge aus Level.sav gelöscht. {fixed_player_files} Spielerdateien bereinigt.",
-"deletion.menu.delete_all_skins": "Alle Skins löschen"
+"deletion.menu.delete_all_skins": "Alle Skins löschen",
+"deletion.menu.reset_dungeons": "Dungeons zurücksetzen",
+"reset_dungeons.reset_success": "Dungeons erfolgreich zurückgesetzt",
+"reset_dungeons.none_found": "Dungeon-Daten nicht gefunden",
+"export.base": "Basis exportieren",
+"import.base": "Basis importieren",
+"clone.base": "Basis klonen",
+"delete.base": "Basis löschen",
+"button.export": "Basis exportieren",
+"button.import": "Basis importieren",
+"delete.guild": "Gilde löschen"
 }

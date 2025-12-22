@@ -452,5 +452,15 @@
 "deletion.menu.remove_invalid_structures": "すべての無効な構造物を削除",
 "deletion.menu.remove_invalid_structures_summary": "{deleted_count} 個の無効な構造物マップオブジェクトを削除しました。残りの構造物は {remaining_count} 個です。",
 "deletion.menu.remove_invalid_skins_summary": "Level.sav から {removed_level_skins} 件のスキンデータを削除しました。{fixed_player_files} 件のプレイヤーファイルを修正しました。",
-"deletion.menu.delete_all_skins": "すべてのスキンを削除"
+"deletion.menu.delete_all_skins": "すべてのスキンを削除",
+"deletion.menu.reset_dungeons": "ダンジョンをリセット",
+"reset_dungeons.reset_success": "ダンジョンのリセットに成功しました",
+"reset_dungeons.none_found": "ダンジョンデータが見つかりません",
+"export.base": "拠点をエクスポート",
+"import.base": "拠点をインポート",
+"clone.base": "拠点を複製",
+"delete.base": "拠点を削除",
+"button.export": "拠点をエクスポート",
+"button.import": "拠点をインポート",
+"delete.guild": "ギルドを削除"
 }

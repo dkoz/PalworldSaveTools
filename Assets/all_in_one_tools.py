@@ -355,6 +355,7 @@ def count_pals_found(data, player_pals_count, log_folder, current_save_path, sav
     PASSMAP=load_map("passivedata.json","passives")
     SKILLMAP=load_map("skilldata.json","skills")
     NAMEMAP={**PALMAP,**NPCMAP}
+    miss={"Pals":set(),"Passives":set(),"Skills":set()}
     owner_pals_grouped=defaultdict(lambda: defaultdict(list))
     player_containers={}
     owner_nicknames={}
@@ -398,14 +399,26 @@ def count_pals_found(data, player_pals_count, log_folder, current_save_path, sav
         target_id=u_str if not is_worker else f"WORKER_{gid}_{base}"
         if is_worker and target_id not in owner_nicknames: owner_nicknames[target_id]=f"Base_{base}"
         cid=raw.get("CharacterID",{}).get("value","")
+        if cid and cid.lower() not in NAMEMAP: miss["Pals"].add(cid)
         name=NAMEMAP.get(cid.lower(),cid)
         lvl=extract_value(raw,"Level",1)
         rk=extract_value(raw,"Rank",1)
         gv=raw.get("Gender",{}).get("value",{}).get("value","")
         ginfo={"EPalGenderType::Male":"Male","EPalGenderType::Female":"Female"}.get(gv,"Unknown")
-        pskills=[PASSMAP.get(s.lower(),s) for s in raw.get("PassiveSkillList",{}).get("value",{}).get("values",[])]
-        active=[SKILLMAP.get(w.split("::")[-1].lower(),w.split("::")[-1]) for w in raw.get("EquipWaza",{}).get("value",{}).get("values",[])]
-        learned=[SKILLMAP.get(w.split("::")[-1].lower(),w.split("::")[-1]) for w in raw.get("MasteredWaza",{}).get("value",{}).get("values",[])]
+        p_list=raw.get("PassiveSkillList",{}).get("value",{}).get("values",[])
+        for s in p_list:
+            if s.lower() not in PASSMAP: miss["Passives"].add(s)
+        pskills=[PASSMAP.get(s.lower(),s) for s in p_list]
+        e_list=raw.get("EquipWaza",{}).get("value",{}).get("values",[])
+        for w in e_list:
+            w_short=w.split("::")[-1]
+            if w_short.lower() not in SKILLMAP: miss["Skills"].add(w)
+        active=[SKILLMAP.get(w.split("::")[-1].lower(),w.split("::")[-1]) for w in e_list]
+        m_list=raw.get("MasteredWaza",{}).get("value",{}).get("values",[])
+        for w in m_list:
+            w_short=w.split("::")[-1]
+            if w_short.lower() not in SKILLMAP: miss["Skills"].add(w)
+        learned=[SKILLMAP.get(w.split("::")[-1].lower(),w.split("::")[-1]) for w in m_list]
         rh,ra,rd=int(extract_value(raw,"Rank_HP",0))*3,int(extract_value(raw,"Rank_Attack",0))*3,int(extract_value(raw,"Rank_Defence",0))*3
         iv_str=f"HP: {extract_value(raw,'Talent_HP','0')} (+{rh}%), ATK: {extract_value(raw,'Talent_Shot','0')} (+{ra}%), DEF: {extract_value(raw,'Talent_Defense','0')} (+{rd}%)"
         nick=raw.get("NickName",{}).get("value","Unknown")
@@ -424,6 +437,11 @@ def count_pals_found(data, player_pals_count, log_folder, current_save_path, sav
         owner_pals_grouped[target_id][lbl].append(info)
         if is_worker: player_pals_count["worker_dropped"]=player_pals_count.get("worker_dropped",0)+1
         else: player_pals_count[u_str]=player_pals_count.get(u_str,0)+1
+    if any(miss.values()):
+        with open(os.path.join(log_folder, "missing_assets.log"), "w", encoding="utf-8") as f:
+            for cat, items in miss.items():
+                if items:
+                    f.write(f"[{cat}]\n" + "\n".join(sorted(items)) + "\n\n")
     for uid,containers in owner_pals_grouped.items():
         pname=owner_nicknames.get(uid,'Unknown')
         sname=sanitize_filename(pname.encode('utf-8','replace').decode('utf-8'))
@@ -1252,7 +1270,7 @@ def delete_duplicated_players():
         ) + "\n")
     print(t("players.duplicate.marked", count=len(deleted_players)))
 def refresh_all():
-    global guild_tree, base_tree, player_tree, loaded_level_json, PLAYER_PAL_COUNTS, PLAYER_DETAILS_CACHE, guild_result, base_result, player_result
+    global guild_tree, base_tree, player_tree, loaded_level_json, PLAYER_PAL_COUNTS, PLAYER_DETAILS_CACHE, guild_result, base_result, player_result, base_guild_lookup
     guild_tree.delete(*guild_tree.get_children())
     base_tree.delete(*base_tree.get_children())
     player_tree.delete(*player_tree.get_children())
@@ -1262,14 +1280,21 @@ def refresh_all():
     if 'PLAYER_DETAILS_CACHE' not in globals():
         globals()['PLAYER_DETAILS_CACHE'] = {}
     PLAYER_DETAILS_CACHE = {}
-    for g in loaded_level_json['properties']['worldSaveData']['value']['GroupSaveDataMap']['value']:
-        if g['value']['GroupType']['value']['value']=='EPalGroupType::Guild':
-            name=g['value']['RawData']['value'].get('guild_name',"Unknown")
-            gid=as_uuid(g['key'])
-            guild_tree.insert("", "end", values=(name,gid))
-    on_base_search()
-    used=set()
-    for uid,name,gid,seen,level in get_players():
+    wsd = loaded_level_json['properties']['worldSaveData']['value']
+    for g in wsd['GroupSaveDataMap']['value']:
+        if g['value']['GroupType']['value']['value'] == 'EPalGroupType::Guild':
+            name = g['value']['RawData']['value'].get('guild_name', "Unknown")
+            gid = as_uuid(g['key'])
+            guild_tree.insert("", "end", values=(name, gid))
+    base_list = wsd.get('BaseCampSaveData', {}).get('value', [])
+    for b in base_list:
+        base_id = as_uuid(b['key'])
+        info = base_guild_lookup.get(base_id, {"GuildName": "No Guild", "GuildID": "N/A"})
+        guild_name = info["GuildName"]
+        guild_id = info["GuildID"]
+        base_tree.insert("", "end", values=(base_id, guild_id, guild_name))
+    used = set()
+    for uid, name, gid, seen, level in get_players():
         stripped_uid = uid.replace('-', '').lower()
         PLAYER_DETAILS_CACHE[stripped_uid] = {
             'level': level,
@@ -1278,11 +1303,11 @@ def refresh_all():
             'uid_full': uid,
             'gid': gid
         }
-        iid=uid
-        c=1
+        iid = uid
+        c = 1
         while iid in used:
-            iid=f"{uid}_{c}"
-            c+=1
+            iid = f"{uid}_{c}"
+            c += 1
         used.add(iid)
         pal_count = PLAYER_PAL_COUNTS.get(uid, 0)
         guild_name = get_guild_name_by_id(gid)
@@ -1308,18 +1333,22 @@ def on_guild_search(q=None):
         if q in name.lower() or q in gid.lower():
             guild_tree.insert("", "end", values=(name, gid))
 def on_base_search(q=None):
-    global base_tree, base_search_var, base_guild_lookup, guild_tree     
+    global base_tree, base_search_var, base_guild_lookup, guild_tree, loaded_level_json
     if q is None:
         q = base_search_var.get()
     q = q.lower()
     selected_gid = None
     selected_items = guild_tree.selection()
     if selected_items:
-        selected_gid = guild_tree.item(selected_items[0], 'values')[1]        
-    base_tree.delete(*base_tree.get_children())    
+        selected_gid = guild_tree.item(selected_items[0], 'values')[1]
+    base_tree.delete(*base_tree.get_children())
     if 'base_guild_lookup' not in globals() or not globals().get('base_guild_lookup'):
-        return        
+        return
+    wsd = loaded_level_json['properties']['worldSaveData']['value']
+    current_base_ids = {as_uuid(b['key']) for b in wsd.get('BaseCampSaveData', {}).get('value', [])}
     for base_id, info in base_guild_lookup.items():
+        if base_id not in current_base_ids:
+            continue
         guild_name = info["GuildName"]
         guild_id = info["GuildID"]
         if selected_gid is not None and guild_id != selected_gid:
@@ -1486,416 +1515,415 @@ def pil_text_to_surface(text, size=20, color=(255,255,255)):
     ImageDraw.Draw(img).text((-bbox[0], -bbox[1]), text, font=font, fill=color)
     return pygame.image.fromstring(img.tobytes(), img.size, img.mode)
 def show_base_map():
-    global srcGuildMapping, loaded_level_json
-    folder=current_save_path
+    global loaded_level_json
+    folder = current_save_path
     if not folder:
-        messagebox.showerror(t("error.title"),t("guild.rebuild.no_save"))
+        messagebox.showerror(t("error.title"), t("guild.rebuild.no_save"))
         return
-    if srcGuildMapping is None:
-        messagebox.showwarning(t("warning.title"),t("warning.no_data_loaded"))
-        return
-    tick=loaded_level_json['properties']['worldSaveData']['value']['GameTimeSaveData']['value']['RealDateTimeTicks']['value']
+    wsd = loaded_level_json['properties']['worldSaveData']['value']
+    tick = wsd['GameTimeSaveData']['value']['RealDateTimeTicks']['value']
     pygame.init()
-    base_dir=os.path.dirname(os.path.abspath(__file__))
-    wm_path=os.path.join(base_dir,"resources","worldmap.png")
-    icon_path=os.path.join(base_dir,"resources","pal.ico")
-    base_icon_path=os.path.join(base_dir,"resources","baseicon.png")
-    font_path=os.path.join(base_dir,"resources","NotoSansCJKsc-Regular.otf")
-    orig_map_raw=pygame.image.load(wm_path)
-    mw,mh=orig_map_raw.get_size()
-    sidebar_width=420
-    w,h=min(mw,1200)+sidebar_width,min(mh,800)
-    screen=pygame.display.set_mode((w,h),pygame.RESIZABLE)
-    pygame.display.set_caption(t("map.viewer"))
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    wm_path = os.path.join(base_dir, "resources", "worldmap.png")
+    icon_path = os.path.join(base_dir, "resources", "pal.ico")
+    base_icon_path = os.path.join(base_dir, "resources", "baseicon.png")
+    font_path = os.path.join(base_dir, "resources", "NotoSansCJKsc-Regular.otf")
+    orig_map_raw = pygame.image.load(wm_path)
+    mw, mh = orig_map_raw.get_size()
+    sidebar_w = 420
+    w, h = min(mw, 1200) + sidebar_w, min(mh, 800)
+    map_w = w - sidebar_w
+    screen = pygame.display.set_mode((w, h), pygame.RESIZABLE)
+    pygame.display.set_caption(f"PST - {t('map.viewer')}")
     if os.path.exists(icon_path):
         try:
-            icon_surface=pygame.image.load(icon_path)
+            icon_surface = pygame.image.load(icon_path)
             pygame.display.set_icon(icon_surface)
-        except:
-            pass
-    orig_map=orig_map_raw.convert_alpha()
-    base_icon=pygame.image.load(base_icon_path).convert_alpha()
-    base_icon=pygame.transform.smoothscale(base_icon,(24,24))
-    font=pygame.font.Font(font_path,12)
-    small_font=pygame.font.Font(font_path,10)
-    tooltip_font=pygame.font.Font(font_path,10)
-    tooltip_bg_color=(50,50,50,220)
-    tooltip_text_color=(255,255,255)
-    input_bg_color=(40,40,40)
-    input_text_color=(255,255,255)
-    marker_rects=[]
-    min_zoom=min((w-sidebar_width)/mw,h/mh)
-    zoom=max(min_zoom,0.15)
-    offset_x=(mw-(w-sidebar_width)/zoom)/2
-    offset_y=(mh-h/zoom)/2
-    dragging=False
-    drag_start=(0,0)
-    offset_origin=(0,0)
-    clock=pygame.time.Clock()
-    running=True
-    popup_info=None
-    user_input=""
-    active_input=False
-    scroll_offset=0
-    item_height=26
-    header_height=item_height
-    expanded_guilds=set()
-    selected_item=None
-    search_placeholder=t("map.search.placeholder")
-    input_cleared=False
-    glow_start_time=None
-    def to_image_coordinates(x_world,y_world,width,height):
-        x_min,x_max=-1000,1000
-        y_min,y_max=-1000,1000
-        x_scale=width/(x_max-x_min)
-        y_scale=height/(y_max-y_min)
-        x_img=(x_world-x_min)*x_scale
-        y_img=(y_max-y_world)*y_scale
-        return int(x_img),int(y_img)
-    def get_base_coords(b):
+        except: pass
+    orig_map = orig_map_raw.convert_alpha()
+    base_icon = pygame.image.load(base_icon_path).convert_alpha()
+    base_icon = pygame.transform.smoothscale(base_icon, (28, 28))
+    font = pygame.font.Font(font_path, 13)
+    small_font = pygame.font.Font(font_path, 11)
+    marker_rects = []
+    active_shocks = []
+    active_blocked_effects = []
+    shake_amount = 0
+    def trigger_nuke(px, py):
+        nonlocal shake_amount
+        shake_amount = 20
+        active_shocks.append({'pos': (px, py), 'radius': 0, 'alpha': 255, 'start_time': time.time()})
+    def trigger_blocked(px, py, target_id=None):
+        active_blocked_effects.append({'pos': (px, py), 'alpha': 255, 'start_time': time.time(), 'target_id': target_id})
+    def to_image_coordinates(x_world, y_world, width, height):
+        x_min, x_max = -1000, 1000
+        y_min, y_max = -1000, 1000
+        x_scale, y_scale = width / (x_max - x_min), height / (y_max - y_min)
+        return int((x_world - x_min) * x_scale), int((y_max - y_world) * y_scale)
+    def from_image_coordinates(x_img, y_img, width, height):
+        x_min, x_max = -1000, 1000
+        y_min, y_max = -1000, 1000
+        x_world = (x_img / width) * (x_max - x_min) + x_min
+        y_world = y_max - (y_img / height) * (y_max - y_min)
+        return int(x_world), int(y_world)
+    def get_base_coords(b_val):
         try:
-            offset=b["value"]["RawData"]["value"]["transform"]["translation"]
-            x,y=sav_to_map(offset['x'],offset['y'],new=True)
-            return x,y
-        except:
-            return None,None
-    def get_leader_name(gdata):
-        admin_uid=gdata['value']['RawData']['value'].get('admin_player_uid',None)
-        if not admin_uid:
-            return t("map.unknown.leader")
-        players=gdata['value']['RawData']['value'].get('players',[])
-        for p in players:
-            uid_raw=p.get('player_uid')
-            uid=str(uid_raw) if uid_raw else ''
-            if uid==admin_uid:
-                return p.get('player_info',{}).get('player_name',admin_uid)
-        return admin_uid
-    def get_last_seen(gdata,tick):
-        players=gdata['value']['RawData']['value'].get('players',[])
-        last_online_list=[p.get('player_info',{}).get('last_online_real_time') for p in players if p.get('player_info',{}).get('last_online_real_time')]
-        if not last_online_list:
-            return t("map.unknown.lastseen")
-        most_recent=max(last_online_list)
-        diff=(tick-most_recent)/1e7
-        if diff<0:
-            diff=0
-        return format_duration(diff)
-    def format_duration(seconds):
-        days=int(seconds//86400)
-        hours=int((seconds%86400)//3600)
-        mins=int((seconds%3600)//60)
-        if days>0:
-            return f"{days}{t('map.time.day')} {hours}{t('map.time.hour')}"
-        if hours>0:
-            return f"{hours}{t('map.time.hour')} {mins}{t('map.time.minute')}"
-        return f"{mins}{t('map.time.minute')}"
-    def clean_text(text):
-        return text.encode('utf-16','surrogatepass').decode('utf-16','ignore')
-    def truncate_text(text,max_width):
-        text=clean_text(text)
-        while small_font.size(text)[0]>max_width and len(text)>3:
-            text=text[:-1]
-        if len(text)<len(clean_text(text)):
-            text=text[:-3]+"..."
-        return text
-    def get_guild_bases():
-        guilds={}
-        for gid,gdata in srcGuildMapping.GuildSaveDataMap.items():
-            base_ids=gdata['value']['RawData']['value'].get('base_ids',[])
-            if not base_ids:
-                continue
-            guild_name=gdata['value']['RawData']['value'].get('guild_name',t("map.unknown.guild"))
-            leader_name=get_leader_name(gdata)
-            last_seen=get_last_seen(gdata,tick)
-            bases=[]
-            for base_id in base_ids:
-                base_data=srcGuildMapping.BaseCampMapping.get(base_id)
-                if base_data:
-                    bx,by=get_base_coords(base_data)
-                    bases.append({'base_id':base_id,'coords':(bx,by),'data':base_data,'guild_name':guild_name,'leader_name':leader_name,'last_seen':last_seen})
-            if not bases:
-                continue
-            guilds[gid]={'guild_name':guild_name,'leader_name':leader_name,'last_seen':last_seen,'bases':bases}
+            translation = b_val['RawData']['value']['transform']['translation']
+            return sav_to_map(translation['x'], translation['y'], new=True)
+        except: return None, None
+    def get_leader_name(g_val):
+        admin_uid = str(g_val['RawData']['value'].get('admin_player_uid', ''))
+        for p in g_val['RawData']['value'].get('players', []):
+            if str(p.get('player_uid', '')) == admin_uid: return p.get('player_info', {}).get('player_name', admin_uid)
+        return admin_uid if admin_uid else t("map.unknown.leader")
+    def get_last_seen(g_val, current_tick):
+        times = [p.get('player_info', {}).get('last_online_real_time') for p in g_val['RawData']['value'].get('players', []) if p.get('player_info', {}).get('last_online_real_time')]
+        if not times: return t("map.unknown.lastseen")
+        diff = (current_tick - max(times)) / 1e7
+        days, hours, mins = int(diff // 86400), int((diff % 86400) // 3600), int((diff % 3600) // 60)
+        if days > 0: return f"{days}d {hours}h"
+        if hours > 0: return f"{hours}h {mins}m"
+        return f"{mins}m"
+    def truncate_text(text, max_w, use_font):
+        text = text.encode('utf-16', 'surrogatepass').decode('utf-16', 'ignore')
+        if use_font.size(text)[0] <= max_w: return text
+        while use_font.size(text + "...")[0] > max_w and len(text) > 1: text = text[:-1]
+        return text + "..."
+    def get_guild_bases_live():
+        guilds = {}
+        wsd_live = loaded_level_json['properties']['worldSaveData']['value']
+        group_map = wsd_live.get('GroupSaveDataMap', {}).get('value', [])
+        base_map = {str(b['key']).replace('-', ''): b['value'] for b in wsd_live.get('BaseCampSaveData', {}).get('value', [])}
+        for entry in group_map:
+            gid, g_val = str(entry['key']), entry['value']
+            base_ids = g_val['RawData']['value'].get('base_ids', [])
+            valid_bases = []
+            for bid in base_ids:
+                bid_str = str(bid).replace('-', '')
+                if bid_str in base_map:
+                    bx, by = get_base_coords(base_map[bid_str])
+                    valid_bases.append({'base_id': bid, 'coords': (bx, by), 'data': {'key': bid, 'value': base_map[bid_str]}, 'guild_id': gid, 'guild_name': g_val['RawData']['value'].get('guild_name', t("map.unknown.guild")), 'leader_name': get_leader_name(g_val)})
+            if len(valid_bases) > 0:
+                guilds[gid] = {'guild_name': g_val['RawData']['value'].get('guild_name', t("map.unknown.guild")), 'leader_name': get_leader_name(g_val), 'last_seen': get_last_seen(g_val, tick), 'bases': valid_bases}
         return guilds
-    def filter_guilds_and_bases(guilds,search_text):
-        if not search_text:
-            return guilds
-        terms=search_text.lower().split()
-        filtered={}
-        for gid,g in guilds.items():
-            gn=g['guild_name'].lower()
-            ln=g['leader_name'].lower()
-            ls=g['last_seen'].lower()
-            bases=[]
-            for b in g['bases']:
-                bid=str(b['base_id']).lower()
-                coords_str=f"x:{int(b['coords'][0])}, y:{int(b['coords'][1])}" if b['coords'][0] is not None else ""
-                if all(any(term in field for field in [bid,coords_str,gn,ln,ls]) for term in terms):
-                    bases.append(b)
-            guild_match=all(any(term in field for field in [gn,ln,ls]) for term in terms)
-            if bases or guild_match:
-                filtered[gid]=dict(g)
-                filtered[gid]['bases']=bases
+    def filter_guilds_and_bases(guilds, search_text):
+        if not search_text: return guilds
+        terms = search_text.lower().split()
+        filtered = {}
+        for gid, g in guilds.items():
+            gn, ln, ls = g['guild_name'].lower(), g['leader_name'].lower(), g['last_seen'].lower()
+            bases = [b for b in g['bases'] if all(any(term in field for field in [str(b['base_id']).lower(), f"x:{int(b['coords'][0])}, y:{int(b['coords'][1])}" if b['coords'][0] is not None else "", gn, ln, ls]) for term in terms)]
+            if bases:
+                filtered[gid] = dict(g)
+                filtered[gid]['bases'] = bases
         return filtered
-    def pil_text_to_surface(text,size,color):
-        surf=font.render(text,True,color)
-        return surf
-    def draw_sidebar_header():
-        sidebar_x=w-sidebar_width+10
-        y_header=36+30
-        screen.blit(font.render(t("map.header.guild"),True,(180,180,180)),(sidebar_x,y_header))
-        screen.blit(font.render(t("map.header.leader"),True,(180,180,180)),(sidebar_x+110,y_header))
-        screen.blit(font.render(t("map.header.lastseen"),True,(180,180,180)),(sidebar_x+210,y_header))
-        screen.blit(font.render(t("map.header.bases"),True,(180,180,180)),(sidebar_x+300,y_header))
-    def draw_guild_item(guild,y,selected):
-        sidebar_x=w-sidebar_width+10
-        color=(255,200,100) if selected else (255,255,255)
-        max_widths=[100,90,80,40]
-        gn=truncate_text(guild['guild_name'],max_widths[0])
-        ln=truncate_text(guild['leader_name'],max_widths[1])
-        ls=truncate_text(guild['last_seen'],max_widths[2])
-        nb=str(len(guild['bases']))
-        screen.blit(font.render(gn,True,color),(sidebar_x,y))
-        screen.blit(font.render(ln,True,color),(sidebar_x+110,y))
-        screen.blit(font.render(ls,True,color),(sidebar_x+210,y))
-        screen.blit(font.render(nb,True,color),(sidebar_x+300,y))
-    def draw_base_item(base,y,selected):
-        sidebar_x=w-sidebar_width+30
-        color=(255,200,100) if selected else (200,200,200)
-        max_widths=[110,130]
-        bid=str(base['base_id'])
-        coords=f"x:{int(base['coords'][0])}, y:{int(base['coords'][1])}" if base['coords'][0] is not None else t("map.na")
-        bid=truncate_text(bid,max_widths[0])
-        coords=truncate_text(coords,max_widths[1])
-        screen.blit(small_font.render(bid,True,color),(sidebar_x,y))
-        screen.blit(small_font.render(coords,True,color),(sidebar_x+120,y))
-    def draw_totals():
-        sidebar_x=w-sidebar_width+10
-        total_guilds=len(filtered_guilds)
-        total_bases=sum(len(g['bases']) for g in filtered_guilds.values())
-        text=f"{t('map.totals.guilds')}: {total_guilds} | {t('map.totals.bases')}: {total_bases}"
-        screen.blit(font.render(text,True,(180,180,180)),(sidebar_x,40))
-    guilds_all=get_guild_bases()
-    filtered_guilds={}
-    scroll_offset=0
-    while running:
-        mouse_pos=pygame.mouse.get_pos()
-        marker_rects.clear()
-        for ev in pygame.event.get():
-            if ev.type==pygame.QUIT:
-                running=False
-            elif ev.type==pygame.KEYDOWN:
-                if active_input:
-                    if ev.key==pygame.K_BACKSPACE:
-                        user_input=user_input[:-1]
-                    elif ev.key==pygame.K_RETURN:
-                        active_input=False
-                    else:
-                        if ev.unicode.isprintable():
-                            user_input+=ev.unicode
-                else:
-                    if ev.key==pygame.K_f:
-                        active_input=True
-                        input_cleared=False
-            elif ev.type==pygame.MOUSEBUTTONDOWN:
-                if ev.button==1:
-                    dragging=True
-                    drag_start=ev.pos
-                    offset_origin=(offset_x,offset_y)
-                    sidebar_rect=pygame.Rect(w-sidebar_width,0,sidebar_width,h)
-                    input_rect=pygame.Rect(w-sidebar_width+10,4,sidebar_width-20,26)
-                    if input_rect.collidepoint(ev.pos):
-                        active_input=True
-                        if not input_cleared:
-                            user_input=""
-                            input_cleared=True
-                    elif sidebar_rect.collidepoint(ev.pos):
-                        rel_y=ev.pos[1]+scroll_offset-header_height-36-30
-                        y_cursor=0
-                        clicked=False
-                        for gid,guild in filtered_guilds.items():
-                            if y_cursor<=rel_y<y_cursor+item_height:
-                                if gid in expanded_guilds:
-                                    expanded_guilds.remove(gid)
-                                else:
-                                    expanded_guilds.clear()
-                                    expanded_guilds.add(gid)
-                                selected_item=('guild',gid)
-                                clicked=True
-                                break
-                            y_cursor+=item_height
-                            if gid in expanded_guilds:
-                                for base in guild['bases']:
-                                    if y_cursor<=rel_y<y_cursor+item_height:
-                                        selected_item=('base',base)
-                                        bx,by=base['coords']
-                                        if bx is not None and by is not None:
-                                            px,py=to_image_coordinates(bx,by,mw,mh)
-                                            zoom=max(1.5,zoom)
-                                            offset_x=px-(w-sidebar_width)/(2*zoom)
-                                            offset_y=py-h/(2*zoom)
-                                            glow_start_time=time.time()
-                                        clicked=True
-                                        break
-                                    y_cursor+=item_height
-                            if clicked:
-                                break
-                        if not clicked:
-                            selected_item=None
-                        active_input=False
-                elif ev.button==4 or ev.button==5:
-                    pass
-            elif ev.type==pygame.MOUSEBUTTONUP and ev.button==1:
-                dragging=False
-            elif ev.type==pygame.MOUSEMOTION and dragging:
-                dx,dy=ev.pos[0]-drag_start[0],ev.pos[1]-drag_start[1]
-                offset_x=offset_origin[0]-dx/zoom
-                offset_y=offset_origin[1]-dy/zoom
-            elif ev.type==pygame.MOUSEWHEEL:
-                mx,my=pygame.mouse.get_pos()
-                sidebar_x=w-sidebar_width
-                if mx>=sidebar_x:
-                    total_items=sum(len(g['bases'])+1 if gid in expanded_guilds else 1 for gid,g in filtered_guilds.items())
-                    max_scroll=max(0,total_items*item_height-(h-header_height-36-30-8))
-                    scroll_offset-=ev.y*item_height*3
-                    scroll_offset=max(0,min(scroll_offset,max_scroll))
-                else:
-                    old_zoom=zoom
-                    zoom=min(max(zoom*(1.1 if ev.y>0 else 0.9),min_zoom),5.0)
-                    if zoom!=old_zoom:
-                        ox_rel=offset_x+mx/old_zoom
-                        oy_rel=offset_y+my/old_zoom
-                        offset_x=ox_rel-mx/zoom
-                        offset_y=oy_rel-my/zoom
-            elif ev.type==pygame.VIDEORESIZE:
-                w,h=ev.w,ev.h
-                screen=pygame.display.set_mode((w,h),pygame.RESIZABLE)
-        w,h=screen.get_size()
-        map_w=w-sidebar_width
-        rect_w=min(int(map_w/zoom),mw)
-        rect_h=min(int(h/zoom),mh)
-        offset_x=max(0,min(offset_x,mw-rect_w))
-        offset_y=max(0,min(offset_y,mh-rect_h))
-        rect=pygame.Rect(int(offset_x),int(offset_y),rect_w,rect_h)
-        map_rect=pygame.Rect(0,0,mw,mh)
-        rect.clamp_ip(map_rect)
-        sub=orig_map.subsurface(rect).copy()
-        scaled_sub=pygame.transform.smoothscale(sub,(map_w,h))
-        screen.fill((40,40,40))
-        screen.blit(scaled_sub,(0,0))
-        current_time=time.time()
-        for gid,guild in filtered_guilds.items():
-            for base in guild['bases']:
-                bx,by=base['coords']
-                if bx is None or by is None:
-                    continue
-                px,py=to_image_coordinates(bx,by,mw,mh)
-                px=(px-offset_x)*zoom
-                py=(py-offset_y)*zoom
-                if 0<=px<map_w and 0<=py<h:
-                    if selected_item and selected_item[0]=='base' and selected_item[1]==base and glow_start_time:
-                        elapsed=current_time-glow_start_time
-                        if elapsed<5:
-                            glow_alpha=int(128+127*(1+math.sin(elapsed*10))/2)
-                            glow_surf=pygame.Surface((48,48),pygame.SRCALPHA)
-                            pygame.draw.circle(glow_surf,(255,215,0,glow_alpha),(24,24),22)
-                            screen.blit(glow_surf,(int(px)-24,int(py)-24))
-                        else:
-                            glow_start_time=None
-                    pygame.draw.circle(screen,(255,0,0),(int(px),int(py)),16,3)
-                    rect_marker=pygame.Rect(int(px)-12,int(py)-12,24,24)
-                    marker_rects.append((base,rect_marker))
-                    screen.blit(base_icon,rect_marker.topleft)
-        sidebar_rect=pygame.Rect(w-sidebar_width,0,sidebar_width,h)
-        pygame.draw.rect(screen,(30,30,30),sidebar_rect)
-        input_rect=pygame.Rect(w-sidebar_width+10,4,sidebar_width-20,26)
-        pygame.draw.rect(screen,input_bg_color,input_rect,border_radius=4)
-        if active_input:
-            pygame.draw.rect(screen,(255,215,0),input_rect,width=2,border_radius=4)
-        if not user_input and not active_input:
-            placeholder_surf=font.render(search_placeholder,True,(120,120,120))
-            screen.blit(placeholder_surf,(input_rect.x+6,input_rect.y+4))
-        else:
-            input_surf=font.render(user_input,True,input_text_color)
-            screen.blit(input_surf,(input_rect.x+6,input_rect.y+4))
-        draw_sidebar_header()
-        sidebar_x=w-sidebar_width+10
-        visible_height=h-header_height-36-30-8
-        y_cursor=header_height+36+30+4-scroll_offset
-        total_items=0
-        filtered_guilds=filter_guilds_and_bases(get_guild_bases(),user_input)
-        draw_totals()
-        for gid,guild in filtered_guilds.items():
-            is_selected=selected_item and selected_item[0]=='guild' and selected_item[1]==gid
-            draw_guild_item(guild,y_cursor,is_selected)
-            total_items+=1
-            y_cursor+=item_height
+    def draw_sidebar_ui(win_w, win_h):
+        sidebar_surface = pygame.Surface((sidebar_w, win_h))
+        sidebar_surface.fill((35, 35, 35))
+        pygame.draw.line(sidebar_surface, (60, 60, 60), (0, 0), (0, win_h), 2)
+        input_rect = pygame.Rect(15, 12, sidebar_w - 30, 32)
+        pygame.draw.rect(sidebar_surface, (25, 25, 25), input_rect, border_radius=6)
+        if active_input: pygame.draw.rect(sidebar_surface, (0, 150, 255), input_rect, width=2, border_radius=6)
+        txt = user_input if user_input or active_input else t("map.search.placeholder")
+        sidebar_surface.blit(font.render(txt, True, (220, 220, 220) if user_input or active_input else (100, 100, 100)), (input_rect.x + 10, input_rect.y + 7))
+        y_h = 60
+        pygame.draw.rect(sidebar_surface, (45, 45, 45), (5, y_h, sidebar_w - 10, 30), border_radius=4)
+        cols = [(t("map.header.guild"), 15), (t("map.header.leader"), 135), (t("map.header.lastseen"), 245), (t("map.header.bases"), 335)]
+        for lbl, off in cols: sidebar_surface.blit(small_font.render(lbl, True, (160, 160, 160)), (off, y_h + 7))
+        y_c = 100 - scroll_offset
+        for gid, guild in filtered_guilds.items():
+            draw_list_item_to_surf(sidebar_surface, gid, guild, y_c, selected_item and selected_item[1] == gid, mouse_pos[0] > map_w and pygame.Rect(map_w + 5, y_c, sidebar_w - 10, item_height).collidepoint(mouse_pos))
+            y_c += item_height
             if gid in expanded_guilds:
-                for base in guild['bases']:
-                    is_selected=selected_item and selected_item[0]=='base' and selected_item[1]==base
-                    draw_base_item(base,y_cursor,is_selected)
-                    total_items+=1
-                    y_cursor+=item_height
-        mx,my=mouse_pos
-        hovered_item=None
-        for base,rect_marker in marker_rects:
-            if rect_marker.collidepoint(mx,my):
-                hovered_item=('base',base)
-                break
-        if not hovered_item:
-            y_cursor=header_height+36+30+4-scroll_offset
-            for gid,guild in filtered_guilds.items():
-                rect_guild=pygame.Rect(w-sidebar_width+10,y_cursor,sidebar_width-20,item_height)
-                if rect_guild.collidepoint(mouse_pos):
-                    hovered_item=('guild',gid,guild)
-                    break
-                y_cursor+=item_height
-                if gid in expanded_guilds:
-                    for base in guild['bases']:
-                        rect_base=pygame.Rect(w-sidebar_width+30,y_cursor,sidebar_width-50,item_height)
-                        if rect_base.collidepoint(mouse_pos):
-                            hovered_item=('base',base)
-                            break
-                        y_cursor+=item_height
-                if hovered_item:
-                    break
-        if hovered_item:
-            if hovered_item[0]=='base':
-                base=hovered_item[1]
-                guild_name=base.get('guild_name',t("map.unknown.guild"))
-                leader_name=base.get('leader_name',t("map.unknown.leader"))
-                last_seen=base.get('last_seen',t("map.unknown.lastseen"))
-                base_id=base['base_id']
-                coords=base['coords']
-                tooltip_lines=[
-                    f"{t('map.tooltip.guild')}: {guild_name} | {t('map.tooltip.leader')}: {leader_name} | {t('map.tooltip.lastseen')}: {last_seen}",
-                    f"{t('map.tooltip.baseid')}: {base_id} | {t('map.tooltip.coords')}: x:{int(coords[0])}, y:{int(coords[1])}" if coords[0] is not None else f"{t('map.tooltip.coords')}: {t('map.na')}"
-                ]
-            else:
-                gid,guild=hovered_item[1],hovered_item[2]
-                tooltip_lines=[
-                    f"{t('map.tooltip.guild')}: {guild['guild_name']} | {t('map.tooltip.leader')}: {guild['leader_name']} | {t('map.tooltip.lastseen')}: {guild['last_seen']}",
-                    f"{t('map.tooltip.bases')}: {len(guild['bases'])}"
-                ]
-            max_width=0
-            for line in tooltip_lines:
-                bbox=font.get_rect(line) if hasattr(font,"get_rect") else font.size(line)
-                w_line=bbox[0] if isinstance(bbox,tuple) else bbox.width
-                if w_line>max_width:
-                    max_width=w_line
-            tooltip_height=len(tooltip_lines)*(font.get_linesize()+2)+6
-            tooltip_width=max_width+10
-            x_tip,y_tip=mx+15,my+15
-            if x_tip+tooltip_width>w-sidebar_width:
-                x_tip=mx-tooltip_width-15
-            if y_tip+tooltip_height>h:
-                y_tip=my-tooltip_height-15
-            s=pygame.Surface((tooltip_width,tooltip_height),pygame.SRCALPHA)
-            s.fill(tooltip_bg_color)
-            for i,line in enumerate(tooltip_lines):
-                txt_surf=pil_text_to_surface(line,10,tooltip_text_color)
-                s.blit(txt_surf,(5,3+i*(10+2)))
-            screen.blit(s,(x_tip,y_tip))
+                for b in guild['bases']:
+                    br = pygame.Rect(25, y_c, sidebar_w - 35, item_height - 4)
+                    if (selected_item and selected_item[0] == 'base' and selected_item[1] == b): pygame.draw.rect(sidebar_surface, (70, 70, 70), br, border_radius=4)
+                    sidebar_surface.blit(small_font.render(f"X: {int(b['coords'][0])} Y: {int(b['coords'][1])}", True, (0, 180, 255)), (br.x + 10, br.y + 6))
+                    sidebar_surface.blit(small_font.render(str(b['base_id'])[:12] + "...", True, (130, 130, 130)), (br.x + 120, br.y + 6))
+                    y_c += item_height
+        screen.blit(sidebar_surface, (win_w - sidebar_w, 0))
+    def draw_list_item_to_surf(surf, gid, guild, y, is_selected, is_hovered):
+        rect = pygame.Rect(5, y, sidebar_w - 10, item_height - 2)
+        if is_selected: pygame.draw.rect(surf, (60, 80, 100), rect, border_radius=4)
+        elif is_hovered: pygame.draw.rect(surf, (50, 50, 50), rect, border_radius=4)
+        color = (255, 255, 255) if not is_selected else (200, 230, 255)
+        surf.blit(font.render(truncate_text(guild['guild_name'], 110, font), True, color), (rect.x + 10, rect.y + 6))
+        surf.blit(small_font.render(truncate_text(guild['leader_name'], 100, small_font), True, (200, 200, 200)), (rect.x + 130, rect.y + 8))
+        surf.blit(small_font.render(guild['last_seen'], True, (180, 180, 180)), (rect.x + 240, rect.y + 8))
+        pygame.draw.circle(surf, (0, 180, 255), (rect.x + 350, rect.y + 14), 10)
+        cnt = small_font.render(str(len(guild['bases'])), True, (255, 255, 255))
+        surf.blit(cnt, (rect.x + 350 - cnt.get_width()//2, rect.y + 14 - cnt.get_height()//2))
+    def draw_tooltip(lines, pos, m_w):
+        tw, th = max(small_font.size(l)[0] for l in lines) + 20, len(lines) * 18 + 10
+        tx, ty = pos[0] + 15, pos[1] + 15
+        if tx + tw > m_w: tx = pos[0] - tw - 15
+        if ty + th > h: ty = pos[1] - th - 15
+        ts = pygame.Surface((tw, th), pygame.SRCALPHA)
+        pygame.draw.rect(ts, (30, 30, 30, 230), (0, 0, tw, th), border_radius=8)
+        pygame.draw.rect(ts, (80, 80, 80, 255), (0, 0, tw, th), width=1, border_radius=8)
+        for i, l in enumerate(lines):
+            col = (0, 180, 255) if i == 0 else (255, 255, 255)
+            ts.blit(small_font.render(l, True, col), (10, 5 + i * 18))
+        screen.blit(ts, (tx, ty))
+    def get_initial_state(m_w, m_h):
+        init_min_zoom = min(m_w / mw, m_h / mh)
+        init_zoom = max(init_min_zoom, 0.15)
+        init_off_x = (mw - m_w / init_zoom) / 2
+        init_off_y = (mh - m_h / init_zoom) / 2
+        return init_zoom, init_off_x, init_off_y, init_zoom
+    zoom, offset_x, offset_y, absolute_min_zoom = get_initial_state(map_w, h)
+    target_zoom, target_offset_x, target_offset_y = zoom, offset_x, offset_y
+    is_animating, dragging, drag_start, offset_origin = False, False, (0, 0), (0, 0)
+    clock = pygame.time.Clock()
+    running, user_input, active_input = True, "", False
+    scroll_offset, item_height = 0, 30
+    expanded_guilds, selected_item, glow_start_time = set(), None, None
+    context_menu_pos, context_menu_target, last_click_time = None, None, 0
+    guilds_all = get_guild_bases_live()
+    while running:
+        mouse_pos = pygame.mouse.get_pos()
+        w, h = screen.get_size()
+        map_w = w - sidebar_w
+        if is_animating:
+            zoom += (target_zoom - zoom) * 0.1
+            offset_x += (target_offset_x - offset_x) * 0.1
+            offset_y += (target_offset_y - offset_y) * 0.1
+            if abs(offset_x - target_offset_x) < 0.1 and abs(zoom - target_zoom) < 0.001: is_animating = False
+        for ev in pygame.event.get():
+            if ev.type == pygame.QUIT: running = False
+            elif ev.type == pygame.KEYDOWN:
+                if active_input:
+                    if ev.key == pygame.K_BACKSPACE: user_input = user_input[:-1]
+                    elif ev.key == pygame.K_RETURN: active_input = False
+                    elif ev.unicode.isprintable(): user_input += ev.unicode
+                elif ev.key == pygame.K_f: active_input = True
+                elif ev.key == pygame.K_r:
+                    target_zoom, target_offset_x, target_offset_y, _ = get_initial_state(map_w, h)
+                    is_animating = True
+                elif ev.key == pygame.K_ESCAPE: running = False
+            elif ev.type == pygame.MOUSEBUTTONDOWN:
+                if ev.button == 1:
+                    now = time.time()
+                    is_double = (now - last_click_time < 0.3)
+                    last_click_time = now
+                    if context_menu_pos:
+                        if context_menu_target[0] == 'base': opts = [t("delete.base"), t("button.export")]
+                        else: opts = [t("guild.rename.title"), t("delete.guild"), t("button.import")]
+                        cmr = pygame.Rect(context_menu_pos[0], context_menu_pos[1], 160, len(opts) * 32)
+                        if cmr.collidepoint(ev.pos):
+                            idx = (ev.pos[1] - context_menu_pos[1]) // 32
+                            if 0 <= idx < len(opts):
+                                act = opts[idx]
+                                if act == t("delete.base"):
+                                    bid, bx, by = str(context_menu_target[1]['base_id']), context_menu_target[1]['coords'][0], context_menu_target[1]['coords'][1]
+                                    for item in base_tree.get_children():
+                                        if str(base_tree.item(item)['values'][0]) == bid: base_tree.selection_set(item); delete_selected_base(); break
+                                    guilds_all = get_guild_bases_live()
+                                    still_exists = any(bid == str(b['base_id']) for g in guilds_all.values() for b in g['bases'])
+                                    cx, cy = to_image_coordinates(bx, by, mw, mh)
+                                    if not still_exists:
+                                        trigger_nuke((cx - offset_x) * zoom, (cy - offset_y) * zoom)
+                                        target_zoom, target_offset_x, target_offset_y, _ = get_initial_state(map_w, h); is_animating = True
+                                    else: trigger_blocked((cx - offset_x) * zoom, (cy - offset_y) * zoom, bid)
+                                elif act == t("delete.guild"):
+                                    gid = str(context_menu_target[1])
+                                    for item in guild_tree.get_children():
+                                        if str(guild_tree.item(item)['values'][1]) == gid: guild_tree.selection_set(item); delete_selected_guild(); break
+                                    guilds_all = get_guild_bases_live()
+                                    if gid not in guilds_all:
+                                        trigger_nuke(map_w // 2, h // 2)
+                                        target_zoom, target_offset_x, target_offset_y, _ = get_initial_state(map_w, h); is_animating = True
+                                elif act == t("guild.rename.title"):
+                                    gid = str(context_menu_target[1])
+                                    for item in guild_tree.get_children():
+                                        if str(guild_tree.item(item)['values'][1]) == gid: guild_tree.selection_set(item); rename_guild(); break
+                                    guilds_all = get_guild_bases_live()
+                                elif act == t("button.export"):
+                                    bid = str(context_menu_target[1]['base_id'])
+                                    exp_data = export_base_json(loaded_level_json, bid)
+                                    if exp_data:
+                                        save_path = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")], initialfile=f"base_{bid[:8]}.json")
+                                        if save_path:
+                                            class CustomEncoder(json.JSONEncoder):
+                                                def default(self, obj):
+                                                    if hasattr(obj, 'bytes') or obj.__class__.__name__ == 'UUID':
+                                                        return str(obj)
+                                                    return super().default(obj)
+                                            with open(save_path, 'w', encoding='utf-8') as f:
+                                                json.dump(exp_data, f, cls=CustomEncoder)
+                                            bx, by = context_menu_target[1]['coords']
+                                            cx, cy = to_image_coordinates(bx, by, mw, mh)
+                                            trigger_nuke((cx - offset_x) * zoom, (cy - offset_y) * zoom)
+                                            messagebox.showinfo(t("success.title"), t("base.export.success"))
+                                elif act == t("button.import"):
+                                    gid_str = str(context_menu_target[1])
+                                    import_file = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")])
+                                    if import_file:
+                                        with open(import_file, 'r', encoding='utf-8') as f: exp_data = json.load(f)
+                                        if import_base_json(loaded_level_json, exp_data, gid_str):
+                                            guilds_all = get_guild_bases_live()
+                                            try:
+                                                raw_t = exp_data["base_camp"]["value"]["RawData"]["value"]["transform"]["translation"]
+                                                bx, by = sav_to_map(raw_t['x'], raw_t['y'], new=True)
+                                                cx, cy = to_image_coordinates(bx, by, mw, mh)
+                                                target_zoom, target_offset_x, target_offset_y = 2.0, cx - map_w/(2*2.0), cy - h/(2*2.0)
+                                                is_animating, glow_start_time = True, time.time()
+                                                trigger_nuke(map_w // 2, h // 2)
+                                            except: pass
+                                            messagebox.showinfo(t("success.title"), t("base.import.success"))
+                        context_menu_pos = None
+                        continue
+                    if ev.pos[0] < map_w:
+                        hb = next((b for b, r in marker_rects if r.collidepoint(ev.pos)), None)
+                        if hb and is_double:
+                            bx, by = hb['coords']
+                            if bx is not None:
+                                cx, cy = to_image_coordinates(bx, by, mw, mh)
+                                target_zoom, glow_start_time = 2.5, time.time()
+                                target_offset_x, target_offset_y = cx - map_w / (2 * target_zoom), cy - h / (2 * target_zoom)
+                                is_animating, selected_item = True, ('base', hb)
+                                continue
+                        reset_rect = pygame.Rect(map_w - 30, h // 2 - 20, 30, 40)
+                        if reset_rect.collidepoint(ev.pos):
+                            target_zoom, target_offset_x, target_offset_y, _ = get_initial_state(map_w, h); is_animating = True
+                            continue
+                        dragging, drag_start, offset_origin, is_animating = True, ev.pos, (offset_x, offset_y), False
+                    else:
+                        if pygame.Rect(w - sidebar_w + 15, 12, sidebar_w - 30, 32).collidepoint(ev.pos): active_input = True
+                        else:
+                            active_input, rel_y = False, ev.pos[1] + scroll_offset - 100
+                            y_cursor, clicked = 0, False
+                            for gid, guild in filtered_guilds.items():
+                                if y_cursor <= rel_y < y_cursor + item_height:
+                                    if not is_double:
+                                        if gid in expanded_guilds: expanded_guilds.remove(gid)
+                                        else: expanded_guilds.add(gid)
+                                    selected_item, clicked = ('guild', gid), True
+                                    break
+                                y_cursor += item_height
+                                if gid in expanded_guilds:
+                                    for b in guild['bases']:
+                                        if y_cursor <= rel_y < y_cursor + item_height:
+                                            selected_item, clicked = ('base', b), True
+                                            if is_double:
+                                                bx, by = b['coords']
+                                                if bx is not None:
+                                                    cx, cy = to_image_coordinates(bx, by, mw, mh)
+                                                    target_zoom, glow_start_time = 2.5, time.time()
+                                                    target_offset_x, target_offset_y = cx - map_w / (2 * target_zoom), cy - h / (2 * target_zoom)
+                                                    is_animating = True
+                                            break
+                                        y_cursor += item_height
+                                if clicked: break
+                elif ev.button == 3:
+                    found = next((('base', b) for b, r in marker_rects if r.collidepoint(ev.pos)), None)
+                    if not found and ev.pos[0] > map_w:
+                        rel_y, y_cursor = ev.pos[1] + scroll_offset - 100, 0
+                        for gid, guild in filtered_guilds.items():
+                            if y_cursor <= rel_y < y_cursor + item_height: found = ('guild', gid); break
+                            y_cursor += item_height
+                            if gid in expanded_guilds:
+                                for b in guild['bases']:
+                                    if y_cursor <= rel_y < y_cursor + item_height: found = ('base', b); break
+                                    y_cursor += item_height
+                            if found: break
+                    if found: context_menu_pos, context_menu_target = ev.pos, found
+            elif ev.type == pygame.MOUSEBUTTONUP: dragging = False
+            elif ev.type == pygame.MOUSEMOTION and dragging:
+                dx, dy = ev.pos[0] - drag_start[0], ev.pos[1] - drag_start[1]
+                offset_x, offset_y = offset_origin[0] - dx / zoom, offset_origin[1] - dy / zoom
+                target_offset_x, target_offset_y = offset_x, offset_y
+            elif ev.type == pygame.MOUSEWHEEL:
+                if mouse_pos[0] > map_w: scroll_offset = max(0, scroll_offset - ev.y * 40)
+                else:
+                    new_zoom = zoom * (1.1 if ev.y > 0 else 0.9)
+                    if new_zoom < absolute_min_zoom:
+                        zoom = absolute_min_zoom
+                        target_zoom, target_offset_x, target_offset_y, _ = get_initial_state(map_w, h); is_animating = True
+                    else:
+                        is_animating, old_z = False, zoom
+                        zoom = min(new_zoom, 8.0)
+                        offset_x, offset_y = (offset_x + mouse_pos[0] / old_z) - mouse_pos[0] / zoom, (offset_y + mouse_pos[1] / old_z) - mouse_pos[1] / zoom
+                        target_zoom, target_offset_x, target_offset_y = zoom, offset_x, offset_y
+            elif ev.type == pygame.VIDEORESIZE:
+                screen = pygame.display.set_mode((ev.w, ev.h), pygame.RESIZABLE)
+                _, _, _, absolute_min_zoom = get_initial_state(ev.w - sidebar_w, ev.h)
+                if zoom <= absolute_min_zoom:
+                    zoom = absolute_min_zoom
+                    target_zoom, target_offset_x, target_offset_y, _ = get_initial_state(ev.w - sidebar_w, ev.h); is_animating = True
+        rw, rh = min(int(map_w / zoom), mw), min(int(h / zoom), mh)
+        offset_x, offset_y = max(0, min(offset_x, mw - rw)), max(0, min(offset_y, mh - rh))
+        screen.fill((20, 20, 20))
+        sh_x, sh_y = 0, 0
+        if shake_amount > 0:
+            sh_x, sh_y = random.randint(-int(shake_amount), int(shake_amount)), random.randint(-int(shake_amount), int(shake_amount))
+            shake_amount *= 0.9
+            if shake_amount < 0.5: shake_amount = 0
+        sub = orig_map.subsurface(pygame.Rect(int(offset_x), int(offset_y), rw, rh))
+        screen.blit(pygame.transform.smoothscale(sub, (map_w, h)), (sh_x, sh_y))
+        marker_rects.clear()
+        filtered_guilds = filter_guilds_and_bases(guilds_all, user_input)
+        for gid, guild in filtered_guilds.items():
+            for b in guild['bases']:
+                bx, by = b['coords']
+                if bx is None: continue
+                cx, cy = to_image_coordinates(bx, by, mw, mh)
+                px, py = (cx - offset_x) * zoom, (cy - offset_y) * zoom
+                if 0 <= px < map_w and 0 <= py < h:
+                    b_shx, b_shy = 0, 0
+                    for eff in active_blocked_effects:
+                        if eff['target_id'] == str(b['base_id']):
+                            el = time.time() - eff['start_time']
+                            if el < 0.8: b_shx, b_shy = random.randint(-5, 5), random.randint(-5, 5)
+                    if glow_start_time:
+                        el = time.time() - glow_start_time
+                        if el < 5:
+                            s = pygame.Surface((120, 120), pygame.SRCALPHA)
+                            pulse = (math.sin(el * 10) + 1) / 2
+                            pygame.draw.circle(s, (0, 200, 255, int(150 * (1 - el/5))), (60, 60), 20 + int(40 * pulse))
+                            screen.blit(s, (px - 60 + sh_x + b_shx, py - 60 + sh_y + b_shy))
+                            scan_y = int((el % 1.0) * 40) - 20
+                            pygame.draw.line(screen, (255, 255, 255, int(200 * (1 - el/5))), (px - 20, py + scan_y), (px + 20, py + scan_y), 2)
+                    mr = pygame.Rect(px - 14 + sh_x + b_shx, py - 14 + sh_y + b_shy, 28, 28)
+                    screen.blit(base_icon, mr)
+                    marker_rects.append((b, mr))
+        for shock in active_shocks[:]:
+            el = time.time() - shock['start_time']
+            if el > 1.0: active_shocks.remove(shock); continue
+            shock['radius'] += 20; shock['alpha'] = int(255 * (1 - el))
+            s = pygame.Surface((map_w, h), pygame.SRCALPHA)
+            pygame.draw.circle(s, (255, 255, 255, shock['alpha']), shock['pos'], shock['radius'], 6)
+            flash = pygame.Surface((map_w, h), pygame.SRCALPHA)
+            flash.fill((255, 255, 180, int(shock['alpha'] * 0.4)))
+            screen.blit(flash, (0, 0)); screen.blit(s, (0, 0))
+        for eff in active_blocked_effects[:]:
+            el = time.time() - eff['start_time']
+            if el > 0.8: active_blocked_effects.remove(eff); continue
+            eff['alpha'] = int(255 * (1 - el/0.8))
+            px, py = eff['pos']
+            ms_shx, ms_shy = random.randint(-5, 5), random.randint(-5, 5)
+            sz = 20 + int(10 * math.sin(el * 10))
+            pygame.draw.line(screen, (255, 0, 0, eff['alpha']), (px - sz + ms_shx, py - sz + ms_shy), (px + sz + ms_shx, py + sz + ms_shy), 6)
+            pygame.draw.line(screen, (255, 0, 0, eff['alpha']), (px + sz + ms_shx, py - sz + ms_shy), (px - sz + ms_shx, py + sz + ms_shy), 6)
+        draw_sidebar_ui(w, h)
+        reset_rect = pygame.Rect(map_w - 30, h // 2 - 20, 30, 40)
+        pygame.draw.rect(screen, (50, 50, 50), reset_rect, border_top_left_radius=6, border_bottom_left_radius=6)
+        screen.blit(font.render("R", True, (255, 255, 255)), (reset_rect.x + 10, reset_rect.y + 12))
+        hb = next((b for b, r in marker_rects if r.collidepoint(mouse_pos)), None)
+        if hb and not context_menu_pos: draw_tooltip([f"Guild: {hb['guild_name']}", f"Leader: {hb['leader_name']}", f"ID: {hb['base_id']}", f"Coords: X:{int(hb['coords'][0])} Y:{int(hb['coords'][1])}"], mouse_pos, map_w)
+        if mouse_pos[0] < map_w:
+            mx, my = from_image_coordinates(offset_x + (mouse_pos[0]-sh_x)/zoom, offset_y + (mouse_pos[1]-sh_y)/zoom, mw, mh)
+            coord_s = small_font.render(f"Cursor: {mx}, {my}", True, (255, 255, 255))
+            pygame.draw.rect(screen, (0, 0, 0, 150), (10, h - 30, coord_s.get_width() + 10, 20), border_radius=4)
+            screen.blit(coord_s, (15, h - 28))
+        if context_menu_pos:
+            if context_menu_target[0] == 'base': opts = [t("delete.base"), t("button.export")]
+            else: opts = [t("guild.rename.title"), t("delete.guild"), t("button.import")]
+            cmr = pygame.Rect(context_menu_pos[0], context_menu_pos[1], 160, len(opts) * 32)
+            pygame.draw.rect(screen, (40, 40, 40), cmr, border_radius=4); pygame.draw.rect(screen, (80, 80, 80), cmr, 1, border_radius=4)
+            for i, txt in enumerate(opts):
+                col = (255, 100, 100) if (txt == t("delete.base") or txt == t("delete.guild")) else (255, 255, 255)
+                screen.blit(font.render(txt, True, col), (context_menu_pos[0] + 10, context_menu_pos[1] + 6 + i*32))
         pygame.display.flip()
         clock.tick(60)
     pygame.quit()
@@ -2228,6 +2256,24 @@ def reset_anti_air_turrets():
     else:
         print(t("turret.none_found"))
         messagebox.showinfo(t("Info"),t("turret.none_found"))
+    refresh_all()
+def reset_dungeons():
+    folder_path=current_save_path
+    if not folder_path:
+        messagebox.showerror(t("Error"),t("guild.rebuild.no_save"))
+        return
+    try:
+        wsd=loaded_level_json['properties']['worldSaveData']['value']
+    except KeyError:
+        messagebox.showerror(t("Error"),t("turret.invalid_structure"))
+        return
+    if "DungeonPointMarkerSaveData" in wsd:
+        del wsd["DungeonPointMarkerSaveData"]
+        print(t("reset_dungeons.reset_success"))
+        messagebox.showinfo(t("Success"),t("reset_dungeons.reset_success"))
+    else:
+        print(t("reset_dungeons.none_found"))
+        messagebox.showinfo(t("Info"),t("reset_dungeons.none_found"))
     refresh_all()
 def unlock_all_private_chests():
     folder_path=current_save_path
@@ -2853,7 +2899,7 @@ def rebuild_all_guilds():
             except:
                 pass
     refresh_all()
-    refresh_stats("After Deletion")
+    refresh_stats("After")
     messagebox.showinfo("Done", t("guild.rebuild.done"))
 def make_selected_member_leader():
     sel=guild_members_tree.selection()
@@ -2885,6 +2931,7 @@ def make_selected_member_leader():
             raw['admin_player_uid']=p_uid
             break
     refresh_all()
+    refresh_stats("After")
     messagebox.showinfo(t("guild.leader_updated.title"),t("guild.leader_updated.msg").format(old=old_leader_name,new=p_name))
 def rename_guild():
     sel = guild_tree.selection()
@@ -2907,6 +2954,7 @@ def rename_guild():
             g['value']['RawData']['value']['guild_name'] = new_name
             break
     refresh_all()
+    refresh_stats("After")
     messagebox.showinfo(t("guild.rename.done_title"), t("guild.rename.done_msg", old=old_name, new=new_name))
 def rename_player():
     sel=guild_members_tree.selection()
@@ -2951,6 +2999,7 @@ def rename_player():
                 sp_val.setdefault('NickName',{})['value']=new_name
                 break
     refresh_all()
+    refresh_stats("After")
     messagebox.showinfo(t("player.rename.done_title"),t("player.rename.done_msg",old=old_name,new=new_name))
 def rename_world():
     if not current_save_path or not loaded_level_json:
@@ -2965,7 +3014,527 @@ def rename_world():
         meta_json["properties"]["SaveData"]["value"]["WorldName"]["value"]=new_name
         json_to_sav(meta_json,meta_path)
         return new_name
+    refresh_all()
+    refresh_stats("After")
     return None
+def clone_base_complete(loaded_level_json, source_base_id, target_guild_id, offset=(8000, 0, 0)):
+    import uuid, copy
+    from palworld_save_tools.archive import UUID as PalUUID
+    try:
+        _deep = fast_deepcopy
+    except:
+        _deep = copy.deepcopy
+    def _s(x):
+        return str(x).lower()
+    def _new_uuid():
+        return PalUUID(uuid.uuid4().bytes)
+    def _zero():
+        return PalUUID(uuid.UUID("00000000-0000-0000-0000-000000000000").bytes)
+    def _clear_char_container_slots(container_obj):
+        try:
+            container_obj["value"]["Slots"]["value"]["values"] = []
+        except:
+            pass
+    def _iter_work_savedata_entries(work_root):
+        if not isinstance(work_root, dict): return []
+        v = work_root.get("value", {})
+        if isinstance(v, dict): return v.get("values", []) if isinstance(v.get("values", []), list) else []
+        return []
+    def _get_work_raw(work_entry):
+        try: return work_entry["RawData"]["value"]
+        except: return None
+    def _get_model_raw(map_obj):
+        try: return map_obj["Model"]["value"]["RawData"]["value"]
+        except: return None
+    def _get_concrete_raw(map_obj):
+        try: return map_obj["ConcreteModel"]["value"]["RawData"]["value"]
+        except: return None
+    def _offset_translation(t):
+        try:
+            t["x"] += offset[0]
+            t["y"] += offset[1]
+            t["z"] += offset[2] if len(offset) > 2 else 0
+        except: pass
+    raw_prop = loaded_level_json["properties"]["worldSaveData"]["value"]
+    data = raw_prop if isinstance(raw_prop, dict) else {}
+    groups = data.get("GroupSaveDataMap", {}).get("value", [])
+    base_camp_data = data.get("BaseCampSaveData", {}).get("value", [])
+    char_containers = data.get("CharacterContainerSaveData", {}).get("value", [])
+    item_containers = data.get("ItemContainerSaveData", {}).get("value", [])
+    map_objs = data.get("MapObjectSaveData", {}).get("value", {}).get("values", [])
+    char_map = data.get("CharacterSaveParameterMap", {}).get("value", [])
+    work_root = data.get("WorkSaveData", {})
+    z = _zero()
+    src_id_str = _s(source_base_id)
+    tgt_gid_str = _s(target_guild_id)
+    src_base_entry = next((b for b in base_camp_data if _s(b.get("key")) == src_id_str), None)
+    if not src_base_entry:
+        return False
+    try:
+        src_worker_container_id = _s(src_base_entry["value"]["WorkerDirector"]["value"]["RawData"]["value"]["container_id"])
+    except:
+        return False
+    palbox_model_id = None
+    for obj in map_objs:
+        if obj.get("MapObjectId", {}).get("value", "") == "PalBoxV2":
+            mr = _get_model_raw(obj)
+            if mr and _s(mr.get("base_camp_id_belong_to", "")) == src_id_str:
+                palbox_model_id = _s(mr.get("instance_id", ""))
+                break
+    instance_id_map = {}
+    concrete_id_map = {}
+    for obj in map_objs:
+        mr = _get_model_raw(obj)
+        if not isinstance(mr, dict) or _s(mr.get("base_camp_id_belong_to","")) != src_id_str: continue
+        oid = str(obj.get("MapObjectId", {}).get("value", ""))
+        if oid.startswith("PalEgg") and "Hatching" not in oid and "Incubator" not in oid: continue
+        old_inst = _s(mr.get("instance_id",""))
+        if not old_inst or old_inst == _s(z): continue
+        instance_id_map[old_inst] = _new_uuid()
+        old_conc = _s(mr.get("concrete_model_instance_id",""))
+        if old_conc and old_conc != _s(z): concrete_id_map[old_conc] = _new_uuid()
+    if palbox_model_id and palbox_model_id not in instance_id_map:
+        instance_id_map[palbox_model_id] = _new_uuid()
+    new_base_id = _new_uuid()
+    new_worker_container_id = _new_uuid()
+    new_palbox_inst_id = instance_id_map.get(palbox_model_id)
+    work_entries = _iter_work_savedata_entries(work_root)
+    cloned_works = []
+    new_work_ids_for_collection = []
+    work_id_map = {}
+    source_work_entries = [we for we in work_entries if (wr := _get_work_raw(we)) and _s(wr.get("base_camp_id_belong_to", "")) == src_id_str]
+    for we in source_work_entries:
+        nwe = _deep(we)
+        nwr = _get_work_raw(nwe)
+        old_w_id = _s(nwr["id"])
+        nw_id = _new_uuid()
+        work_id_map[old_w_id] = nw_id
+        nwr["id"] = nw_id
+        nwr["base_camp_id_belong_to"] = new_base_id
+        if "WorkAssignMap" in nwe: nwe["WorkAssignMap"]["value"] = []
+        old_om = _s(nwr.get("owner_map_object_model_id", ""))
+        if old_om in instance_id_map: nwr["owner_map_object_model_id"] = instance_id_map[old_om]
+        old_oc = _s(nwr.get("owner_map_object_concrete_model_id", ""))
+        if old_oc in concrete_id_map: nwr["owner_map_object_concrete_model_id"] = concrete_id_map[old_oc]
+        for key in ["cached_base_camp_id", "cached_base_camp_ptr", "cached_base_index"]: nwr.pop(key, None)
+        try:
+            tr = nwr.get("transform", {})
+            mid = _s(tr.get("map_object_instance_id",""))
+            if mid in instance_id_map: tr["map_object_instance_id"] = instance_id_map[mid]
+            if "translation" in tr: _offset_translation(tr["translation"])
+        except: pass
+        cloned_works.append(nwe)
+        new_work_ids_for_collection.append(nw_id)
+    nb = _deep(src_base_entry)
+    nb["key"] = new_base_id
+    try:
+        nb_raw = nb["value"]["RawData"]["value"]
+        nb_raw["id"] = new_base_id
+        nb_raw["group_id_belong_to"] = target_guild_id
+    except: pass
+    try:
+        nb["value"]["WorkerDirector"]["value"]["RawData"]["value"]["id"] = new_base_id
+        nb["value"]["WorkerDirector"]["value"]["RawData"]["value"]["container_id"] = new_worker_container_id
+        _offset_translation(nb["value"]["WorkerDirector"]["value"]["RawData"]["value"]["spawn_transform"]["translation"])
+    except: pass
+    try:
+        nb["value"]["WorkCollection"]["value"]["RawData"]["value"]["id"] = new_base_id
+        nb["value"]["WorkCollection"]["value"]["RawData"]["value"]["work_ids"] = new_work_ids_for_collection
+    except: pass
+    if new_palbox_inst_id:
+        try: nb["value"]["RawData"]["value"]["owner_map_object_instance_id"] = new_palbox_inst_id
+        except: pass
+    try: _offset_translation(nb["value"]["RawData"]["value"]["transform"]["translation"])
+    except: pass
+    base_camp_data.append(nb)
+    target_group = next((g for g in groups if _s(g.get("key")) == tgt_gid_str), None)
+    if target_group:
+        try:
+            t_raw = target_group["value"]["RawData"]["value"]
+            if new_base_id not in t_raw.get("base_ids", []): t_raw.setdefault("base_ids", []).append(new_base_id)
+            if new_palbox_inst_id: t_raw.setdefault("map_object_instance_ids_base_camp_points", []).append(new_palbox_inst_id)
+        except: pass
+    src_worker_container = next((c for c in char_containers if _s(c.get("key",{}).get("ID",{}).get("value")) == src_worker_container_id), None)
+    worker_id_map = {}
+    if src_worker_container:
+        ncnt = _deep(src_worker_container)
+        ncnt["key"]["ID"]["value"] = new_worker_container_id
+        if "instance_id" in ncnt.get("value", {}): ncnt["value"]["instance_id"] = new_worker_container_id
+        old_slots = ncnt["value"]["Slots"]["value"].get("values", [])
+        new_slots = []
+        for slot in old_slots:
+            s_raw = slot.get("RawData", {}).get("value", {})
+            old_inst = _s(s_raw.get("instance_id", z))
+            if old_inst != _s(z):
+                new_inst = _new_uuid()
+                worker_id_map[old_inst] = new_inst
+                s_raw["instance_id"] = new_inst
+                new_slots.append(slot)
+        ncnt["value"]["Slots"]["value"]["values"] = new_slots
+        char_containers.append(ncnt)
+    for old_iid, new_iid in worker_id_map.items():
+        char_entry = next((c for c in char_map if _s(c["key"]["InstanceId"]["value"]) == old_iid), None)
+        if char_entry:
+            n_char = _deep(char_entry)
+            n_char["key"]["InstanceId"]["value"] = new_iid
+            try:
+                c_raw = n_char["value"]["RawData"]["value"]
+                c_raw["group_id"] = target_guild_id
+                spv = c_raw["object"]["SaveParameter"]["value"]
+                spv["SlotId"]["value"]["ContainerId"]["value"]["ID"]["value"] = new_worker_container_id
+                if "WorkRegion" in spv: spv["WorkRegion"]["value"]["group_id"]["value"] = z
+                if "WorkerID" in spv: spv["WorkerID"]["value"] = z
+                if "TaskData" in spv: spv["TaskData"]["value"] = {}
+                if "MapObjectConcreteInstanceIdAssignedToExpedition" in spv: spv["MapObjectConcreteInstanceIdAssignedToExpedition"]["value"] = z
+            except: pass
+            char_map.append(n_char)
+            if target_group:
+                try: 
+                    target_group["value"]["RawData"]["value"].setdefault("individual_character_handle_ids", []).append({"guid": z, "instance_id": new_iid})
+                except: pass
+    for nwe in cloned_works:
+        work_entries.append(nwe)
+    for obj in list(map_objs):
+        mr = _get_model_raw(obj)
+        if not isinstance(mr, dict) or _s(mr.get("base_camp_id_belong_to","")) != src_id_str: continue
+        old_inst = _s(mr.get("instance_id",""))
+        if old_inst not in instance_id_map: continue
+        oid = str(obj.get("MapObjectId", {}).get("value", ""))
+        if oid.startswith("PalEgg") and "Hatching" not in oid and "Incubator" not in oid: continue
+        no = _deep(obj)
+        nmr = _get_model_raw(no)
+        new_inst = instance_id_map[old_inst]
+        old_conc = _s(nmr.get("concrete_model_instance_id",""))
+        new_conc = concrete_id_map.get(old_conc, _new_uuid())
+        nmr["instance_id"] = new_inst
+        nmr["concrete_model_instance_id"] = new_conc
+        nmr["base_camp_id_belong_to"] = new_base_id
+        nmr["group_id_belong_to"] = target_guild_id
+        try: _offset_translation(nmr["initital_transform_cache"]["translation"])
+        except: pass
+        cr = _get_concrete_raw(no)
+        if isinstance(cr, dict):
+            cr["instance_id"] = new_conc
+            cr["model_instance_id"] = new_inst
+            cr["base_camp_id"] = new_base_id
+            if cr.get("concrete_model_type") == "PalMapObjectBreedFarmModel":
+                cr["spawned_egg_instance_ids"] = []
+            try:
+                mm = no["ConcreteModel"]["value"]["ModuleMap"]["value"]
+                for mod in mm:
+                    raw_mod = mod.get("value", {}).get("RawData", {}).get("value", {})
+                    if "target_work_id" in raw_mod:
+                        old_twid = _s(raw_mod["target_work_id"])
+                        if old_twid in work_id_map: raw_mod["target_work_id"] = work_id_map[old_twid]
+                    if "work_ids" in raw_mod and isinstance(raw_mod["work_ids"], list):
+                        raw_mod["work_ids"] = [work_id_map.get(_s(wid), wid) for wid in raw_mod["work_ids"]]
+                    if "target_container_id" not in raw_mod: continue
+                    old_cid = _s(raw_mod.get("target_container_id", ""))
+                    new_cid = _new_uuid()
+                    raw_mod["target_container_id"] = new_cid
+                    if "ItemContainer" in str(mod.get("key", "")):
+                        src_ic = next((c for c in item_containers if _s(c.get("key",{}).get("ID",{}).get("value")) == old_cid), None)
+                        if src_ic:
+                            nic = _deep(src_ic)
+                            nic["key"]["ID"]["value"] = new_cid
+                            if "instance_id" in nic.get("value", {}): nic["value"]["instance_id"] = new_cid
+                            item_containers.append(nic)
+                    elif "CharacterContainer" in str(mod.get("key", "")):
+                        src_cc = next((c for c in char_containers if _s(c.get("key",{}).get("ID",{}).get("value")) == old_cid), None)
+                        if src_cc:
+                            ncc = _deep(src_cc)
+                            ncc["key"]["ID"]["value"] = new_cid
+                            if "instance_id" in ncc.get("value", {}): ncc["value"]["instance_id"] = new_cid
+                            _clear_char_container_slots(ncc)
+                            char_containers.append(ncc)
+            except: pass
+        map_objs.append(no)
+    return True
+def export_base_json(loaded_level_json, source_base_id):
+    import copy
+    def _s(x): return str(x).lower()
+    def _get_model_raw(map_obj):
+        try: return map_obj["Model"]["value"]["RawData"]["value"]
+        except: return None
+    def _iter_work_savedata_entries(work_root):
+        if not isinstance(work_root, dict): return []
+        v = work_root.get("value", {})
+        if isinstance(v, dict): return v.get("values", []) if isinstance(v.get("values", []), list) else []
+        return []
+    def _get_work_raw(work_entry):
+        try: return work_entry["RawData"]["value"]
+        except: return None
+    raw_prop=loaded_level_json["properties"]["worldSaveData"]["value"]
+    data=raw_prop if isinstance(raw_prop,dict) else {}
+    base_camp_data=data.get("BaseCampSaveData",{}).get("value",[])
+    char_containers=data.get("CharacterContainerSaveData",{}).get("value",[])
+    item_containers=data.get("ItemContainerSaveData",{}).get("value",[])
+    map_objs=data.get("MapObjectSaveData",{}).get("value",{}).get("values",[])
+    char_map=data.get("CharacterSaveParameterMap",{}).get("value",[])
+    work_root=data.get("WorkSaveData",{})
+    work_entries=_iter_work_savedata_entries(work_root)
+    src_id_str=_s(source_base_id)
+    src_base_entry=next((b for b in base_camp_data if _s(b.get("key"))==src_id_str),None)
+    if not src_base_entry: return None
+    export_data={"base_camp":copy.deepcopy(src_base_entry),"map_objects":[],"characters":[],"item_containers":[],"char_containers":[],"works":[]}
+    try:
+        src_worker_container_id=_s(src_base_entry["value"]["WorkerDirector"]["value"]["RawData"]["value"]["container_id"])
+        w_cont=next((c for c in char_containers if _s(c.get("key",{}).get("ID",{}).get("value"))==src_worker_container_id),None)
+        if w_cont:
+            export_data["char_containers"].append(copy.deepcopy(w_cont))
+            for slot in w_cont["value"]["Slots"]["value"].get("values",[]):
+                char_inst_id=_s(slot.get("RawData",{}).get("value",{}).get("instance_id","00000000-0000-0000-0000-000000000000"))
+                char_entry=next((c for c in char_map if _s(c["key"]["InstanceId"]["value"])==char_inst_id),None)
+                if char_entry: export_data["characters"].append(copy.deepcopy(char_entry))
+    except: pass
+    for obj in map_objs:
+        mr=_get_model_raw(obj)
+        if not isinstance(mr,dict) or _s(mr.get("base_camp_id_belong_to",""))!=src_id_str: continue
+        oid=str(obj.get("MapObjectId",{}).get("value",""))
+        if oid.startswith("PalEgg") and "Hatching" not in oid and "Incubator" not in oid: continue
+        export_data["map_objects"].append(copy.deepcopy(obj))
+        try:
+            mm=obj["ConcreteModel"]["value"]["ModuleMap"]["value"]
+            for mod in mm:
+                raw_mod=mod.get("value",{}).get("RawData",{}).get("value",{})
+                if "target_container_id" not in raw_mod: continue
+                cid=_s(raw_mod.get("target_container_id",""))
+                if "ItemContainer" in str(mod.get("key","")):
+                    ic=next((c for c in item_containers if _s(c.get("key",{}).get("ID",{}).get("value"))==cid),None)
+                    if ic: export_data["item_containers"].append(copy.deepcopy(ic))
+                elif "CharacterContainer" in str(mod.get("key","")):
+                    cc=next((c for c in char_containers if _s(c.get("key",{}).get("ID",{}).get("value"))==cid),None)
+                    if cc: export_data["char_containers"].append(copy.deepcopy(cc))
+        except: pass
+    for we in work_entries:
+        wr=_get_work_raw(we)
+        if wr and _s(wr.get("base_camp_id_belong_to",""))==src_id_str: export_data["works"].append(copy.deepcopy(we))
+    return export_data
+def import_base_json(loaded_level_json, exported_data, target_guild_id, offset=(8000,0,0), collision_threshold=5000):
+    import uuid,copy,math
+    from palworld_save_tools.archive import UUID as PalUUID
+    try:_deep=fast_deepcopy
+    except:_deep=copy.deepcopy
+    def _s(x): return str(x).lower()
+    def _new_uuid(): return PalUUID(uuid.uuid4().bytes)
+    def _zero(): return PalUUID(uuid.UUID("00000000-0000-0000-0000-000000000000").bytes)
+    def _clear_char_container_slots(container_obj):
+        try: container_obj["value"]["Slots"]["value"]["values"]=[]
+        except: pass
+    def _iter_work_savedata_entries(work_root):
+        if not isinstance(work_root,dict): return []
+        v=work_root.get("value",{})
+        if isinstance(v,dict): return v.get("values",[]) if isinstance(v.get("values",[]),list) else []
+        return []
+    def _get_work_raw(work_entry):
+        try: return work_entry["RawData"]["value"]
+        except: return None
+    def _get_model_raw(map_obj):
+        try: return map_obj["Model"]["value"]["RawData"]["value"]
+        except: return None
+    def _get_concrete_raw(map_obj):
+        try: return map_obj["ConcreteModel"]["value"]["RawData"]["value"]
+        except: return None
+    def _offset_translation(t, apply_offset):
+        if not apply_offset: return
+        try:
+            t["x"]+=offset[0];t["y"]+=offset[1];t["z"]+=offset[2] if len(offset)>2 else 0
+        except: pass
+    raw_prop=loaded_level_json["properties"]["worldSaveData"]["value"]
+    data=raw_prop if isinstance(raw_prop,dict) else {}
+    groups=data.get("GroupSaveDataMap",{}).get("value",[])
+    base_camp_data=data.get("BaseCampSaveData",{}).get("value",[])
+    char_containers=data.get("CharacterContainerSaveData",{}).get("value",[])
+    item_containers=data.get("ItemContainerSaveData",{}).get("value",[])
+    map_objs=data.get("MapObjectSaveData",{}).get("value",{}).get("values",[])
+    char_map=data.get("CharacterSaveParameterMap",{}).get("value",[])
+    work_root=data.get("WorkSaveData",{})
+    work_entries=_iter_work_savedata_entries(work_root)
+    z=_zero()
+    tgt_gid_str=_s(target_guild_id)
+    palbox_model_id=None
+    for obj in exported_data.get("map_objects",[]):
+        if obj.get("MapObjectId",{}).get("value","")=="PalBoxV2":
+            mr=_get_model_raw(obj)
+            if mr: palbox_model_id=_s(mr.get("instance_id",""));break
+    instance_id_map={}
+    concrete_id_map={}
+    for obj in exported_data.get("map_objects",[]):
+        mr=_get_model_raw(obj)
+        if not isinstance(mr,dict): continue
+        oid=str(obj.get("MapObjectId",{}).get("value",""))
+        if oid.startswith("PalEgg") and "Hatching" not in oid and "Incubator" not in oid: continue
+        old_inst=_s(mr.get("instance_id",""))
+        if not old_inst or old_inst==_s(z): continue
+        instance_id_map[old_inst]=_new_uuid()
+        old_conc=_s(mr.get("concrete_model_instance_id",""))
+        if old_conc and old_conc!=_s(z): concrete_id_map[old_conc]=_new_uuid()
+    if palbox_model_id and palbox_model_id not in instance_id_map: instance_id_map[palbox_model_id]=_new_uuid()
+    new_base_id=_new_uuid()
+    new_worker_container_id=_new_uuid()
+    new_palbox_inst_id=instance_id_map.get(palbox_model_id)
+    src_base_raw = exported_data["base_camp"]["value"]["RawData"]["value"]
+    src_pos = src_base_raw["transform"]["translation"]
+    apply_off = False
+    for existing_base in base_camp_data:
+        try:
+            ex_pos = existing_base["value"]["RawData"]["value"]["transform"]["translation"]
+            dist = math.sqrt((src_pos["x"]-ex_pos["x"])**2 + (src_pos["y"]-ex_pos["y"])**2 + (src_pos["z"]-ex_pos["z"])**2)
+            if dist < collision_threshold:
+                apply_off = True
+                break
+        except: continue
+    cloned_works=[]
+    new_work_ids_for_collection=[]
+    work_id_map={}
+    for we in exported_data.get("works",[]):
+        nwe=_deep(we)
+        nwr=_get_work_raw(nwe)
+        if not isinstance(nwr,dict) or "id" not in nwr: continue
+        old_w_id=_s(nwr["id"])
+        nw_id=_new_uuid()
+        work_id_map[old_w_id]=nw_id
+        nwr["id"]=nw_id
+        nwr["base_camp_id_belong_to"]=new_base_id
+        if "WorkAssignMap" in nwe: nwe["WorkAssignMap"]["value"]=[]
+        old_om=_s(nwr.get("owner_map_object_model_id",""))
+        if old_om in instance_id_map: nwr["owner_map_object_model_id"]=instance_id_map[old_om]
+        old_oc=_s(nwr.get("owner_map_object_concrete_model_id",""))
+        if old_oc in concrete_id_map: nwr["owner_map_object_concrete_model_id"]=concrete_id_map[old_oc]
+        for key in ["cached_base_camp_id","cached_base_camp_ptr","cached_base_index"]: nwr.pop(key,None)
+        try:
+            tr=nwr.get("transform",{})
+            mid=_s(tr.get("map_object_instance_id",""))
+            if mid in instance_id_map: tr["map_object_instance_id"]=instance_id_map[mid]
+            if "translation" in tr: _offset_translation(tr["translation"], apply_off)
+        except: pass
+        cloned_works.append(nwe)
+        new_work_ids_for_collection.append(nw_id)
+    nb=_deep(exported_data["base_camp"])
+    nb["key"]=new_base_id
+    try:
+        nb_raw = nb["value"]["RawData"]["value"]
+        nb_raw["id"] = new_base_id
+        nb_raw["group_id_belong_to"] = target_guild_id
+    except: pass
+    try:
+        wd_raw = nb["value"]["WorkerDirector"]["value"]["RawData"]["value"]
+        wd_raw["id"] = new_base_id
+        wd_raw["container_id"] = new_worker_container_id
+        _offset_translation(wd_raw["spawn_transform"]["translation"], apply_off)
+    except: pass
+    try:
+        nb["value"]["WorkCollection"]["value"]["RawData"]["value"]["id"] = new_base_id
+        nb["value"]["WorkCollection"]["value"]["RawData"]["value"]["work_ids"] = new_work_ids_for_collection
+    except: pass
+    if new_palbox_inst_id:
+        try: nb["value"]["RawData"]["value"]["owner_map_object_instance_id"] = new_palbox_inst_id
+        except: pass
+    try: _offset_translation(nb["value"]["RawData"]["value"]["transform"]["translation"], apply_off)
+    except: pass
+    base_camp_data.append(nb)
+    target_group=next((g for g in groups if _s(g.get("key"))==tgt_gid_str),None)
+    if target_group:
+        try:
+            t_raw=target_group["value"]["RawData"]["value"]
+            if new_base_id not in t_raw.get("base_ids",[]): t_raw.setdefault("base_ids",[]).append(new_base_id)
+            if new_palbox_inst_id: t_raw.setdefault("map_object_instance_ids_base_camp_points",[]).append(new_palbox_inst_id)
+        except: pass
+    worker_id_map={}
+    try: src_worker_container_id=_s(exported_data["base_camp"]["value"]["WorkerDirector"]["value"]["RawData"]["value"]["container_id"])
+    except: src_worker_container_id=""
+    src_worker_container=next((c for c in exported_data.get("char_containers",[]) if _s(c.get("key",{}).get("ID",{}).get("value"))==src_worker_container_id),None)
+    if src_worker_container:
+        ncnt=_deep(src_worker_container)
+        ncnt["key"]["ID"]["value"]=new_worker_container_id
+        if "instance_id" in ncnt.get("value",{}): ncnt["value"]["instance_id"]=new_worker_container_id
+        old_slots=ncnt["value"]["Slots"]["value"].get("values",[])
+        new_slots=[]
+        for slot in old_slots:
+            s_raw=slot.get("RawData",{}).get("value",{})
+            old_inst=_s(s_raw.get("instance_id",z))
+            if old_inst!=_s(z):
+                new_inst=_new_uuid()
+                worker_id_map[old_inst]=new_inst
+                s_raw["instance_id"]=new_inst
+                new_slots.append(slot)
+        ncnt["value"]["Slots"]["value"]["values"]=new_slots
+        char_containers.append(ncnt)
+    for old_iid,new_iid in worker_id_map.items():
+        char_entry=next((c for c in exported_data.get("characters",[]) if _s(c["key"]["InstanceId"]["value"])==old_iid),None)
+        if char_entry:
+            n_char=_deep(char_entry)
+            n_char["key"]["InstanceId"]["value"]=new_iid
+            try:
+                c_raw=n_char["value"]["RawData"]["value"]
+                c_raw["group_id"]=target_guild_id
+                spv=c_raw["object"]["SaveParameter"]["value"]
+                spv["SlotId"]["value"]["ContainerId"]["value"]["ID"]["value"]=new_worker_container_id
+                if "WorkRegion" in spv: spv["WorkRegion"]["value"]["group_id"]["value"]=z
+                if "WorkerID" in spv: spv["WorkerID"]["value"]=z
+                if "TaskData" in spv: spv["TaskData"]["value"]={}
+                if "MapObjectConcreteInstanceIdAssignedToExpedition" in spv: spv["MapObjectConcreteInstanceIdAssignedToExpedition"]["value"]=z
+            except: pass
+            char_map.append(n_char)
+            if target_group:
+                try: target_group["value"]["RawData"]["value"].setdefault("individual_character_handle_ids",[]).append({"guid":z,"instance_id":new_iid})
+                except: pass
+    for nwe in cloned_works: work_entries.append(nwe)
+    for obj in exported_data.get("map_objects",[]):
+        mr=_get_model_raw(obj)
+        if not isinstance(mr,dict): continue
+        old_inst=_s(mr.get("instance_id",""))
+        if old_inst not in instance_id_map: continue
+        oid=str(obj.get("MapObjectId",{}).get("value",""))
+        if oid.startswith("PalEgg") and "Hatching" not in oid and "Incubator" not in oid: continue
+        no=_deep(obj)
+        nmr=_get_model_raw(no)
+        new_inst=instance_id_map[old_inst]
+        old_conc=_s(nmr.get("concrete_model_instance_id",""))
+        new_conc=concrete_id_map.get(old_conc,_new_uuid())
+        nmr["instance_id"]=new_inst
+        nmr["concrete_model_instance_id"]=new_conc
+        nmr["base_camp_id_belong_to"]=new_base_id
+        nmr["group_id_belong_to"]=target_guild_id
+        try: _offset_translation(nmr["initital_transform_cache"]["translation"], apply_off)
+        except: pass
+        cr=_get_concrete_raw(no)
+        if isinstance(cr,dict):
+            cr["instance_id"]=new_conc
+            cr["model_instance_id"]=new_inst
+            cr["base_camp_id"]=new_base_id
+            if cr.get("concrete_model_type")=="PalMapObjectBreedFarmModel": cr["spawned_egg_instance_ids"]=[]
+            try:
+                mm=no["ConcreteModel"]["value"]["ModuleMap"]["value"]
+                for mod in mm:
+                    raw_mod=mod.get("value",{}).get("RawData",{}).get("value",{})
+                    if "target_work_id" in raw_mod:
+                        old_twid=_s(raw_mod["target_work_id"])
+                        if old_twid in work_id_map: raw_mod["target_work_id"]=work_id_map[old_twid]
+                    if "work_ids" in raw_mod and isinstance(raw_mod["work_ids"],list):
+                        raw_mod["work_ids"]=[work_id_map.get(_s(wid),wid) for wid in raw_mod["work_ids"]]
+                    if "target_container_id" not in raw_mod: continue
+                    old_cid=_s(raw_mod.get("target_container_id",""))
+                    new_cid=_new_uuid()
+                    raw_mod["target_container_id"]=new_cid
+                    if "ItemContainer" in str(mod.get("key", "")):
+                        src_ic=next((c for c in exported_data.get("item_containers",[]) if _s(c.get("key",{}).get("ID",{}).get("value"))==old_cid),None)
+                        if src_ic:
+                            nic=_deep(src_ic)
+                            nic["key"]["ID"]["value"]=new_cid
+                            if "instance_id" in nic.get("value",{}): nic["value"]["instance_id"]=new_cid
+                            item_containers.append(nic)
+                    elif "CharacterContainer" in str(mod.get("key", "")):
+                        src_cc=next((c for c in exported_data.get("char_containers",[]) if _s(c.get("key",{}).get("ID",{}).get("value"))==old_cid),None)
+                        if src_cc:
+                            ncc=_deep(src_cc)
+                            ncc["key"]["ID"]["value"]=new_cid
+                            if "instance_id" in ncc.get("value",{}): ncc["value"]["instance_id"]=new_cid
+                            _clear_char_container_slots(ncc)
+                            char_containers.append(ncc)
+            except: pass
+        map_objs.append(no)
+    return True
 def all_in_one_tools():
     global window, stat_labels, guild_tree, base_tree, player_tree, guild_members_tree
     global guild_search_var, base_search_var, player_search_var, guild_members_search_var
@@ -3189,6 +3758,7 @@ def all_in_one_tools():
     delete_menu_add("deletion.menu.remove_invalid_pals", remove_invalid_pals_from_save)
     delete_menu_add("deletion.menu.reset_missions", fix_missions)
     delete_menu_add("deletion.menu.reset_anti_air", reset_anti_air_turrets)
+    delete_menu_add("deletion.menu.reset_dungeons", reset_dungeons)
     delete_menu_add("deletion.menu.generate_killnearestbase", open_kill_nearest_base_ui)
     delete_menu_add("guild.menu.rebuild_all_guilds", rebuild_all_guilds)
     delete_menu_add("guild.menu.move_selected_player_to_selected_guild", move_selected_player_to_selected_guild)
@@ -3460,7 +4030,56 @@ def all_in_one_tools():
             menu.add_command(label=t("deletion.ctx.add_exclusion"), command=lambda: add_exclusion(base_tree, "bases"))
             menu.add_command(label=t("deletion.ctx.remove_exclusion"), command=lambda: remove_selected_from_regular(base_tree, "bases"))
             menu.add_command(label=t("deletion.ctx.delete_base"), command=delete_selected_base)
+            menu.add_command(label=t("export.base"), command=lambda: trigger_base_transfer(base_tree, loaded_level_json, "export"))
+            menu.add_command(label=t("import.base"), command=lambda: trigger_base_transfer(base_tree, loaded_level_json, "import"))
+            menu.add_command(label=t("clone.base"), command=lambda: trigger_clone_base(base_tree, loaded_level_json))
             menu.tk_popup(event.x_root, event.y_root)
+    def trigger_base_transfer(base_tree, loaded_level_json, mode="export"):
+        import json, tkinter.filedialog, tkinter.messagebox
+        class CustomEncoder(json.JSONEncoder):
+            def default(self, obj):
+                if hasattr(obj, 'bytes') or obj.__class__.__name__ == 'UUID':
+                    return str(obj)
+                return super().default(obj)
+        selected = base_tree.selection()
+        if not selected:
+            tkinter.messagebox.showwarning("Selection Required", "Please select a row from the list.")
+            return
+        item = base_tree.item(selected[0])
+        base_id = item['values'][0]
+        guild_id = item['values'][1]
+        if mode == "export":
+            data = export_base_json(loaded_level_json, base_id)
+            if not data:
+                tkinter.messagebox.showerror("Error", f"Could not find base data for ID:\n{base_id}")
+                return
+            path = tkinter.filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")], title="Export Base")
+            if path:
+                with open(path, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, cls=CustomEncoder)
+                tkinter.messagebox.showinfo("Success", "Base exported to JSON successfully.")
+        else:
+            path = tkinter.filedialog.askopenfilename(filetypes=[("JSON files", "*.json")], title="Import Base")
+            if not path: return
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                if import_base_json(loaded_level_json, data, guild_id, offset=(8000, 0, 0)):
+                    tkinter.messagebox.showinfo("Success", f"Base imported successfully!\nRemember to save Level.sav.")
+                else:
+                    tkinter.messagebox.showerror("Error", "Import logic failed.")
+            except Exception as e:
+                tkinter.messagebox.showerror("Error", f"Failed to read JSON file:\n{str(e)}")
+    def trigger_clone_base(tree, loaded_level_json):
+        selected = tree.selection()
+        if not selected: return
+        base_id = tree.item(selected[0])['values'][0]
+        guild_id = tree.item(selected[0])['values'][1]
+        if clone_base_complete(loaded_level_json, base_id, guild_id):
+            messagebox.showinfo("Success", "Base cloned successfully with all structures and containers!")
+            refresh_all()
+        else:
+            messagebox.showerror("Error", "Failed to clone base.")
     def player_tree_menu(event):
         global selected_source_player        
         iid = player_tree.identify_row(event.y)

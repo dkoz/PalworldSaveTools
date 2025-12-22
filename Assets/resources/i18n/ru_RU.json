@@ -449,5 +449,15 @@
 "deletion.menu.remove_invalid_structures": "Удалить все недопустимые строения",
 "deletion.menu.remove_invalid_structures_summary": "Удалено {deleted_count} недопустимых объектов карты строений. Осталось {remaining_count} строений.",
 "deletion.menu.remove_invalid_skins_summary": "Удалено {removed_level_skins} записей скинов из Level.sav. Очищено {fixed_player_files} файлов игроков.",
-"deletion.menu.delete_all_skins": "Удалить все скины"
+"deletion.menu.delete_all_skins": "Удалить все скины",
+"deletion.menu.reset_dungeons": "Сбросить подземелья",
+"reset_dungeons.reset_success": "Подземелья успешно сброшены",
+"reset_dungeons.none_found": "Данные подземелий не найдены",
+"export.base": "Экспорт базы",
+"import.base": "Импорт базы",
+"clone.base": "Клонировать базу",
+"delete.base": "Удалить базу",
+"button.export": "Экспорт базы",
+"button.import": "Импорт базы",
+"delete.guild": "Удалить гильдию"
 }

@@ -453,5 +453,15 @@
 "deletion.menu.remove_invalid_structures": "모든 유효하지 않은 구조물 제거",
 "deletion.menu.remove_invalid_structures_summary": "{deleted_count}개의 유효하지 않은 구조물 맵 오브젝트를 삭제했습니다. {remaining_count}개의 구조물이 남았습니다.",
 "deletion.menu.remove_invalid_skins_summary": "Level.sav에서 {removed_level_skins}개의 스킨 항목을 삭제했습니다. {fixed_player_files}개의 플레이어 파일을 정리했습니다.",
-"deletion.menu.delete_all_skins": "모든 스킨 삭제"
+"deletion.menu.delete_all_skins": "모든 스킨 삭제",
+"deletion.menu.reset_dungeons": "던전 초기화",
+"reset_dungeons.reset_success": "던전 초기화 성공",
+"reset_dungeons.none_found": "던전 데이터를 찾을 수 없습니다",
+"export.base": "거점 내보내기",
+"import.base": "거점 가져오기",
+"clone.base": "거점 복제",
+"delete.base": "거점 삭제",
+"button.export": "거점 내보내기",
+"button.import": "거점 가져오기",
+"delete.guild": "길드 삭제"
 }
