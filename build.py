@@ -43,10 +43,8 @@ def build_with_cx_freeze():
     if os.path.exists(lib_folder):
         print(f"Removing {lib_folder}...")
         shutil.rmtree(lib_folder)
-def clean_build_artifacts(full_clean=False):
+def clean_build_artifacts():
     items=["build","PalworldSaveTools.egg-info","Backups","PST_standalone","Scan Save Logger","psp_windows","ppe_windows","updated_worldmap.png","PalDefender","XGP_converted_saves"]
-    if full_clean:
-        items.append(VENV_DIR)
     for item in items:
         if os.path.exists(item):
             print(f"Removing {item}...")
@@ -57,22 +55,6 @@ def clean_build_artifacts(full_clean=False):
             if d=="__pycache__":
                 path=os.path.join(root,d)
                 shutil.rmtree(path,ignore_errors=True)
-def run_upx_on_build():
-    build_dir="PST_standalone"
-    if not os.path.exists(build_dir) or shutil.which("upx") is None: return
-    targets=[]
-    skip_names=("vcruntime","msvcp","python3.dll")
-    for root,dirs,files in os.walk(build_dir):
-        for f in files:
-            lf=f.lower()
-            if not (lf.endswith(".exe") or lf.endswith(".dll")): continue
-            if any(k in lf for k in skip_names): continue
-            targets.append(os.path.join(root,f))
-    if not targets: return
-    targets.sort(key=lambda x: 0 if x.lower().endswith(".exe") else 1)
-    print("Running UPX compression...")
-    cmd=["upx","--best","--lzma","--no-progress"]+targets
-    subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
 def get_app_version():
     common_file=os.path.join("Assets","common.py")
     if not os.path.exists(common_file): return "unknown"
@@ -94,17 +76,33 @@ def create_release_archive():
     cmd=["7z","a","-t7z","-m0=lzma2","-mx=9","-mfb=273","-md=256m","-ms=on",os.path.join("..",archive_name)]+items
     subprocess.check_call(cmd)
     os.chdir(old)
+def print_logo():
+    return
+    print("="*40)
+    msg = r"""
+  ___      _                _    _ ___              _____         _    
+ | _ \__ _| |_ __ _____ _ _| |__| / __| __ ___ ____|_   _|__  ___| |___
+ |  _/ _` | \ V  V / _ \ '_| / _` \__ \/ _` \ V / -_)| |/ _ \/ _ \ (_-<
+ |_| \__,_|_|\_/\_/\___/_| |_\__,_|___/\__,_|\_/\___||_|\___/\___/_/__/
+ 
+    """
+    print(msg)
+    print("="*40)
 def main():
-    print("="*40)
-    print("STARTING CLEAN AUTOMATED BUILD")
-    clean_build_artifacts(full_clean=True)
+    clean_build_artifacts()
+    print_logo()
     create_venv()
+    print_logo()
     install_deps()
+    print_logo()
     sync_version()
+    print_logo()
     build_with_cx_freeze()
-    run_upx_on_build()
+    print_logo()
     create_release_archive()
-    clean_build_artifacts(full_clean=False)
-    print("="*40)
+    print_logo()
+    clean_build_artifacts()
+    print_logo()
     print("Build Completed Successfully")
+    print_logo()
 if __name__=="__main__": main()

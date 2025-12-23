@@ -227,7 +227,7 @@ class CharacterTransferWindow(QWidget):
         self.source_search_entry.textChanged.connect(lambda txt: self.filter_treeview(self.source_player_list, txt, True))
         source_panel_layout.addWidget(self.source_search_entry)
         self.source_player_list = QTreeWidget()
-        self.source_player_list.setHeaderLabels([t('GUID'), t('Name'), t('Guild ID')])
+        self.source_player_list.setHeaderLabels([t('Guild ID'), t('GUID'), t('Name')])
         self.source_player_list.itemSelectionChanged.connect(self.on_selection_of_source_player)
         self.source_player_list.setSortingEnabled(True)
         src_header = self.source_player_list.header()
@@ -250,7 +250,7 @@ class CharacterTransferWindow(QWidget):
         self.target_search_entry.textChanged.connect(lambda txt: self.filter_treeview(self.target_player_list, txt, False))
         target_panel_layout.addWidget(self.target_search_entry)
         self.target_player_list = QTreeWidget()
-        self.target_player_list.setHeaderLabels([t('GUID'), t('Name'), t('Guild ID')])
+        self.target_player_list.setHeaderLabels([t('Guild ID'), t('GUID'), t('Name')])
         self.target_player_list.itemSelectionChanged.connect(self.on_selection_of_target_player)
         self.target_player_list.setSortingEnabled(True)
         tgt_header = self.target_player_list.header()
@@ -662,11 +662,9 @@ def transfer_pals_only():
     used_ids=set()
     try:
         for ch in level_json["CharacterSaveParameterMap"]["value"]:
-            try: used_ids.add(str(ch["key"]["InstanceId"]["value"]))
-            except: pass
+            used_ids.add(str(ch["key"]["InstanceId"]["value"]))
         for ch in targ_lvl["CharacterSaveParameterMap"]["value"]:
-            try: used_ids.add(str(ch["key"]["InstanceId"]["value"]))
-            except: pass
+            used_ids.add(str(ch["key"]["InstanceId"]["value"]))
     except:
         pass
     def bump_guid_str(s):
@@ -680,70 +678,46 @@ def transfer_pals_only():
     targ_guild_id=None
     gmap_all=targ_lvl.get("GroupSaveDataMap",{}).get("value",[])
     for entry in gmap_all:
-        try:
-            raw=entry["value"]["RawData"]["value"]
-            gid=raw.get("group_id",zero)
-            plist=raw.get("players",[])
-            for p in plist:
-                if p.get("player_uid")==targ_uid:
-                    targ_guild_id=gid
-                    break
-            if targ_guild_id: break
-        except:
-            pass
+        raw=entry["value"]["RawData"]["value"]
+        gid=raw.get("group_id",zero)
+        plist=raw.get("players",[])
+        for p in plist:
+            if str(p.get("player_uid"))==str(targ_uid):
+                targ_guild_id=gid
+                break
+        if targ_guild_id: break
     if not targ_guild_id: targ_guild_id=zero
     src_params=[]
     id_map={}
     cmap=level_json["CharacterSaveParameterMap"]["value"]
     for ch in cmap:
-        raw=ch.get("value",{}).get("RawData",{}).get("value",{})
-        obj=raw.get("object")
-        if not obj: continue
-        sp=obj.get("SaveParameter")
-        if not sp: continue
-        spv=sp.get("value",{})
+        try:
+            spv=ch["value"]["RawData"]["value"]["object"]["SaveParameter"]["value"]
+        except: continue
         owner=spv.get("OwnerPlayerUId")
-        if not owner or owner.get("value")!=host_guid: continue
-        key=ch.get("key",{})
-        inst_field=key.get("InstanceId")
-        if not inst_field: continue
-        old_inst=inst_field.get("value")
-        if not old_inst: continue
+        if not owner or str(owner.get("value"))!=str(host_guid): continue
+        old_inst=ch["key"]["InstanceId"]["value"]
         bumped=bump_guid_str(old_inst)
-        try: new_inst=UUID.from_str(bumped)
-        except: new_inst=old_inst
+        new_inst=UUID.from_str(bumped)
         id_map[str(old_inst)]=new_inst
         cp=fast_deepcopy(ch)
-        try: cp["value"]["RawData"]["value"]["object"]["SaveParameter"]["value"]["OwnerPlayerUId"]["value"]=targ_uid
-        except: pass
-        try: cp["key"]["InstanceId"]["value"]=new_inst
-        except: pass
-        try: cp["value"]["RawData"]["value"]["group_id"]=str(targ_guild_id)
-        except: pass
-        try:
-            spv2=cp["value"]["RawData"]["value"]["object"]["SaveParameter"]["value"]
-            try: spv2["WorkRegion"]["group_id"]["value"]=zero
-            except: pass
-            try: spv2["WorkerID"]["value"]=zero
-            except: pass
-            try:
-                if "TaskData" in spv2: spv2["TaskData"]["value"]={}
-            except: pass
-            try:
-                if "MapObjectConcreteInstanceIdAssignedToExpedition" in spv2: del spv2["MapObjectConcreteInstanceIdAssignedToExpedition"]
-            except: pass
-            try: del spv2["WorkSuitabilityOptionInfo"]
-            except: pass
-        except:
-            pass
+        cp["key"]["InstanceId"]["value"]=new_inst
+        cp_raw=cp["value"]["RawData"]["value"]
+        cp_raw["group_id"] = str(targ_guild_id)
+        v = cp_raw["object"]["SaveParameter"]["value"]
+        v["OwnerPlayerUId"]["value"] = targ_uid
+        v.pop("OldOwnerPlayerUIds", None)
+        v.pop("MapObjectConcreteInstanceIdAssignedToExpedition", None)
+        v.pop("WorkSuitabilityOptionInfo", None)
+        if "WorkRegion" in v: v["WorkRegion"]["group_id"]["value"]=zero
+        if "WorkerID" in v: v["WorkerID"]["value"]=zero
         src_params.append(cp)
     try:
         s_pal_id=host_json["SaveData"]["value"]["PalStorageContainerId"]["value"]["ID"]["value"]
         s_oto_id=host_json["SaveData"]["value"]["OtomoCharacterContainerId"]["value"]["ID"]["value"]
         t_pal_id=targ_json["SaveData"]["value"]["PalStorageContainerId"]["value"]["ID"]["value"]
         t_oto_id=targ_json["SaveData"]["value"]["OtomoCharacterContainerId"]["value"]["ID"]["value"]
-    except:
-        return False
+    except: return False
     src_pal=src_oto=tgt_pal=tgt_oto=None
     for c in level_json["CharacterContainerSaveData"]["value"]:
         cid=c["key"]["ID"]["value"]
@@ -753,49 +727,40 @@ def transfer_pals_only():
         cid=c["key"]["ID"]["value"]
         if cid==t_pal_id: tgt_pal=c
         if cid==t_oto_id: tgt_oto=c
-    if not src_pal or not tgt_pal: return False
-    if not src_oto or not tgt_oto: return False
-    def remap_slots(slots):
-        for slot in slots:
+    if not all([src_pal, src_oto, tgt_pal, tgt_oto]): return False
+    def remap_slots(slots, new_cid):
+        for idx, slot in enumerate(slots):
             raw=slot.get("RawData",{}).get("value",{})
             old=raw.get("instance_id")
-            if old is None: continue
-            key=str(old)
-            if key in id_map: raw["instance_id"]=id_map[key]
+            if old and str(old) in id_map:
+                new_i = id_map[str(old)]
+                raw["instance_id"]=new_i
+                for p in src_params:
+                    if str(p["key"]["InstanceId"]["value"]) == str(new_i):
+                        pv = p["value"]["RawData"]["value"]["object"]["SaveParameter"]["value"]
+                        pv["SlotId"]["value"]["ContainerId"]["value"]["ID"]["value"] = new_cid
+                        pv["SlotId"]["value"]["SlotIndex"]["value"] = idx
     new_box=fast_deepcopy(src_pal["value"]["Slots"]["value"].get("values",[]))
-    remap_slots(new_box)
+    remap_slots(new_box, t_pal_id)
     tgt_pal["value"]["Slots"]["value"]["values"]=new_box
     new_oto=fast_deepcopy(src_oto["value"]["Slots"]["value"].get("values",[]))
-    remap_slots(new_oto)
+    remap_slots(new_oto, t_oto_id)
     tgt_oto["value"]["Slots"]["value"]["values"]=new_oto
-    new_map=[]
-    for ch in targ_lvl["CharacterSaveParameterMap"]["value"]:
-        raw=ch.get("value",{}).get("RawData",{}).get("value",{})
-        obj=raw.get("object")
-        if not obj: new_map.append(ch); continue
-        sp=obj.get("SaveParameter")
-        if not sp: new_map.append(ch); continue
-        val=sp.get("value")
-        if not val: new_map.append(ch); continue
-        owner=val.get("OwnerPlayerUId")
-        if not owner: new_map.append(ch); continue
-        if owner.get("value")==targ_uid: continue
-        new_map.append(ch)
+    t_chars = targ_lvl["CharacterSaveParameterMap"]["value"]
+    new_map=[ch for ch in t_chars if str(get_val_safe(ch).get("OwnerPlayerUId",{}).get("value")) != str(targ_uid)]
     new_map+=src_params
     targ_lvl["CharacterSaveParameterMap"]["value"]=new_map
     for entry in gmap_all:
-        try:
-            raw=entry["value"]["RawData"]["value"]
-            gid=raw.get("group_id")
-            if gid!=targ_guild_id: continue
-            handles=raw.get("individual_character_handle_ids")
-            if handles is None: continue
-            if not isinstance(handles,list): continue
-            for old_inst,new_inst in id_map.items():
-                handles.append({"guid":str(zero),"instance_id":new_inst})
-        except:
-            pass
+        raw=entry["value"]["RawData"]["value"]
+        if raw.get("group_id")==targ_guild_id:
+            handles=raw.get("individual_character_handle_ids", [])
+            for new_inst in id_map.values():
+                handles.append({"guid":str(targ_uid),"instance_id":new_inst})
+            raw["individual_character_handle_ids"] = handles
     return True
+def get_val_safe(p):
+    try: return p["value"]["RawData"]["value"]["object"]["SaveParameter"]["value"]
+    except: return {}
 def save_and_backup():
     print(t("Now saving the data..."))
     WORLDSAVESIZEPREFIX=b'\x0e\x00\x00\x00worldSaveData\x00\x0f\x00\x00\x00StructProperty\x00'

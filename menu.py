@@ -37,22 +37,48 @@ try:
 except Exception:
     ctk = None
 def unlock_self_folder():
-    print(f"Attempting to unlock the folder...")
-    folder=os.path.dirname(os.path.abspath(sys.argv[0]))
-    script=(
-        f"$target=\"{folder}\"\n"
-        "$p=Get-Process\n"
-        "foreach($x in $p){try{if($x.Id -ne $PID -and $x.Path -and $x.Path.StartsWith($target)){Stop-Process -Id $x.Id -Force -ErrorAction SilentlyContinue}}catch{}}\n"
-        "foreach($x in $p){try{$m=$x.Modules|Where-Object{$_.FileName -and $_.FileName.StartsWith($target)};if($m.Count -gt 0 -and $x.Id -ne $PID){Stop-Process -Id $x.Id -Force -ErrorAction SilentlyContinue}}catch{}}\n"
-        "exit\n"
+    if getattr(sys, 'frozen', False):
+        folder = os.path.dirname(os.path.abspath(sys.executable))
+    else:
+        folder = os.path.dirname(os.path.abspath(sys.argv[0]))
+    folder_escaped = folder.replace("\\", "\\\\")
+    parent_pid = os.getpid()
+    ps_command = (
+        "Set-Location C:\\; "
+        f"$target = '{folder_escaped}'; "
+        f"$pPid = {parent_pid}; "
+        "function Global-Nuke { "
+        "  $procs = Get-WmiObject Win32_Process | Where-Object { ($_.ExecutablePath -like \"$target*\") -and ($_.ProcessId -ne $PID) }; "
+        "  foreach($p in $procs){ "
+        "    try { "
+        "      taskkill /F /T /ID $p.ProcessId /NoWindow; "
+        "      $process = Get-Process -Id $p.ProcessId -ErrorAction SilentlyContinue; "
+        "      if($process){ $process.Kill() } "
+        "    } catch {} "
+        "  } "
+        "}; "
+        "while($true){ "
+        "  Start-Sleep -Seconds 1; "
+        "  $parentAlive = Get-Process -Id $pPid -ErrorAction SilentlyContinue; "
+        "  if(!$parentAlive){ "
+        "    Global-Nuke; "
+        "    break; "
+        "  } "
+        "  $active = Get-WmiObject Win32_Process | Where-Object { ($_.ExecutablePath -like \"$target*\") -and ($_.ProcessId -ne $PID) -and ($_.ProcessId -ne $pPid) }; "
+        "  if(!$active){ "
+        "    break; "
+        "  } "
+        "}; "
+        "Stop-Process -Id $PID -Force"
     )
-    tmp=tempfile.NamedTemporaryFile(delete=False,suffix=".ps1")
-    tmp.write(script.encode())
-    tmp.close()
-    si=subprocess.STARTUPINFO()
-    si.dwFlags=subprocess.STARTF_USESHOWWINDOW
-    subprocess.Popen(["powershell","-WindowStyle","Hidden","-ExecutionPolicy","Bypass","-File",tmp.name],startupinfo=si,creationflags=subprocess.CREATE_NO_WINDOW)
-    print("Operation completed.")
+    si = subprocess.STARTUPINFO()
+    si.dwFlags = subprocess.STARTF_USESHOWWINDOW
+    subprocess.Popen(
+        ["powershell", "-WindowStyle", "Hidden", "-ExecutionPolicy", "Bypass", "-Command", ps_command],
+        startupinfo=si,
+        creationflags=subprocess.CREATE_NO_WINDOW,
+        cwd="C:\\"
+    )
 def is_frozen() -> bool:
     return getattr(sys, 'frozen', False)
 def get_assets_path() -> str:
@@ -821,10 +847,16 @@ class MenuGUI(QMainWindow):
         QApplication.quit()
         event.accept()
 def on_exit():
-    unlock_self_folder()
+    if getattr(sys, 'frozen', False):
+        folder = os.path.dirname(os.path.abspath(sys.executable))
+    else:
+        folder = os.path.dirname(os.path.abspath(sys.argv[0]))
+    folder_escaped = folder.replace("\\", "\\\\")
+    nuke_cmd = f"Get-WmiObject Win32_Process | Where-Object {{ $_.ExecutablePath -like '{folder_escaped}*' }} | ForEach-Object {{ Stop-Process -Id $_.ProcessId -Force }}"
+    subprocess.Popen(["powershell", "-WindowStyle", "Hidden", "-Command", nuke_cmd], creationflags=subprocess.CREATE_NO_WINDOW)
     os._exit(0)
-    pass
 if __name__ == "__main__":
+    unlock_self_folder()
     if "--list-assets" in sys.argv:
         print("Assets path:", get_assets_path())
         for p in list_assets_modules():

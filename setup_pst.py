@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Optional
 PROJECT_DIR=Path(__file__).resolve().parent
 VENV_DIR=PROJECT_DIR/"pst_venv"
+SENTINEL=VENV_DIR/".ready"
 USE_ANSI=True
 if os.name=="nt":
     try:
@@ -86,17 +87,26 @@ def main():
  |_| \__,_|_|\_/\_/\___/_| |_\__,_|___/\__,_|\_/\___||_|\___/\___/_/__/
     """
     print(msg)
-    nuke_build_artifacts()
-    if not VENV_DIR.exists():
-        print_step_working(step_label(1,3,"Creating Virtual Environment"))
-        subprocess.run([sys.executable,"-m","venv",str(VENV_DIR)])
-        print_ok(step_label(1,3,"Venv created"))
+    if not SENTINEL.exists():
+        nuke_build_artifacts()
+        if not VENV_DIR.exists():
+            print_step_working(step_label(1,3,"Creating Virtual Environment"))
+            subprocess.run([sys.executable,"-m","venv",str(VENV_DIR)])
+            print_ok(step_label(1,3,"Venv created"))
+        vpy=venv_python_path()
+        print_step_working(step_label(2,3,"Updating Dependencies"))
+        ret=run_and_watch([str(vpy),"-m","pip","install","pip==24.3.1","setuptools==75.6.0","wheel","numpy==2.1.3","PySide6-Essentials","shiboken6","packaging"])
+        if ret==0:
+            SENTINEL.touch()
+            print_ok(step_label(2,3,"Dependencies updated"))
+        else:
+            print_fail(step_label(2,3,"Dependency update failed"))
+            return
     vpy=venv_python_path()
-    print_step_working(step_label(2,3,"Updating Dependencies"))
-    run_and_watch([str(vpy),"-m","pip","install","pip==24.3.1","setuptools==75.6.0","wheel","numpy==2.1.3","PySide6-Essentials","shiboken6","packaging"])
-    print_ok(step_label(2,3,"Dependencies updated"))
     start_py=PROJECT_DIR/"start.py"
     if start_py.exists():
+        if SENTINEL.exists():
+            print(f"{DIM}{step_label(3,3,'Environment ready, bypassing checks')}{RESET}")
         print(f"{BOLD}{step_label(3,3,'Launching Application')}{RESET}")
         subprocess.call([str(vpy),str(start_py)])
 if __name__=="__main__":
