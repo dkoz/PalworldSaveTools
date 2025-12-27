@@ -463,13 +463,16 @@ class MenuGUI (QMainWindow ):
         action_toggle =menu .addAction (nf .icons ['nf-md-theme_light_dark']+" "+t ("Toggle Theme"))
         menu .addSeparator ()
         action_settings =menu .addAction (nf .icons ['nf-md-cog']+" "+t ("Settings"))
+        action_about =menu .addAction (nf .icons ['nf-md-information']+" "+t ("About PST"))
         action_toggle .triggered .connect (self .toggle_theme )
         action_settings .triggered .connect (self .show_settings )
+        action_about .triggered .connect (self .show_about )
         dropdown_btn .clicked .connect (lambda :menu .exec (dropdown_btn .mapToGlobal (QPoint (0 ,dropdown_btn .height ()))))
         self .dropdown_btn =dropdown_btn 
         self .menu =menu 
         self .action_toggle =action_toggle 
         self .action_settings =action_settings 
+        self .action_about =action_about 
         top_h .addWidget (dropdown_btn )
         minimize_btn =QPushButton (nf .icons ['nf-md-circle_medium'])
         minimize_btn .setObjectName ("controlChip")
@@ -683,6 +686,7 @@ class MenuGUI (QMainWindow ):
             btn .setToolTip (t (key ))
         self .action_toggle .setText (nf .icons ['nf-md-theme_light_dark']+" "+t ("Toggle Theme"))
         self .action_settings .setText (nf .icons ['nf-md-cog']+" "+t ("Settings"))
+        self .action_about .setText (nf .icons ['nf-md-information']+" "+t ("About PST"))
         self .dropdown_btn .setToolTip (t ("Menu"))
         self .warn_btn .setToolTip (t ("PalworldSaveTools"))
     def _show_warnings (self ):
@@ -798,6 +802,32 @@ class MenuGUI (QMainWindow ):
         button_layout .addWidget (close_btn )
         layout .addLayout (button_layout )
         dialog .show ()
+    def show_about (self ):
+        tools_version ,game_version =get_versions ()
+        h2_color ="#4a90e2"if self .is_dark_mode else "#1a5fb4"
+        text_color ="#e0e0e0"if self .is_dark_mode else "#333"
+        sub_color ="#888"if self .is_dark_mode else "#666"
+        about_text =f"""<h2 style="color: {h2_color };">{t ('about.title')} v{tools_version }</h2>
+    <p style="color: {text_color };">{t ('about.description')}</p>
+    <p style="color: {text_color };"><b>{t ('about.features.label')}:</b></p>
+    <ul>
+    <li style="color: {text_color };">{t ('about.features.1')}</li>
+    <li style="color: {text_color };">{t ('about.features.2')}</li>
+    <li style="color: {text_color };">{t ('about.features.3')}</li>
+    <li style="color: {text_color };">{t ('about.features.4')}</li>
+    <li style="color: {text_color };">{t ('about.features.5')}</li>
+    </ul>
+    <p style="color: {text_color };"><b>{t ('about.game_version')}:</b> {game_version }</p>
+    <p style="color: {text_color };"><b>{t ('about.developer')}:</b> Palworld Save Tools Team</p>
+    <p style="color: {text_color };"><b>GitHub:</b> <a href="{GITHUB_LATEST_ZIP }" style="color: {h2_color };">{t ('about.github')}</a></p>
+    <p style="color: {sub_color };">© 2025 Palworld Save Tools</p>"""
+        msg_box =QMessageBox (self )
+        msg_box .setWindowTitle (t ("About PST")if callable (t )else "About PST")
+        msg_box .setTextFormat (Qt .RichText )
+        msg_box .setText (about_text )
+        msg_box .setStandardButtons (QMessageBox .Ok )
+        msg_box .setIcon (QMessageBox .Information )
+        msg_box .exec ()
     def _preview_show_icons (self ,show ):
         self .user_settings ["show_icons"]=show 
         self ._populate_tool_buttons ()

@@ -2408,39 +2408,39 @@ def delete_all_skins ():
     msg =t ('deletion.menu.remove_invalid_skins_summary',removed_level_skins =removed_level_skins ,fixed_player_files =fixed_player_files )
     print (msg )
     refresh_all ()
-def unlock_viewing_cage_for_player():
-    import os
-    if not selected_source_player:
-        return
-    player_id = selected_source_player.replace("-", "").lower()
-    file_path = os.path.join(current_save_path, 'Players', f"{player_id.zfill(32)}.sav")
-    if not os.path.exists(file_path):
-        messagebox.showerror(t('Error'), t('File not found'))
-        return
-    try:
-        p_json = sav_to_json(file_path)
-        changed = False
-        def inject_viewing_cage(data):
-            nonlocal changed
-            if isinstance(data, dict):
-                if 'UnlockedRecipeTechnologyNames' in data:
-                    values_list = data['UnlockedRecipeTechnologyNames']['value']['values']
-                    if "DisplayCharacter" not in values_list:
-                        values_list.append("DisplayCharacter")
-                        changed = True
-                for v in data.values():
-                    inject_viewing_cage(v)
-            elif isinstance(data, list):
-                for item in data:
-                    inject_viewing_cage(item)
-        inject_viewing_cage(p_json)
-        if changed:
-            json_to_sav(p_json, file_path)
-            messagebox.showinfo(t('Success'), t('Viewing Cage Unlocked'))
-        else:
-            messagebox.showinfo(t('Info'), t('Already Unlocked'))
-    except Exception as e:
-        messagebox.showerror(t('Error'), str(e))
+def unlock_viewing_cage_for_player ():
+    import os 
+    if not selected_source_player :
+        return 
+    player_id =selected_source_player .replace ("-","").lower ()
+    file_path =os .path .join (current_save_path ,'Players',f"{player_id .zfill (32 )}.sav")
+    if not os .path .exists (file_path ):
+        messagebox .showerror (t ('Error'),t ('file.error.not_found'))
+        return 
+    try :
+        p_json =sav_to_json (file_path )
+        changed =False 
+        def inject_viewing_cage (data ):
+            nonlocal changed 
+            if isinstance (data ,dict ):
+                if 'UnlockedRecipeTechnologyNames'in data :
+                    values_list =data ['UnlockedRecipeTechnologyNames']['value']['values']
+                    if "DisplayCharacter"not in values_list :
+                        values_list .append ("DisplayCharacter")
+                        changed =True 
+                for v in data .values ():
+                    inject_viewing_cage (v )
+            elif isinstance (data ,list ):
+                for item in data :
+                    inject_viewing_cage (item )
+        inject_viewing_cage (p_json )
+        if changed :
+            json_to_sav (p_json ,file_path )
+            messagebox .showinfo (t ('Success'),t ('player.viewing_cage.unlocked'))
+        else :
+            messagebox .showinfo (t ('Info'),t ('player.viewing_cage.already_unlocked'))
+    except Exception as e :
+        messagebox .showerror (t ('Error'),str (e ))
 def delete_invalid_structure_map_objects ():
     global loaded_level_json 
     import json ,os 
@@ -4427,31 +4427,31 @@ def all_in_one_tools ():
             refresh_all ()
         else :
             messagebox .showerror ('Error','Failed to clone base.')
-    def player_tree_menu(event):
-        global selected_source_player
-        iid = player_tree.identify_row(event.y)
-        if iid:
-            player_tree.selection_set(iid)
-        selected_iids = player_tree.selection()
-        if selected_iids:
-            raw_uid = player_tree.item(selected_iids[0])['values'][4]
-            selected_source_player = raw_uid
-            menu = tk.Menu(window, tearoff=0, bg=MENU_BG, fg=MENU_FG, activebackground=MENU_ACTIVE_BG, activeforeground=MENU_FG)
-            menu.add_command(label=t('deletion.ctx.add_exclusion'), command=lambda: add_exclusion(player_tree, 'players'))
-            menu.add_command(label=t('deletion.ctx.remove_exclusion'), command=lambda: remove_selected_from_regular(player_tree, 'players'))
-            menu.add_command(label=t('deletion.ctx.delete_player'), command=delete_selected_player)
-            menu.add_command(label=t('player.rename.menu'), command=rename_player)
-            menu.add_command(label="Unlock Viewing Cage", command=unlock_viewing_cage_for_player)
-            menu.add_separator()
-            menu.add_command(label=t('deletion.ctx.delete_guild'), command=delete_selected_guild)
-            menu.add_command(label=t('guild.rename.menu'), command=rename_guild)
-            menu.add_command(label=t('guild.menu.max_level'), command=max_guild_level)
-            menu.add_command(label=t('button.import'), command=import_base_to_guild)
-            menu.add_separator()
-            menu.add_command(label=t('guild.menu.move_selected_player_to_selected_guild'), command=move_selected_player_to_selected_guild)
-            menu.tk_popup(event.x_root, event.y_root)
-        else:
-            selected_source_player = None
+    def player_tree_menu (event ):
+        global selected_source_player 
+        iid =player_tree .identify_row (event .y )
+        if iid :
+            player_tree .selection_set (iid )
+        selected_iids =player_tree .selection ()
+        if selected_iids :
+            raw_uid =player_tree .item (selected_iids [0 ])['values'][4 ]
+            selected_source_player =raw_uid 
+            menu =tk .Menu (window ,tearoff =0 ,bg =MENU_BG ,fg =MENU_FG ,activebackground =MENU_ACTIVE_BG ,activeforeground =MENU_FG )
+            menu .add_command (label =t ('deletion.ctx.add_exclusion'),command =lambda :add_exclusion (player_tree ,'players'))
+            menu .add_command (label =t ('deletion.ctx.remove_exclusion'),command =lambda :remove_selected_from_regular (player_tree ,'players'))
+            menu .add_command (label =t ('deletion.ctx.delete_player'),command =delete_selected_player )
+            menu .add_command (label =t ('player.rename.menu'),command =rename_player )
+            menu .add_command (label =t ('player.viewing_cage.menu'),command =unlock_viewing_cage_for_player )
+            menu .add_separator ()
+            menu .add_command (label =t ('deletion.ctx.delete_guild'),command =delete_selected_guild )
+            menu .add_command (label =t ('guild.rename.menu'),command =rename_guild )
+            menu .add_command (label =t ('guild.menu.max_level'),command =max_guild_level )
+            menu .add_command (label =t ('button.import'),command =import_base_to_guild )
+            menu .add_separator ()
+            menu .add_command (label =t ('guild.menu.move_selected_player_to_selected_guild'),command =move_selected_player_to_selected_guild )
+            menu .tk_popup (event .x_root ,event .y_root )
+        else :
+            selected_source_player =None 
     def guild_members_tree_menu (event ):
         iid =guild_members_tree .identify_row (event .y )
         if iid :

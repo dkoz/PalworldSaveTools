@@ -1,4 +1,5 @@
 {
+"About PST": "À propos de PST",
 "app.title": "PalworldSaveTools v{version}",
 "app.subtitle": "Compatible avec la version du jeu v{game_version}",
 "update.latest": "Dernière version",
@@ -475,5 +476,19 @@
 "blueprint.status.up_to_date": "Le plan est à jour.",
 "guild.level.maxed": "Le niveau du camp de base de la guilde a été défini sur 30 avec succès.",
 "base.error.no_base_found": "Aucun camp de base trouvé dans la sauvegarde cible. Veuillez créer au moins un camp de base (Boîte Pal) en jeu avant d'importer.",
-"base.error.title": "Erreur d'importation"
+"base.error.title": "Erreur d'importation",
+"player.viewing_cage.menu": "Débloquer la cage d'exposition",
+"player.viewing_cage.unlocked": "Cage d'exposition débloquée avec succès.",
+"player.viewing_cage.already_unlocked": "La cage d'exposition est déjà débloquée.",
+"about.title": "Palworld Save Tools",
+"about.description": "Une boîte à outils complète pour gérer les fichiers de sauvegarde de Palworld.",
+"about.features.label": "Caractéristiques",
+"about.features.1": "Convertir des fichiers de sauvegarde entre différents formats",
+"about.features.2": "Gérer et modifier les données de sauvegarde",
+"about.features.3": "Transférer des personnages entre les sauvegardes",
+"about.features.4": "Corriger les problèmes de sauvegarde courants",
+"about.features.5": "Restaurer les données de la carte",
+"about.game_version": "Version du jeu",
+"about.developer": "Développeur",
+"about.github": "Voir sur GitHub"
 }
