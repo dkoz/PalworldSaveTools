@@ -490,5 +490,9 @@
 "about.features.5": "Restaurer les données de la carte",
 "about.game_version": "Version du jeu",
 "about.developer": "Développeur",
-"about.github": "Voir sur GitHub"
+"about.github": "Voir sur GitHub",
+"error.overlay.title": "UNE ERREUR EST SURVENUE",
+"error.overlay.copy": "COPIER DANS LE PRESSE-PAPIERS",
+"error.overlay.close": "FERMER L'ERREUR",
+"error.overlay.copied": "COPIÉ !"
 }

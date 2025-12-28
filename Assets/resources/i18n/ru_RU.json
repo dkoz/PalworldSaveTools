@@ -507,5 +507,9 @@
 "about.features.5": "Восстановление данных карты",
 "about.game_version": "Версия игры",
 "about.developer": "Разработчик",
-"about.github": "Посмотреть на GitHub"
+"about.github": "Посмотреть на GitHub",
+"error.overlay.title": "ПРОИЗОШЛА ОШИБКА",
+"error.overlay.copy": "КОПИРОВАТЬ В БУФЕР",
+"error.overlay.close": "ЗАКРЫТЬ ОШИБКУ",
+"error.overlay.copied": "СКОПИРОВАНО!"
 }

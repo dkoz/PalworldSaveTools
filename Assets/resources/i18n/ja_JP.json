@@ -510,5 +510,9 @@
 "about.features.5": "マップデータの復元",
 "about.game_version": "ゲームバージョン",
 "about.developer": "開発者",
-"about.github": "GitHubで表示"
+"about.github": "GitHubで表示",
+"error.overlay.title": "エラーが発生しました",
+"error.overlay.copy": "クリップボードにコピー",
+"error.overlay.close": "エラーを閉じる",
+"error.overlay.copied": "コピーしました！"
 }

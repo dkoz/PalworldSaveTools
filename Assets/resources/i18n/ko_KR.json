@@ -511,5 +511,9 @@
 "about.features.5": "지도 데이터 복구",
 "about.game_version": "게임 버전",
 "about.developer": "개발자",
-"about.github": "GitHub에서 보기"
+"about.github": "GitHub에서 보기",
+"error.overlay.title": "오류가 발생했습니다",
+"error.overlay.copy": "클립보드에 복사",
+"error.overlay.close": "오류 닫기",
+"error.overlay.copied": "복사됨!"
 }

@@ -510,5 +510,9 @@
 "about.features.5": "Kartendaten wiederherstellen",
 "about.game_version": "Spielversion",
 "about.developer": "Entwickler",
-"about.github": "Auf GitHub ansehen"
+"about.github": "Auf GitHub ansehen",
+"error.overlay.title": "EIN FEHLER IST AUFGETRETEN",
+"error.overlay.copy": "IN ZWISCHENABLAGE KOPIEREN",
+"error.overlay.close": "FEHLER SCHLIESSEN",
+"error.overlay.copied": "KOPIERT!"
 }

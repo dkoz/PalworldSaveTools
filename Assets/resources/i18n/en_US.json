@@ -506,5 +506,16 @@
 "about.features.5": "Restore map data",
 "about.game_version": "Game Version",
 "about.developer": "Developer",
-"about.github": "View on GitHub"
+"about.github": "View on GitHub",
+"error.overlay.title": "AN ERROR OCCURRED",
+"error.overlay.copy": "COPY TO CLIPBOARD",
+"error.overlay.close": "CLOSE ERROR",
+"error.overlay.copied": "COPIED!",
+"about.features.5": "Restore map data",
+"about.game_version": "Game Version",
+"about.developer": "Developer",
+"error.overlay.title": "AN ERROR OCCURRED",
+"error.overlay.copy": "COPY TO CLIPBOARD",
+"error.overlay.close": "CLOSE ERROR",
+"error.overlay.copied": "COPIED!"
 }

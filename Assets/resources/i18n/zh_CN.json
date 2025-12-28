@@ -510,5 +510,9 @@
 "about.features.5": "恢复地图数据",
 "about.game_version": "游戏版本",
 "about.developer": "开发者",
-"about.github": "在 GitHub 上查看"
+"about.github": "在 GitHub 上查看",
+"error.overlay.title": "发生错误",
+"error.overlay.copy": "复制到剪贴板",
+"error.overlay.close": "关闭错误",
+"error.overlay.copied": "已复制！"
 }

@@ -510,5 +510,9 @@
 "about.features.5": "Restaurar datos del mapa",
 "about.game_version": "Versión del juego",
 "about.developer": "Desarrollador",
-"about.github": "Ver en GitHub"
+"about.github": "Ver en GitHub",
+"error.overlay.title": "HA OCURRIDO UN ERROR",
+"error.overlay.copy": "COPIAR AL PORTAPAPELES",
+"error.overlay.close": "CERRAR ERROR",
+"error.overlay.copied": "¡COPIADO!"
 }
