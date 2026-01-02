@@ -115,7 +115,7 @@ def setup_import_paths ():
     assets =get_assets_path ()
     if assets not in sys .path :
         sys .path .insert (0 ,assets )
-    for sub in ['palworld_coord','palworld_save_tools','palworld_xgp_import','resources']:
+    for sub in ['palworld_coord','palworld_save_tools','palworld_xgp_import','resources','palworld_aio']:
         p =os .path .join (assets ,sub )
         if os .path .isdir (p )and p not in sys .path :
             sys .path .insert (0 ,p )
@@ -289,6 +289,10 @@ def run_tool (choice ):
             print (f"Error importing/calling {module_name }.{function_name }: {e }")
             traceback .print_exc ()
             raise 
+    def run_aio_tool ():
+        from palworld_aio .ui import MainWindow 
+        window =MainWindow ()
+        return window 
     tool_lists =[
     [
     lambda :import_and_call ("convert_level_location_finder","convert_level_location_finder","json"),
@@ -299,7 +303,7 @@ def run_tool (choice ):
     lambda :import_and_call ("convertids","convert_steam_id"),
     ],
     [
-    lambda :import_and_call ("all_in_one_tools","all_in_one_tools"),
+    run_aio_tool ,
     lambda :import_and_call ("slot_injector","slot_injector"),
     lambda :import_and_call ("modify_save","modify_save"),
     lambda :import_and_call ("character_transfer","character_transfer"),
@@ -776,13 +780,13 @@ class MenuGUI (QMainWindow ):
         theme_combo =QComboBox ()
         theme_combo .addItems (["dark","light"])
         theme_combo .setCurrentText (settings .get ("theme","dark"))
-        theme_combo .currentTextChanged .connect (lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ))
+        theme_combo .currentTextChanged .connect (lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo ))
         theme_layout .addWidget (theme_label )
         theme_layout .addWidget (theme_combo )
         layout .addLayout (theme_layout )
         show_icons_cb =QCheckBox ("Show icons in tool list")
         show_icons_cb .setChecked (settings .get ("show_icons",True ))
-        show_icons_cb .stateChanged .connect (lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ))
+        show_icons_cb .stateChanged .connect (lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo ))
         layout .addWidget (show_icons_cb )
         lang_layout =QHBoxLayout ()
         lang_label =QLabel ("Language:")
@@ -791,10 +795,19 @@ class MenuGUI (QMainWindow ):
         current_lang_code =settings .get ("language","en_US")
         current_lang_name =next ((name for name ,code in self .lang_map .items ()if code ==current_lang_code ),"English")
         lang_combo .setCurrentText (current_lang_name )
-        lang_combo .currentTextChanged .connect (lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ))
+        lang_combo .currentTextChanged .connect (lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo ))
         lang_layout .addWidget (lang_label )
         lang_layout .addWidget (lang_combo )
         layout .addLayout (lang_layout )
+        boot_pref_layout =QHBoxLayout ()
+        boot_pref_label =QLabel ("Boot Preference:")
+        boot_pref_combo =QComboBox ()
+        boot_pref_combo .addItems (["menu","palworld_aio"])
+        boot_pref_combo .setCurrentText (settings .get ("boot_preference","menu"))
+        boot_pref_combo .currentTextChanged .connect (lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo ))
+        boot_pref_layout .addWidget (boot_pref_label )
+        boot_pref_layout .addWidget (boot_pref_combo )
+        layout .addLayout (boot_pref_layout )
         button_layout =QHBoxLayout ()
         button_layout .addStretch ()
         close_btn =QPushButton ("Close")
@@ -831,12 +844,13 @@ class MenuGUI (QMainWindow ):
     def _preview_show_icons (self ,show ):
         self .user_settings ["show_icons"]=show 
         self ._populate_tool_buttons ()
-    def _auto_save_settings (self ,dialog ,theme_combo ,show_icons_cb ,lang_combo ):
+    def _auto_save_settings (self ,dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo ):
         old_lang =self .user_settings .get ("language")
         settings ={
         "theme":theme_combo .currentText (),
         "show_icons":show_icons_cb .isChecked (),
-        "language":self .lang_map .get (lang_combo .currentText (),"en_US")
+        "language":self .lang_map .get (lang_combo .currentText (),"en_US"),
+        "boot_preference":boot_pref_combo .currentText ()
         }
         self .user_settings =settings 
         user_cfg_path =os .path .join (get_assets_path (),"data","configs","user.cfg")
@@ -940,9 +954,24 @@ if __name__ =="__main__":
     app =QApplication (sys .argv )
     app .setQuitOnLastWindowClosed (False )
     gui =MenuGUI ()
-    gui .show ()
-    gui .start_fade_in ()
-    gui ._automatic_check_updates ()
+    if gui .user_settings .get ("boot_preference")=="palworld_aio":
+        gui .hide ()
+        try :
+            from palworld_aio .ui .main_window import MainWindow 
+            from import_libs import center_window 
+            aio_window =MainWindow ()
+            center_window (aio_window )
+            aio_window .show ()
+        except Exception as e :
+            print (f"Failed to load palworld_aio: {e }")
+            traceback .print_exc ()
+            gui .show ()
+            gui .start_fade_in ()
+            gui ._automatic_check_updates ()
+    else :
+        gui .show ()
+        gui .start_fade_in ()
+        gui ._automatic_check_updates ()
     try :
         sys .exit (app .exec ())
     except KeyboardInterrupt :

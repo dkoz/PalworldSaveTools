@@ -514,5 +514,11 @@
 "error.overlay.title": "发生错误",
 "error.overlay.copy": "复制到剪贴板",
 "error.overlay.close": "关闭错误",
-"error.overlay.copied": "已复制！"
+"error.overlay.copied": "已复制！",
+"search.placeholder": "输入搜索内容...",
+"deletion.results_panel": "结果面板",
+"deletion.stats_panel": "统计面板",
+"deletion.selected_player_label": "已选玩家",
+"deletion.selected_guild_label": "已选公会",
+"deletion.selected_base_label": "已选基地"
 }

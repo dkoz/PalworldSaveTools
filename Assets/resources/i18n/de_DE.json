@@ -514,5 +514,11 @@
 "error.overlay.title": "EIN FEHLER IST AUFGETRETEN",
 "error.overlay.copy": "IN ZWISCHENABLAGE KOPIEREN",
 "error.overlay.close": "FEHLER SCHLIESSEN",
-"error.overlay.copied": "KOPIERT!"
+"error.overlay.copied": "KOPIERT!",
+"search.placeholder": "Suchen...",
+"deletion.results_panel": "Ergebnispanel",
+"deletion.stats_panel": "Statistikpanel",
+"deletion.selected_player_label": "Ausgewählter Spieler",
+"deletion.selected_guild_label": "Ausgewählte Gilde",
+"deletion.selected_base_label": "Ausgewählte Basis"
 }

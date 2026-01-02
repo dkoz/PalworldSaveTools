@@ -74,6 +74,8 @@ def nuke_build_artifacts ():
         if path .exists ():shutil .rmtree (path ,ignore_errors =True )
     for p in PROJECT_DIR .rglob ("*.egg-info"):
         if p .is_dir ():shutil .rmtree (p ,ignore_errors =True )
+    for p in PROJECT_DIR .rglob ("__pycache__"):
+        if p .is_dir ():shutil .rmtree (p ,ignore_errors =True )
     print_ok ("Environment cleaned")
 def venv_python_path ()->Path :
     if os .name =="nt":return VENV_DIR /"Scripts"/"python.exe"

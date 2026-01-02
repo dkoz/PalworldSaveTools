@@ -515,5 +515,11 @@
 "error.overlay.title": "오류가 발생했습니다",
 "error.overlay.copy": "클립보드에 복사",
 "error.overlay.close": "오류 닫기",
-"error.overlay.copied": "복사됨!"
+"error.overlay.copied": "복사됨!",
+"search.placeholder": "검색어 입력...",
+"deletion.results_panel": "결과 패널",
+"deletion.stats_panel": "통계 패널",
+"deletion.selected_player_label": "선택된 플레이어",
+"deletion.selected_guild_label": "선택된 길드",
+"deletion.selected_base_label": "선택된 기지"
 }

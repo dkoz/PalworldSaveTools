@@ -494,5 +494,11 @@
 "error.overlay.title": "UNE ERREUR EST SURVENUE",
 "error.overlay.copy": "COPIER DANS LE PRESSE-PAPIERS",
 "error.overlay.close": "FERMER L'ERREUR",
-"error.overlay.copied": "COPIÉ !"
+"error.overlay.copied": "COPIÉ !",
+"search.placeholder": "Tapez pour rechercher...",
+"deletion.results_panel": "Panneau de résultats",
+"deletion.stats_panel": "Panneau de statistiques",
+"deletion.selected_player_label": "Joueur sélectionné",
+"deletion.selected_guild_label": "Guilde sélectionnée",
+"deletion.selected_base_label": "Base sélectionnée"
 }

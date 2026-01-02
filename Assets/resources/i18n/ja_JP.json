@@ -514,5 +514,11 @@
 "error.overlay.title": "エラーが発生しました",
 "error.overlay.copy": "クリップボードにコピー",
 "error.overlay.close": "エラーを閉じる",
-"error.overlay.copied": "コピーしました！"
+"error.overlay.copied": "コピーしました！",
+"search.placeholder": "検索...",
+"deletion.results_panel": "結果パネル",
+"deletion.stats_panel": "統計パネル",
+"deletion.selected_player_label": "選択されたプレイヤー",
+"deletion.selected_guild_label": "選択されたギルド",
+"deletion.selected_base_label": "選択された基地"
 }

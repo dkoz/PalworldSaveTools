@@ -1,0 +1,1131 @@
+import os 
+import json 
+import webbrowser 
+import urllib .request 
+import re 
+from PySide6 .QtWidgets import (
+QMainWindow ,QWidget ,QVBoxLayout ,QHBoxLayout ,QLabel ,
+QPushButton ,QFrame ,QMenuBar ,QMenu ,QStatusBar ,
+QSplitter ,QMessageBox ,QFileDialog ,QInputDialog ,QDialog ,QCheckBox ,QComboBox ,QApplication ,
+QTabBar ,QStackedWidget 
+)
+from PySide6 .QtCore import Qt ,QTimer ,Signal 
+from PySide6 .QtGui import QIcon ,QFont ,QAction ,QPixmap ,QCloseEvent 
+from i18n import t ,set_language ,load_resources 
+from common import get_versions 
+GITHUB_RAW_URL ="https://raw.githubusercontent.com/deafdudecomputers/PalworldSaveTools/main/Assets/common.py"
+GITHUB_LATEST_ZIP ="https://github.com/deafdudecomputers/PalworldSaveTools/releases/latest"
+try :
+    from palworld_aio import constants 
+    from palworld_aio .utils import check_for_update ,as_uuid 
+    from palworld_aio .save_manager import save_manager 
+    from palworld_aio .data_manager import get_guilds ,get_guild_members ,get_bases ,delete_guild ,delete_player ,load_exclusions ,save_exclusions ,delete_base_camp 
+    from palworld_aio .func_manager import (
+    delete_empty_guilds ,delete_inactive_players ,delete_inactive_bases ,
+    delete_duplicated_players ,delete_unreferenced_data ,delete_non_base_map_objects ,
+    delete_invalid_structure_map_objects ,delete_all_skins ,unlock_all_private_chests ,
+    remove_invalid_items_from_save ,remove_invalid_pals_from_save ,fix_missions ,
+    reset_anti_air_turrets ,reset_dungeons ,unlock_viewing_cage_for_player ,
+    fix_all_negative_timestamps ,reset_selected_player_timestamp 
+    )
+    from palworld_aio .guild_manager import move_player_to_guild ,rebuild_all_guilds ,make_member_leader ,rename_guild ,max_guild_level 
+    from palworld_aio .base_manager import export_base_json ,import_base_json ,clone_base_complete 
+    from palworld_aio .player_manager import rename_player 
+    from palworld_aio .map_generator import generate_world_map 
+    from palworld_aio .dialogs import InputDialog ,DaysInputDialog ,PalDefenderDialog 
+    from palworld_aio .widgets import SearchPanel ,StatsPanel 
+except ImportError :
+    from ..import constants 
+    from ..utils import check_for_update ,as_uuid 
+    from ..save_manager import save_manager 
+    from ..data_manager import get_guilds ,get_guild_members ,get_bases ,delete_guild ,delete_player ,load_exclusions ,save_exclusions ,delete_base_camp 
+    from ..func_manager import (
+    delete_empty_guilds ,delete_inactive_players ,delete_inactive_bases ,
+    delete_duplicated_players ,delete_unreferenced_data ,delete_non_base_map_objects ,
+    delete_invalid_structure_map_objects ,delete_all_skins ,unlock_all_private_chests ,
+    remove_invalid_items_from_save ,remove_invalid_pals_from_save ,fix_missions ,
+    reset_anti_air_turrets ,reset_dungeons ,unlock_viewing_cage_for_player ,
+    fix_all_negative_timestamps ,reset_selected_player_timestamp 
+    )
+    from ..guild_manager import move_player_to_guild ,rebuild_all_guilds ,make_member_leader ,rename_guild ,max_guild_level 
+    from ..base_manager import export_base_json ,import_base_json ,clone_base_complete 
+    from ..player_manager import rename_player 
+    from ..map_generator import generate_world_map 
+    from ..dialogs import InputDialog ,DaysInputDialog ,PalDefenderDialog 
+    from ..widgets import SearchPanel ,StatsPanel 
+class MainWindow (QMainWindow ):
+    def __init__ (self ):
+        super ().__init__ ()
+        self .is_dark_mode =True 
+        self .user_settings ={}
+        self .lang_map ={
+        "English":"en_US",
+        "中文":"zh_CN",
+        "Русский":"ru_RU",
+        "Français":"fr_FR",
+        "Español":"es_ES",
+        "Deutsch":"de_DE",
+        "日本語":"ja_JP",
+        "한국어":"ko_KR"
+        }
+        load_exclusions ()
+        self ._load_user_settings ()
+        self ._setup_ui ()
+        self ._load_theme ()
+        self ._setup_menus ()
+        self ._setup_connections ()
+        self ._check_update ()
+    def _setup_ui (self ):
+        self .setWindowTitle (t ('deletion.title')if t else 'All-in-One Tools')
+        self .setMinimumSize (1400 ,800 )
+        self .resize (1400 ,800 )
+        self .setWindowFlags (Qt .FramelessWindowHint )
+        if os .path .exists (constants .ICON_PATH ):
+            self .setWindowIcon (QIcon (constants .ICON_PATH ))
+        central_widget =QWidget ()
+        central_widget .setObjectName ("central")
+        self .setCentralWidget (central_widget )
+        main_layout =QVBoxLayout (central_widget )
+        main_layout .setContentsMargins (0 ,0 ,0 ,0 )
+        main_layout .setSpacing (0 )
+        from .header_widget import HeaderWidget 
+        self .header_widget =HeaderWidget ()
+        self .header_widget .set_theme (self .is_dark_mode )
+        self .header_widget .minimize_clicked .connect (self .showMinimized )
+        self .header_widget .close_clicked .connect (self .close )
+        self .header_widget .theme_toggle_clicked .connect (self ._toggle_theme )
+        self .header_widget .settings_clicked .connect (self ._show_settings )
+        self .header_widget .about_clicked .connect (self ._show_about )
+        self .header_widget .sidebar_toggle_clicked .connect (self ._toggle_dashboard )
+        self .header_widget .warn_btn .clicked .connect (self ._show_warnings )
+        self .header_widget .show_warning (True )
+        main_layout .addWidget (self .header_widget )
+        self ._dashboard_collapsed =False 
+        self ._dashboard_sizes =[1000 ,400 ]
+        self .tab_bar =QTabBar ()
+        self .tab_bar .setObjectName ("customTabBar")
+        self .tab_bar .setExpanding (False )
+        self .tab_bar .currentChanged .connect (self ._on_tab_changed )
+        main_layout .addWidget (self .tab_bar )
+        self .splitter =QSplitter (Qt .Horizontal )
+        self .splitter .setChildrenCollapsible (False )
+        self .stacked_widget =QStackedWidget ()
+        self ._setup_players_tab ()
+        self ._setup_guilds_tab ()
+        self ._setup_bases_tab ()
+        self ._setup_map_tab ()
+        self ._setup_tools_tab ()
+        self ._setup_exclusions_tab ()
+        self .splitter .addWidget (self .stacked_widget )
+        from .results_widget import ResultsWidget 
+        self .results_widget =ResultsWidget ()
+        self .splitter .addWidget (self .results_widget )
+        total_width =self .width ()
+        tab_width =int (total_width *0.75 )
+        results_width =int (total_width *0.25 )
+        self .splitter .setSizes ([tab_width ,results_width ])
+        self .splitter .setStretchFactor (0 ,1 )
+        self .splitter .setStretchFactor (1 ,1 )
+        main_layout .addWidget (self .splitter ,stretch =1 )
+        self .status_bar =QStatusBar ()
+        self .setStatusBar (self .status_bar )
+        self .status_bar .showMessage (t ('status.ready')if t else 'Ready')
+    def _setup_players_tab (self ):
+        players_tab =QWidget ()
+        layout =QVBoxLayout (players_tab )
+        layout .setContentsMargins (10 ,10 ,10 ,10 )
+        self .players_panel =SearchPanel (
+        'deletion.search_players',
+        [t ('deletion.col.player_name'),t ('deletion.col.last_seen'),t ('deletion.col.level'),
+        t ('deletion.col.pals'),'UID',t ('deletion.col.guild_name'),t ('deletion.col.guild_id')],
+        [140 ,120 ,60 ,60 ,150 ,180 ,180 ]
+        )
+        self .players_panel .item_selected .connect (self ._on_player_selected )
+        self .players_panel .tree .customContextMenuRequested .connect (self ._show_player_context_menu )
+        layout .addWidget (self .players_panel )
+        self .tab_bar .addTab (t ('deletion.search_players')if t else 'Players')
+        self .stacked_widget .addWidget (players_tab )
+    def _setup_guilds_tab (self ):
+        guilds_tab =QWidget ()
+        layout =QVBoxLayout (guilds_tab )
+        layout .setContentsMargins (10 ,10 ,10 ,10 )
+        splitter =QSplitter (Qt .Vertical )
+        self .guilds_panel =SearchPanel (
+        'deletion.search_guilds',
+        [t ('deletion.col.guild_name'),t ('deletion.col.guild_id')],
+        [200 ,300 ]
+        )
+        self .guilds_panel .item_selected .connect (self ._on_guild_selected )
+        self .guilds_panel .tree .customContextMenuRequested .connect (self ._show_guild_context_menu )
+        splitter .addWidget (self .guilds_panel )
+        self .guild_members_panel =SearchPanel (
+        'deletion.guild_members',
+        [t ('deletion.col.member'),t ('deletion.col.last_seen'),t ('deletion.col.level'),
+        t ('deletion.col.pals'),'UID'],
+        [200 ,120 ,60 ,100 ,300 ]
+        )
+        self .guild_members_panel .item_selected .connect (self ._on_guild_member_selected )
+        self .guild_members_panel .tree .customContextMenuRequested .connect (self ._show_guild_member_context_menu )
+        splitter .addWidget (self .guild_members_panel )
+        layout .addWidget (splitter )
+        self .tab_bar .addTab (t ('deletion.search_guilds')if t else 'Guilds')
+        self .stacked_widget .addWidget (guilds_tab )
+    def _setup_bases_tab (self ):
+        bases_tab =QWidget ()
+        layout =QVBoxLayout (bases_tab )
+        layout .setContentsMargins (10 ,10 ,10 ,10 )
+        self .bases_panel =SearchPanel (
+        'deletion.search_bases',
+        [t ('deletion.col.base_id'),t ('deletion.col.guild_id'),t ('deletion.col.guild_name')],
+        [200 ,250 ,250 ]
+        )
+        self .bases_panel .item_selected .connect (self ._on_base_selected )
+        self .bases_panel .tree .customContextMenuRequested .connect (self ._show_base_context_menu )
+        layout .addWidget (self .bases_panel )
+        self .tab_bar .addTab (t ('deletion.search_bases')if t else 'Bases')
+        self .stacked_widget .addWidget (bases_tab )
+    def _setup_map_tab (self ):
+        from .map_tab import MapTab 
+        self .map_tab =MapTab (self )
+        self .tab_bar .addTab (t ('map.viewer')if t else 'Map')
+        self .stacked_widget .addWidget (self .map_tab )
+    def _setup_tools_tab (self ):
+        from .tools_tab import ToolsTab 
+        self .tools_tab =ToolsTab (self )
+        self .tab_bar .addTab (t ('tools.tab')if t else 'Tools')
+        self .stacked_widget .addWidget (self .tools_tab )
+    def _setup_exclusions_tab (self ):
+        exclusions_tab =QWidget ()
+        layout =QHBoxLayout (exclusions_tab )
+        layout .setContentsMargins (10 ,10 ,10 ,10 )
+        layout .setSpacing (10 )
+        self .excl_players_panel =SearchPanel (
+        'deletion.exclusions.player_label',
+        [t ('deletion.excluded_player_uid')if t else 'Player UID'],
+        [300 ]
+        )
+        self .excl_players_panel .tree .customContextMenuRequested .connect (
+        lambda pos :self ._show_exclusion_context_menu (pos ,'players'))
+        layout .addWidget (self .excl_players_panel )
+        self .excl_guilds_panel =SearchPanel (
+        'deletion.exclusions.guild_label',
+        [t ('deletion.excluded_guild_id')if t else 'Guild ID'],
+        [300 ]
+        )
+        self .excl_guilds_panel .tree .customContextMenuRequested .connect (
+        lambda pos :self ._show_exclusion_context_menu (pos ,'guilds'))
+        layout .addWidget (self .excl_guilds_panel )
+        self .excl_bases_panel =SearchPanel (
+        'deletion.exclusions.base_label',
+        [t ('deletion.excluded_bases')if t else 'Base ID'],
+        [300 ]
+        )
+        self .excl_bases_panel .tree .customContextMenuRequested .connect (
+        lambda pos :self ._show_exclusion_context_menu (pos ,'bases'))
+        layout .addWidget (self .excl_bases_panel )
+        self .tab_bar .addTab (t ('deletion.menu.exclusions')if t else 'Exclusions')
+        self .stacked_widget .addWidget (exclusions_tab )
+    def _setup_menus (self ):
+
+        menu_actions ={
+        'file':[
+        (t ('menu.file.load_save')if t else 'Load Save',self ._load_save ),
+        (t ('menu.file.save_changes')if t else 'Save Changes',self ._save_changes ),
+        (t ('menu.file.rename_world')if t else 'Rename World',self ._rename_world ),
+        ],
+        'functions':[
+        (t ('deletion.menu.delete_empty_guilds')if t else 'Delete Empty Guilds',self ._delete_empty_guilds ),
+        (t ('deletion.menu.delete_inactive_bases')if t else 'Delete Inactive Bases',self ._delete_inactive_bases ),
+        (t ('deletion.menu.delete_duplicate_players')if t else 'Delete Duplicate Players',self ._delete_duplicate_players ),
+        (t ('deletion.menu.delete_inactive_players')if t else 'Delete Inactive Players',self ._delete_inactive_players ),
+        (t ('deletion.menu.delete_unreferenced')if t else 'Delete Unreferenced Data',self ._delete_unreferenced ),
+        (t ('deletion.menu.delete_non_base_map_objs')if t else 'Delete Non-Base Map Objects',self ._delete_non_base_map_objs ),
+        (t ('deletion.menu.delete_all_skins')if t else 'Delete All Skins',self ._delete_all_skins ),
+        (t ('deletion.menu.unlock_private_chests')if t else 'Unlock Private Chests',self ._unlock_private_chests ),
+        (t ('deletion.menu.remove_invalid_items')if t else 'Remove Invalid Items',self ._remove_invalid_items ),
+        (t ('deletion.menu.remove_invalid_structures')if t else 'Remove Invalid Structures',self ._remove_invalid_structures ),
+        (t ('deletion.menu.remove_invalid_pals')if t else 'Remove Invalid Pals',self ._remove_invalid_pals ),
+        (t ('deletion.menu.reset_missions')if t else 'Reset Missions',self ._reset_missions ),
+        (t ('deletion.menu.reset_anti_air')if t else 'Reset Anti-Air Turrets',self ._reset_anti_air ),
+        (t ('deletion.menu.reset_dungeons')if t else 'Reset Dungeons',self ._reset_dungeons ),
+        (t ('deletion.menu.paldefender')if t else 'PalDefender Commands',self ._open_paldefender ,'separator_after'),
+        (t ('deletion.menu.fix_timestamps')if t else 'Fix All Negative Timestamps',self ._fix_all_timestamps ,'separator_after'),
+        (t ('guild.menu.rebuild_all_guilds')if t else 'Rebuild All Guilds',self ._rebuild_all_guilds ),
+        (t ('guild.menu.move_selected_player_to_selected_guild')if t else 'Move Player to Guild',self ._move_player_to_guild ),
+        ],
+        'maps':[
+        (t ('deletion.menu.show_map')if t else 'Show Map',self ._show_map ),
+        (t ('deletion.menu.generate_map')if t else 'Generate Map',self ._generate_map ),
+        ],
+        'exclusions':[
+        (t ('deletion.menu.save_exclusions')if t else 'Save Exclusions',self ._save_exclusions ),
+        ],
+        'languages':[
+        (t (f'lang.{code }')if t else code ,lambda c =code :self ._change_language (c ))
+        for code in ['en_US','zh_CN','ru_RU','fr_FR','es_ES','de_DE','ja_JP','ko_KR']
+        ],
+        }
+        self .header_widget .set_menu_actions (menu_actions )
+    def _create_action (self ,text ,callback ):
+        action =QAction (text ,self )
+        action .triggered .connect (callback )
+        return action 
+    def _setup_connections (self ):
+        save_manager .load_finished .connect (self ._on_load_finished )
+        save_manager .save_finished .connect (self ._on_save_finished )
+    def _on_tab_changed (self ,index ):
+
+        self .stacked_widget .setCurrentIndex (index )
+    def _load_user_settings (self ):
+
+        base_path =constants .get_assets_path ()
+        user_cfg_path =os .path .join (base_path ,'data','configs','user.cfg')
+        default_settings ={
+        "theme":"dark",
+        "language":"en_US",
+        "show_icons":True ,
+        "boot_preference":"menu"
+        }
+        if os .path .exists (user_cfg_path ):
+            try :
+                with open (user_cfg_path ,'r')as f :
+                    self .user_settings =json .load (f )
+                    for key ,value in default_settings .items ():
+                        if key not in self .user_settings :
+                            self .user_settings [key ]=value 
+                    self .is_dark_mode =self .user_settings .get ('theme','dark')=='dark'
+            except Exception as e :
+                print (f"Failed to load user settings: {e }")
+                self .user_settings =default_settings .copy ()
+                self .is_dark_mode =True 
+        else :
+            self .user_settings =default_settings .copy ()
+            self .is_dark_mode =True 
+            os .makedirs (os .path .dirname (user_cfg_path ),exist_ok =True )
+            self ._save_user_settings ()
+    def _save_user_settings (self ):
+
+        base_path =constants .get_assets_path ()
+        user_cfg_path =os .path .join (base_path ,'data','configs','user.cfg')
+        try :
+            os .makedirs (os .path .dirname (user_cfg_path ),exist_ok =True )
+            with open (user_cfg_path ,'w')as f :
+                json .dump (self .user_settings ,f ,indent =2 )
+        except Exception as e :
+            print (f"Failed to save user settings: {e }")
+    def _load_theme (self ):
+
+        base_path =constants .get_assets_path ()
+        theme_file ='darkmode.qss'if self .is_dark_mode else 'lightmode.qss'
+        theme_path =os .path .join (base_path ,'data','gui',theme_file )
+        if os .path .exists (theme_path ):
+            try :
+                with open (theme_path ,'r',encoding ='utf-8')as f :
+                    qss_content =f .read ()
+                    self .setStyleSheet (qss_content )
+                    print (f"Loaded theme: {theme_file }")
+            except Exception as e :
+                print (f"Failed to load theme {theme_file }: {e }")
+                self ._apply_fallback_styles ()
+        else :
+            print (f"Theme file not found: {theme_path }")
+            self ._apply_fallback_styles ()
+    def _apply_fallback_styles (self ):
+
+        self .setStyleSheet (f"""
+            QMainWindow {{
+                background-color: {constants .BG };
+            }}
+            QWidget {{
+                color: {constants .TEXT };
+            }}
+            QTabWidget::pane {{
+                background-color: {constants .GLASS };
+                border: 1px solid {constants .BORDER };
+                border-radius: 4px;
+            }}
+            QTabBar::tab {{
+                background-color: {constants .GLASS };
+                color: {constants .TEXT };
+                padding: 8px 16px;
+                border: 1px solid {constants .BORDER };
+                border-bottom: none;
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+            }}
+            QTabBar::tab:selected {{
+                background-color: {constants .ACCENT };
+            }}
+            QTabBar::tab:hover {{
+                background-color: {constants .BUTTON_HOVER };
+            }}
+            QPushButton {{
+                background-color: {constants .GLASS };
+                color: {constants .TEXT };
+                border: 1px solid {constants .BORDER };
+                border-radius: 4px;
+                padding: 6px 12px;
+            }}
+            QPushButton:hover {{
+                background-color: {constants .BUTTON_HOVER };
+            }}
+            QMenuBar {{
+                background-color: {constants .GLASS };
+                color: {constants .TEXT };
+            }}
+            QMenuBar::item:selected {{
+                background-color: {constants .ACCENT };
+            }}
+            QMenu {{
+                background-color: {constants .GLASS };
+                color: {constants .TEXT };
+                border: 1px solid {constants .BORDER };
+            }}
+            QMenu::item:selected {{
+                background-color: {constants .ACCENT };
+            }}
+        """)
+    def _toggle_theme (self ):
+
+        self .is_dark_mode =not self .is_dark_mode 
+        self ._save_user_settings ()
+        self ._load_theme ()
+        if hasattr (self ,'header_widget'):
+            self .header_widget .set_theme (self .is_dark_mode )
+    def _toggle_dashboard (self ):
+
+        if self ._dashboard_collapsed :
+            self .results_widget .show ()
+            self .splitter .setSizes (self ._dashboard_sizes )
+            self ._dashboard_collapsed =False 
+        else :
+            self ._dashboard_sizes =self .splitter .sizes ()
+            self .results_widget .hide ()
+            self ._dashboard_collapsed =True 
+        self .header_widget .set_sidebar_collapsed (self ._dashboard_collapsed )
+    def check_github_update (self ,force_test =False ):
+
+        try :
+            r =urllib .request .urlopen (GITHUB_RAW_URL ,timeout =5 )
+            content =r .read ().decode ("utf-8")
+            match =re .search (r'APP_VERSION\s*=\s*"([^"]+)"',content )
+            latest =match .group (1 )if match else None 
+            local ,_ =get_versions ()
+            if force_test :
+                local ="0.0.1"
+            if latest :
+                try :
+                    local_tuple =tuple (int (x )for x in local .split ("."))
+                    latest_tuple =tuple (int (x )for x in latest .split ("."))
+                except Exception :
+                    local_tuple =(0 ,)
+                    latest_tuple =(0 ,)
+                if local_tuple >=latest_tuple :
+                    return True ,latest 
+                return False ,latest 
+            return True ,None 
+        except Exception :
+            return True ,None 
+    def _check_update (self ):
+
+        try :
+            ok ,latest =self .check_github_update (force_test =False )
+            if not ok and latest :
+                tools_version ,_ =get_versions ()
+                self .header_widget .start_pulse_animation (latest )
+                self .header_widget .update_version_text (tools_version ,latest )
+                self .status_bar .showMessage (
+                f"{t ('update.current')if t else 'Current'}: {tools_version } | {t ('update.latest')if t else 'Latest'}: {latest } - Click version chip to update",
+                0 
+                )
+        except Exception :
+            pass 
+    def _on_load_finished (self ,success ):
+        if success :
+            self .refresh_all ()
+            self .results_widget .refresh_stats_before ()
+            self .status_bar .showMessage (t ('status.loaded')if t else 'Save loaded successfully',5000 )
+        else :
+            self .status_bar .showMessage (t ('status.load_failed')if t else 'Failed to load save',5000 )
+    def _on_save_finished (self ,duration ):
+        self .status_bar .showMessage (f"{t ('status.saved')if t else 'Save completed'} ({duration :.2f}s)",5000 )
+        QMessageBox .information (self ,t ('success.title'),t ('save.complete'))
+    def refresh_all (self ):
+        self ._refresh_players ()
+        self ._refresh_guilds ()
+        self ._refresh_bases ()
+        self ._refresh_map ()
+        self ._refresh_exclusions ()
+    def _refresh_stats (self ):
+
+        stats =save_manager .get_current_stats ()
+        self .results_widget .update_stats (stats )
+    def _refresh_players (self ):
+        self .players_panel .clear ()
+        players =save_manager .get_players ()
+        for uid ,name ,gid ,lastseen ,level in players :
+            pals =constants .PLAYER_PAL_COUNTS .get (uid .replace ('-','').lower (),0 )
+            gname =save_manager .get_guild_name_by_id (gid )
+            self .players_panel .add_item ([name ,lastseen ,level ,pals ,uid ,gname ,gid ])
+    def _refresh_guilds (self ):
+        self .guilds_panel .clear ()
+        self .guild_members_panel .clear ()
+        guilds =get_guilds ()
+        for g in guilds :
+            self .guilds_panel .add_item ([g ['name'],g ['id']])
+    def _refresh_bases (self ):
+        self .bases_panel .clear ()
+        bases =get_bases ()
+        for b in bases :
+            self .bases_panel .add_item ([b ['id'],b ['guild_id'],b ['guild_name']])
+    def _refresh_map (self ):
+        if hasattr (self ,'map_tab'):
+            self .map_tab .refresh ()
+    def _refresh_exclusions (self ):
+        self .excl_players_panel .clear ()
+        for uid in constants .exclusions .get ('players',[]):
+            self .excl_players_panel .add_item ([uid ])
+        self .excl_guilds_panel .clear ()
+        for gid in constants .exclusions .get ('guilds',[]):
+            self .excl_guilds_panel .add_item ([gid ])
+        self .excl_bases_panel .clear ()
+        for bid in constants .exclusions .get ('bases',[]):
+            self .excl_bases_panel .add_item ([bid ])
+    def mousePressEvent (self ,event ):
+
+        if event .button ()==Qt .LeftButton :
+            if hasattr (self ,'header_widget')and self .header_widget .underMouse ():
+                self .drag_position =event .globalPosition ().toPoint ()-self .frameGeometry ().topLeft ()
+                event .accept ()
+            else :
+                super ().mousePressEvent (event )
+        else :
+            super ().mousePressEvent (event )
+    def mouseMoveEvent (self ,event ):
+
+        if event .buttons ()==Qt .LeftButton and hasattr (self ,'drag_position'):
+            self .move (event .globalPosition ().toPoint ()-self .drag_position )
+            event .accept ()
+        else :
+            super ().mouseMoveEvent (event )
+    def mouseReleaseEvent (self ,event ):
+
+        if hasattr (self ,'drag_position'):
+            delattr (self ,'drag_position')
+        super ().mouseReleaseEvent (event )
+    def _show_settings (self ):
+
+        dialog =QDialog (self )
+        dialog .setWindowTitle (t ("Settings")if t else "Settings")
+        dialog .setMinimumWidth (400 )
+        layout =QVBoxLayout (dialog )
+        layout .setContentsMargins (20 ,20 ,20 ,20 )
+        layout .setSpacing (15 )
+        theme_layout =QHBoxLayout ()
+        theme_label =QLabel (t ("Theme:")if t else "Theme:")
+        theme_combo =QComboBox ()
+        theme_combo .addItems (["dark","light"])
+        theme_combo .setCurrentText (self .user_settings .get ("theme","dark"))
+        theme_combo .currentTextChanged .connect (
+        lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo )
+        )
+        theme_layout .addWidget (theme_label )
+        theme_layout .addWidget (theme_combo )
+        layout .addLayout (theme_layout )
+        show_icons_cb =QCheckBox (t ("Show icons in tool list")if t else "Show icons in tool list")
+        show_icons_cb .setChecked (self .user_settings .get ("show_icons",True ))
+        show_icons_cb .stateChanged .connect (
+        lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo )
+        )
+        layout .addWidget (show_icons_cb )
+        lang_layout =QHBoxLayout ()
+        lang_label =QLabel (t ("Language:")if t else "Language:")
+        lang_combo =QComboBox ()
+        lang_combo .addItems (self .lang_map .keys ())
+        current_lang_code =self .user_settings .get ("language","en_US")
+        current_lang_name =next ((name for name ,code in self .lang_map .items ()if code ==current_lang_code ),"English")
+        lang_combo .setCurrentText (current_lang_name )
+        lang_combo .currentTextChanged .connect (
+        lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo )
+        )
+        lang_layout .addWidget (lang_label )
+        lang_layout .addWidget (lang_combo )
+        layout .addLayout (lang_layout )
+        boot_layout =QHBoxLayout ()
+        boot_label =QLabel (t ("Boot Preference:")if t else "Boot Preference:")
+        boot_pref_combo =QComboBox ()
+        boot_pref_combo .addItems (["menu","palworld_aio"])
+        boot_pref_combo .setCurrentText (self .user_settings .get ("boot_preference","menu"))
+        boot_pref_combo .currentTextChanged .connect (
+        lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo )
+        )
+        boot_layout .addWidget (boot_label )
+        boot_layout .addWidget (boot_pref_combo )
+        layout .addLayout (boot_layout )
+        button_layout =QHBoxLayout ()
+        button_layout .addStretch ()
+        close_btn =QPushButton (t ("Close")if t else "Close")
+        close_btn .clicked .connect (dialog .close )
+        button_layout .addWidget (close_btn )
+        layout .addLayout (button_layout )
+        dialog .show ()
+    def _auto_save_settings (self ,dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo ):
+
+        old_lang =self .user_settings .get ("language")
+        old_theme =self .user_settings .get ("theme")
+        settings ={
+        "theme":theme_combo .currentText (),
+        "show_icons":show_icons_cb .isChecked (),
+        "language":self .lang_map .get (lang_combo .currentText (),"en_US"),
+        "boot_preference":boot_pref_combo .currentText ()
+        }
+        self .user_settings =settings 
+        self ._save_user_settings ()
+        if old_theme !=settings ["theme"]:
+            self .is_dark_mode =settings ["theme"]=="dark"
+            self ._load_theme ()
+            self .header_widget .set_theme (self .is_dark_mode )
+        if old_lang !=settings ["language"]:
+            set_language (settings ["language"])
+            QMessageBox .information (
+            self ,
+            t ("Language Changed")if t else "Language Changed",
+            t ("Please restart the application for full language changes to take effect.")if t else "Please restart the application for full language changes to take effect."
+            )
+    def _show_warnings (self ):
+
+        warnings =[
+        (t ("notice.backup")if t else "WARNING: ALWAYS BACKUP YOUR SAVES BEFORE USING THESE TOOLS!",{}),
+        (t ("notice.patch")if t else "MAKE SURE TO UPDATE YOUR SAVES AFTER EVERY GAME PATCH!",{"game_version":get_versions ()[1 ]}),
+        (t ("notice.errors")if t else "IF YOU DO NOT UPDATE YOUR SAVES AFTER A PATCH, YOU MAY ENCOUNTER ERRORS!",{})
+        ]
+        combined ="\n\n".join (w for w ,_ in warnings if w )
+        if not combined :
+            combined =t ("notice.none")if t else "No warnings."
+        QMessageBox .warning (
+        self ,
+        t ("PalworldSaveTools")if t else "Palworld Save Tools",
+        combined 
+        )
+    def _show_about (self ):
+
+        tools_version ,game_version =get_versions ()
+        h2_color ="#4a90e2"if self .is_dark_mode else "#1a5fb4"
+        text_color ="#e0e0e0"if self .is_dark_mode else "#333"
+        sub_color ="#888"if self .is_dark_mode else "#666"
+        about_text =f"""<h2 style="color: {h2_color };">{t ('about.title')if t else 'Palworld Save Tools'} v{tools_version }</h2>
+    <p style="color: {text_color };">{t ('about.description')if t else 'A comprehensive toolkit for managing Palworld save files.'}</p>
+    <p style="color: {text_color };"><b>{t ('about.features.label')if t else 'Features'}:</b></p>
+    <ul>
+    <li style="color: {text_color };">{t ('about.features.1')if t else 'Transfer saves between servers and co-op worlds'}</li>
+    <li style="color: {text_color };">{t ('about.features.2')if t else 'Fix host saves and manage player/guild data'}</li>
+    <li style="color: {text_color };">{t ('about.features.3')if t else 'Edit bases and manage save files'}</li>
+    <li style="color: {text_color };">{t ('about.features.4')if t else 'Convert between Steam and GamePass formats'}</li>
+    <li style="color: {text_color };">{t ('about.features.5')if t else 'Visualize and manage world maps'}</li>
+    </ul>
+    <p style="color: {text_color };"><b>{t ('about.game_version')if t else 'Game Version'}:</b> {game_version }</p>
+    <p style="color: {text_color };"><b>{t ('about.developer')if t else 'Developer'}:</b> Palworld Save Tools Team</p>
+    <p style="color: {text_color };"><b>GitHub:</b> <a href="{GITHUB_LATEST_ZIP }" style="color: {h2_color };">{t ('about.github')if t else 'View on GitHub'}</a></p>
+    <p style="color: {sub_color };">© 2025 Palworld Save Tools</p>"""
+        msg_box =QMessageBox (self )
+        msg_box .setWindowTitle (t ("About PST")if t else "About PST")
+        msg_box .setTextFormat (Qt .RichText )
+        msg_box .setText (about_text )
+        msg_box .setStandardButtons (QMessageBox .Ok )
+        msg_box .setIcon (QMessageBox .Information )
+        msg_box .exec ()
+    def _on_player_selected (self ,data ):
+        if data :
+            self .results_widget .set_player (data [0 ])
+            self .results_widget .set_guild (data [5 ])
+    def _on_guild_selected (self ,data ):
+        if data :
+            self .results_widget .set_guild (data [0 ])
+            self .guild_members_panel .clear ()
+            members =get_guild_members (data [1 ])
+            for m in members :
+                prefix ='[L] 'if m ['is_leader']else ''
+                self .guild_members_panel .add_item ([
+                prefix +m ['name'],m ['lastseen'],m ['level'],m ['pals'],m ['uid']
+                ])
+    def _on_guild_member_selected (self ,data ):
+        if data :
+            name =data [0 ].replace ('[L] ','')
+            self .results_widget .set_player (name )
+    def _on_base_selected (self ,data ):
+        if data :
+            self .results_widget .set_base (data [0 ])
+            self .results_widget .set_guild (data [2 ])
+    def closeEvent (self ,event :QCloseEvent ):
+
+        boot_preference =self .user_settings .get ("boot_preference","menu")
+        if boot_preference =="palworld_aio":
+            QApplication .quit ()
+            event .accept ()
+        else :
+            event .accept ()
+    def _show_player_context_menu (self ,pos ):
+        item =self .players_panel .tree .itemAt (pos )
+        if not item :
+            return 
+        menu =QMenu (self )
+        menu .addAction (self ._create_action (t ('deletion.ctx.add_exclusion'),lambda :self ._add_exclusion ('players',item .text (4 ))))
+        menu .addAction (self ._create_action (t ('deletion.ctx.remove_exclusion'),lambda :self ._remove_exclusion ('players',item .text (4 ))))
+        menu .addAction (self ._create_action (t ('deletion.ctx.delete_player'),lambda :self ._delete_player (item .text (4 ))))
+        menu .addAction (self ._create_action (t ('player.rename.menu'),lambda :self ._rename_player (item .text (4 ),item .text (0 ))))
+        menu .addAction (self ._create_action (t ('player.viewing_cage.menu'),lambda :self ._unlock_viewing_cage (item .text (4 ))))
+        menu .addAction (self ._create_action (t ('player.reset_timestamp.menu')if t else 'Reset Timestamp',lambda :self ._reset_player_timestamp (item .text (4 ))))
+        menu .addSeparator ()
+        menu .addAction (self ._create_action (t ('deletion.ctx.delete_guild'),lambda :self ._delete_guild (item .text (6 ))))
+        menu .addAction (self ._create_action (t ('guild.rename.menu'),lambda :self ._rename_guild_action (item .text (6 ),item .text (5 ))))
+        menu .addAction (self ._create_action (t ('guild.menu.max_level'),lambda :self ._max_guild_level (item .text (6 ))))
+        menu .addAction (self ._create_action (t ('button.import'),lambda :self ._import_base_to_guild (item .text (6 ))))
+        menu .exec (self .players_panel .tree .viewport ().mapToGlobal (pos ))
+    def _show_guild_context_menu (self ,pos ):
+        item =self .guilds_panel .tree .itemAt (pos )
+        if not item :
+            return 
+        menu =QMenu (self )
+        menu .addAction (self ._create_action (t ('deletion.ctx.add_exclusion'),lambda :self ._add_exclusion ('guilds',item .text (1 ))))
+        menu .addAction (self ._create_action (t ('deletion.ctx.remove_exclusion'),lambda :self ._remove_exclusion ('guilds',item .text (1 ))))
+        menu .addAction (self ._create_action (t ('deletion.ctx.delete_guild'),lambda :self ._delete_guild (item .text (1 ))))
+        menu .addAction (self ._create_action (t ('guild.rename.menu'),lambda :self ._rename_guild_action (item .text (1 ),item .text (0 ))))
+        menu .addAction (self ._create_action (t ('guild.menu.max_level'),lambda :self ._max_guild_level (item .text (1 ))))
+        menu .addAction (self ._create_action (t ('button.import'),lambda :self ._import_base_to_guild (item .text (1 ))))
+        menu .addAction (self ._create_action (t ('guild.menu.move_selected_player_to_selected_guild'),self ._move_player_to_guild ))
+        menu .exec (self .guilds_panel .tree .viewport ().mapToGlobal (pos ))
+    def _show_guild_member_context_menu (self ,pos ):
+        item =self .guild_members_panel .tree .itemAt (pos )
+        if not item :
+            return 
+        guild_data =self .guilds_panel .get_selected_data ()
+        if not guild_data :
+            return 
+        menu =QMenu (self )
+        menu .addAction (self ._create_action (t ('guild.ctx.make_leader'),lambda :self ._make_leader (guild_data [1 ],item .text (4 ))))
+        menu .addAction (self ._create_action (t ('deletion.ctx.add_exclusion'),lambda :self ._add_exclusion ('players',item .text (4 ))))
+        menu .addAction (self ._create_action (t ('deletion.ctx.remove_exclusion'),lambda :self ._remove_exclusion ('players',item .text (4 ))))
+        menu .addAction (self ._create_action (t ('deletion.ctx.delete_player'),lambda :self ._delete_player (item .text (4 ))))
+        menu .addAction (self ._create_action (t ('player.rename.menu'),lambda :self ._rename_player (item .text (4 ),item .text (0 ).replace ('[L] ',''))))
+        menu .addAction (self ._create_action (t ('player.reset_timestamp.menu')if t else 'Reset Timestamp',lambda :self ._reset_player_timestamp (item .text (4 ))))
+        menu .exec (self .guild_members_panel .tree .viewport ().mapToGlobal (pos ))
+    def _show_base_context_menu (self ,pos ):
+        item =self .bases_panel .tree .itemAt (pos )
+        if not item :
+            return 
+        menu =QMenu (self )
+        menu .addAction (self ._create_action (t ('deletion.ctx.add_exclusion'),lambda :self ._add_exclusion ('bases',item .text (0 ))))
+        menu .addAction (self ._create_action (t ('deletion.ctx.remove_exclusion'),lambda :self ._remove_exclusion ('bases',item .text (0 ))))
+        menu .addAction (self ._create_action (t ('deletion.ctx.delete_base'),lambda :self ._delete_base (item .text (0 ),item .text (1 ))))
+        menu .addAction (self ._create_action (t ('export.base'),lambda :self ._export_base (item .text (0 ))))
+        menu .addAction (self ._create_action (t ('import.base'),lambda :self ._import_base (item .text (1 ))))
+        menu .addAction (self ._create_action (t ('clone.base'),lambda :self ._clone_base (item .text (0 ),item .text (1 ))))
+        menu .exec (self .bases_panel .tree .viewport ().mapToGlobal (pos ))
+    def _show_exclusion_context_menu (self ,pos ,excl_type ):
+        panel =getattr (self ,f'excl_{excl_type }_panel')
+        item =panel .tree .itemAt (pos )
+        if not item :
+            return 
+        menu =QMenu (self )
+        menu .addAction (self ._create_action (t ('deletion.ctx.remove_exclusion'),lambda :self ._remove_exclusion (excl_type ,item .text (0 ))))
+        menu .exec (panel .tree .viewport ().mapToGlobal (pos ))
+    def _load_save (self ):
+        if constants .loaded_level_json is not None :
+            msg =QMessageBox (self )
+            msg .setIcon (QMessageBox .Question )
+            msg .setWindowTitle (t ('Warning')if t else 'Warning')
+            msg .setText (t ('save.already_loaded.options')if t else 'A save is already loaded. What would you like to do?')
+            refresh_btn =msg .addButton (t ('save.refresh_current')if t else 'Refresh Current Save',QMessageBox .AcceptRole )
+            load_new_btn =msg .addButton (t ('save.load_new')if t else 'Load New Save (Restart)',QMessageBox .ActionRole )
+            cancel_btn =msg .addButton (t ('button.cancel')if t else 'Cancel',QMessageBox .RejectRole )
+            msg .exec ()
+            clicked =msg .clickedButton ()
+            if clicked ==refresh_btn :
+                try :
+                    save_manager .reload_current_save ()
+                    self .refresh_all ()
+                    QMessageBox .information (
+                    self ,
+                    t ('success.title')if t else 'Success',
+                    t ('save.refreshed')if t else 'Save data refreshed successfully!'
+                    )
+                except Exception as e :
+                    QMessageBox .critical (
+                    self ,
+                    t ('error.title')if t else 'Error',
+                    f"{t ('save.refresh_failed')if t else 'Failed to refresh save'}: {str (e )}"
+                    )
+                return 
+            elif clicked ==load_new_btn :
+                self ._restart_program ()
+                return 
+            else :
+                return 
+        save_manager .load_save (parent =self )
+    def _restart_program (self ):
+
+        import sys 
+        python =sys .executable 
+        os .execl (python ,python ,*sys .argv )
+    def _save_changes (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('error.title'),t ('guild.rebuild.no_save'))
+            return 
+        save_manager .save_changes (parent =self )
+    def _rename_world (self ):
+        from ..utils import sav_to_json ,json_to_sav 
+        if not constants .current_save_path :
+            return 
+        meta_path =os .path .join (constants .current_save_path ,'LevelMeta.sav')
+        if not os .path .exists (meta_path ):
+            return 
+        meta_json =sav_to_json (meta_path )
+        old =meta_json ['properties']['SaveData']['value'].get ('WorldName',{}).get ('value','Unknown World')
+        new_name =InputDialog .get_text (t ('world.rename.title'),t ('world.rename.prompt',old =old ),self )
+        if new_name :
+            meta_json ['properties']['SaveData']['value']['WorldName']['value']=new_name 
+            json_to_sav (meta_json ,meta_path )
+            QMessageBox .information (self ,t ('success.title'),t ('world.rename.done'))
+    def _delete_empty_guilds (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
+            return 
+        removed =delete_empty_guilds (self )
+        self .refresh_all ()
+        QMessageBox .information (self ,t ('Done'),t ('deletion.empty_guilds_removed',count =removed ))
+    def _delete_inactive_bases (self ):
+
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error')if t else 'Error',t ('error.no_save_loaded')if t else 'No save file loaded.')
+            return 
+        days =DaysInputDialog .get_days (
+        t ('deletion.inactive_bases.title')if t else 'Delete Inactive Bases',
+        t ('deletion.inactive_bases.prompt')if t else 'Delete bases where ALL players inactive for how many days?',
+        self 
+        )
+        if not days :
+            return 
+        cnt =delete_inactive_bases (days ,self )
+        self ._delete_orphaned_bases ()
+        self .refresh_all ()
+        self .results_widget .refresh_stats_after ()
+        QMessageBox .information (self ,t ('Done')if t else 'Done',t ('bases.deleted_count',count =cnt )if t else f'Deleted {cnt } bases')
+    def _delete_orphaned_bases (self ):
+
+        if not constants .loaded_level_json :
+            return 
+        wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
+        valid_guild_ids ={
+        as_uuid (g ['key'])
+        for g in wsd .get ('GroupSaveDataMap',{}).get ('value',[])
+        if g ['value']['GroupType']['value']['value']=='EPalGroupType::Guild'
+        }
+        base_list =wsd .get ('BaseCampSaveData',{}).get ('value',[])[:]
+        cnt =0 
+        for b in base_list :
+            raw =b ['value']['RawData']['value']
+            gid_raw =raw .get ('group_id_belong_to')
+            gid =as_uuid (gid_raw )if gid_raw else None 
+            if not gid or gid not in valid_guild_ids :
+                if delete_base_camp (b ,gid ):
+                    cnt +=1 
+        if cnt >0 :
+            print (f'Deleted {cnt } orphaned bases')
+    def _delete_duplicate_players (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
+            return 
+        removed =delete_duplicated_players (self )
+        self .refresh_all ()
+        QMessageBox .information (self ,t ('Done'),t ('deletion.duplicates_removed',count =removed ))
+    def _delete_inactive_players (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
+            return 
+        days =DaysInputDialog .get_days (t ('deletion.inactive_days_title'),t ('deletion.inactive_days_prompt'),self )
+        if days :
+            removed =delete_inactive_players (days ,self )
+            self .refresh_all ()
+            QMessageBox .information (self ,t ('Done'),t ('deletion.inactive_players_removed',count =removed ))
+    def _delete_unreferenced (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
+            return 
+        result =delete_unreferenced_data (self )
+        self .refresh_all ()
+        msg =f"Removed {result .get ('characters',0 )} players, {result .get ('pals',0 )} pals, {result .get ('guilds',0 )} guilds\n"
+        msg +=f"Removed {result .get ('broken_objects',0 )} broken objects, {result .get ('dropped_items',0 )} dropped items"
+        QMessageBox .information (self ,t ('Done'),msg )
+    def _delete_non_base_map_objs (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
+            return 
+        removed =delete_non_base_map_objects (self )
+        self .refresh_all ()
+        QMessageBox .information (self ,t ('Done'),t ('deletion.non_base_objs_removed',count =removed ))
+    def _delete_all_skins (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
+            return 
+        removed =delete_all_skins (self )
+        self .refresh_all ()
+        QMessageBox .information (self ,t ('Done'),t ('deletion.skins_removed',count =removed ))
+    def _unlock_private_chests (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
+            return 
+        unlocked =unlock_all_private_chests (self )
+        self .refresh_all ()
+        QMessageBox .information (self ,t ('Done'),t ('deletion.chests_unlocked',count =unlocked ))
+    def _remove_invalid_items (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
+            return 
+        fixed =remove_invalid_items_from_save (self )
+        self .refresh_all ()
+        QMessageBox .information (self ,t ('Done'),f"Fixed {fixed } files")
+    def _remove_invalid_structures (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
+            return 
+        removed =delete_invalid_structure_map_objects (self )
+        self .refresh_all ()
+        QMessageBox .information (self ,t ('Done'),f"Removed {removed } invalid structures")
+    def _remove_invalid_pals (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
+            return 
+        removed =remove_invalid_pals_from_save (self )
+        self .refresh_all ()
+        QMessageBox .information (self ,t ('Done'),t ('palclean.summary',removed =removed ))
+    def _reset_missions (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
+            return 
+        result =fix_missions (self )
+        self .refresh_all ()
+        QMessageBox .information (self ,t ('missions.reset_title'),t ('missions.summary',**result ))
+    def _reset_anti_air (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
+            return 
+        count =reset_anti_air_turrets (self )
+        self .refresh_all ()
+        QMessageBox .information (self ,t ('Done'),f"Reset {count } anti-air turrets")
+    def _reset_dungeons (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
+            return 
+        count =reset_dungeons (self )
+        self .refresh_all ()
+        QMessageBox .information (self ,t ('Done'),f"Reset {count } dungeons")
+    def _fix_all_timestamps (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error')if t else 'Error',t ('guild.rebuild.no_save')if t else 'No save loaded!')
+            return 
+        fixed =fix_all_negative_timestamps (self )
+        self .refresh_all ()
+        QMessageBox .information (self ,t ('Done')if t else 'Done',t ('timestamps.fixed_count',count =fixed )if t else f'Fixed {fixed } player timestamps')
+    def _reset_player_timestamp (self ,uid ):
+        if reset_selected_player_timestamp (uid ,self ):
+            self .refresh_all ()
+            QMessageBox .information (self ,t ('Done')if t else 'Done',t ('timestamps.player_reset')if t else 'Player timestamp reset to current time')
+        else :
+            QMessageBox .warning (self ,t ('Error')if t else 'Error',t ('timestamps.reset_failed')if t else 'Failed to reset player timestamp')
+    def _open_paldefender (self ):
+
+        dialog =PalDefenderDialog (self )
+        dialog .exec ()
+    def _rebuild_all_guilds (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
+            return 
+        if rebuild_all_guilds ():
+            self .refresh_all ()
+            QMessageBox .information (self ,t ('Done'),t ('guild.rebuild.done'))
+        else :
+            QMessageBox .warning (self ,t ('error.title'),t ('guild.rebuild.failed'))
+    def _move_player_to_guild (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
+            return 
+        player_data =self .players_panel .get_selected_data ()
+        guild_data =self .guilds_panel .get_selected_data ()
+        if not player_data :
+            QMessageBox .warning (self ,t ('Error'),t ('guild.move.no_player'))
+            return 
+        if not guild_data :
+            QMessageBox .warning (self ,t ('Error'),t ('guild.common.select_guild_first'))
+            return 
+        if move_player_to_guild (player_data [4 ],guild_data [1 ]):
+            self .refresh_all ()
+            QMessageBox .information (self ,t ('Done'),t ('guild.move.moved',player =player_data [0 ],guild =guild_data [0 ]))
+        else :
+            QMessageBox .warning (self ,t ('Error'),t ('guild.move.failed'))
+    def _show_map (self ):
+
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error')if t else 'Error',
+            t ('error.no_save_loaded')if t else 'No save file loaded.')
+            return 
+        for i in range (self .stacked_widget .count ()):
+            if self .stacked_widget .widget (i )==self .map_tab :
+                self .tab_bar .setCurrentIndex (i )
+                return 
+    def _generate_map (self ):
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error')if t else 'Error',
+            t ('error.no_save_loaded')if t else 'No save file loaded.')
+            return 
+        path =generate_world_map ()
+        if path :
+            from common import open_file_with_default_app 
+            open_file_with_default_app (path )
+            QMessageBox .information (self ,t ('Done')if t else 'Done',
+            f"Map saved to {path }")
+        else :
+            QMessageBox .warning (self ,t ('Error')if t else 'Error',
+            t ('mapgen.failed')if t else 'Map generation failed.')
+    def _save_exclusions (self ):
+        save_exclusions ()
+        QMessageBox .information (self ,t ('Saved'),t ('deletion.saved_exclusions'))
+    def _change_language (self ,code ):
+        set_language (code )
+        load_resources (code )
+        self ._refresh_texts ()
+    def _refresh_texts (self ):
+
+        tools_version ,_ =get_versions ()
+        self .setWindowTitle (t ('app.title',version =tools_version )+' - '+t ('tool.deletion'))
+        if hasattr (self ,'results_widget')and self .results_widget :
+            if hasattr (self .results_widget ,'stats_panel'):
+                self .results_widget .stats_panel .refresh_labels ()
+        if hasattr (self ,'players_panel'):
+            self .players_panel .refresh_labels ()
+        if hasattr (self ,'guilds_panel'):
+            self .guilds_panel .refresh_labels ()
+        if hasattr (self ,'guild_members_panel'):
+            self .guild_members_panel .refresh_labels ()
+        if hasattr (self ,'bases_panel'):
+            self .bases_panel .refresh_labels ()
+        if hasattr (self ,'menu_bar'):
+            self ._setup_menus ()
+    def _add_exclusion (self ,excl_type ,value ):
+        if value not in constants .exclusions [excl_type ]:
+            constants .exclusions [excl_type ].append (value )
+            self ._refresh_exclusions ()
+        else :
+            QMessageBox .information (self ,t ('Info'),t ('deletion.info.already_in_exclusions',kind =excl_type [:-1 ].capitalize ()))
+    def _remove_exclusion (self ,excl_type ,value ):
+        if value in constants .exclusions [excl_type ]:
+            constants .exclusions [excl_type ].remove (value )
+            self ._refresh_exclusions ()
+    def _delete_player (self ,uid ):
+        delete_player (uid )
+        self .refresh_all ()
+    def _delete_guild (self ,gid ):
+        delete_guild (gid )
+        self .refresh_all ()
+    def _delete_base (self ,bid ,gid ):
+        from ..data_manager import delete_base_camp 
+        wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
+        base_list =wsd .get ('BaseCampSaveData',{}).get ('value',[])
+        for b in base_list :
+            if str (b ['key']).replace ('-','').lower ()==bid .replace ('-','').lower ():
+                delete_base_camp (b ,gid )
+                break 
+        self .refresh_all ()
+    def _rename_player (self ,uid ,old_name ):
+        new_name =InputDialog .get_text (t ('player.rename.title'),t ('player.rename.prompt'),self )
+        if new_name :
+            rename_player (uid ,new_name )
+            self .refresh_all ()
+            QMessageBox .information (self ,t ('player.rename.done_title'),t ('player.rename.done_msg',old =old_name ,new =new_name ))
+    def _unlock_viewing_cage (self ,uid ):
+        if unlock_viewing_cage_for_player (uid ,self ):
+            QMessageBox .information (self ,t ('Done'),t ('player.viewing_cage.unlocked'))
+        else :
+            QMessageBox .warning (self ,t ('Error'),t ('player.viewing_cage.failed'))
+    def _rename_guild_action (self ,gid ,old_name ):
+        new_name =InputDialog .get_text (t ('guild.rename.title'),t ('guild.rename.prompt'),self )
+        if new_name :
+            rename_guild (gid ,new_name )
+            self .refresh_all ()
+            QMessageBox .information (self ,t ('guild.rename.done_title'),t ('guild.rename.done_msg',old =old_name ,new =new_name ))
+    def _max_guild_level (self ,gid ):
+        max_guild_level (gid )
+        self .refresh_all ()
+        QMessageBox .information (self ,t ('success.title'),t ('guild.level.maxed'))
+    def _make_leader (self ,gid ,uid ):
+        make_member_leader (gid ,uid )
+        self .refresh_all ()
+    def _import_base_to_guild (self ,gid ):
+        file_path ,_ =QFileDialog .getOpenFileName (self ,'Select Base JSON','','JSON Files (*.json)')
+        if not file_path :
+            return 
+        try :
+            with open (file_path ,'r',encoding ='utf-8')as f :
+                exported_data =json .load (f )
+            if import_base_json (constants .loaded_level_json ,exported_data ,gid ):
+                self .refresh_all ()
+                self .results_widget .refresh_stats_after ()
+                QMessageBox .information (self ,t ('success.title'),t ('base.import.success')if t else 'Base imported successfully! Remember to save Level.sav.')
+            else :
+                QMessageBox .warning (self ,t ('error.title'),'Import failed')
+        except Exception as e :
+            QMessageBox .critical (self ,t ('error.title'),f'Import failed: {str (e )}')
+    def _export_base (self ,bid ):
+
+        if not constants .loaded_level_json :
+            QMessageBox .warning (self ,t ('Error')if t else 'Error',t ('error.no_save_loaded')if t else 'No save file loaded.')
+            return 
+        data =export_base_json (constants .loaded_level_json ,bid )
+        if not data :
+            QMessageBox .warning (
+            self ,
+            t ('error.title')if t else 'Error',
+            t ('base.export.not_found')if t else f'Could not find base data for ID: {bid }'
+            )
+            return 
+        default_filename =f'base_{bid }.json'
+        file_path ,_ =QFileDialog .getSaveFileName (
+        self ,
+        t ('base.export.title')if t else 'Export Base',
+        default_filename ,
+        'JSON Files (*.json)'
+        )
+        if not file_path :
+            return 
+        try :
+            class CustomEncoder (json .JSONEncoder ):
+                def default (self ,obj ):
+                    if hasattr (obj ,'bytes')or obj .__class__ .__name__ =='UUID':
+                        return str (obj )
+                    return super ().default (obj )
+            with open (file_path ,'w',encoding ='utf-8')as f :
+                json .dump (data ,f ,cls =CustomEncoder ,indent =2 )
+            QMessageBox .information (
+            self ,
+            t ('success.title')if t else 'Success',
+            t ('base.export.success')if t else 'Base exported successfully'
+            )
+        except Exception as e :
+            QMessageBox .critical (
+            self ,
+            t ('error.title')if t else 'Error',
+            t ('base.export.failed')if t else f'Failed to export base: {str (e )}'
+            )
+    def _import_base (self ,gid ):
+        self ._import_base_to_guild (gid )
+    def _clone_base (self ,bid ,gid ):
+        if clone_base_complete (constants .loaded_level_json ,bid ,gid ):
+            self .refresh_all ()
+            self .results_widget .refresh_stats_after ()
+            QMessageBox .information (self ,t ('success.title'),'Base cloned successfully')
+        else :
+            QMessageBox .warning (self ,t ('error.title'),'Failed to clone base')
+    def keyPressEvent (self ,event ):
+        if event .key ()==Qt .Key_F5 :
+            if constants .current_save_path :
+                self .refresh_all ()
+        super ().keyPressEvent (event )

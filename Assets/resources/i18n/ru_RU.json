@@ -511,5 +511,11 @@
 "error.overlay.title": "ПРОИЗОШЛА ОШИБКА",
 "error.overlay.copy": "КОПИРОВАТЬ В БУФЕР",
 "error.overlay.close": "ЗАКРЫТЬ ОШИБКУ",
-"error.overlay.copied": "СКОПИРОВАНО!"
+"error.overlay.copied": "СКОПИРОВАНО!",
+"search.placeholder": "Введите поисковый запрос...",
+"deletion.results_panel": "Панель результатов",
+"deletion.stats_panel": "Панель статистики",
+"deletion.selected_player_label": "Выбранный игрок",
+"deletion.selected_guild_label": "Выбранная гильдия",
+"deletion.selected_base_label": "Выбранная база"
 }

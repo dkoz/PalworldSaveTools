@@ -33,6 +33,24 @@ QLabel#gameVersionChip {
     color: #000000;
 }
 
+/* Menu chip button */
+QPushButton#menuChip {
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 17px;
+    color: #6D28D9;
+}
+QPushButton#menuChip:hover {
+    background: rgba(139, 92, 246, 0.25);
+    border: 1px solid rgba(139, 92, 246, 0.45);
+    color: #5B21B6;
+}
+QPushButton#menuChip:pressed {
+    background: rgba(139, 92, 246, 0.35);
+}
+
 /* Control chips */
 QPushButton#controlChip {
     background: rgba(128,128,128,0.4);
@@ -219,6 +237,12 @@ QTreeWidget QHeaderView::section {
     border: 1px solid rgba(0,0,0,0.1);
     height: 28px;
 }
+
+/* Ensure all QTreeWidget text is black in light mode */
+QTreeWidget {
+    background: transparent;
+    color: #000000;
+}
 QFrame#treePanel {
     background-color: transparent;
 }
@@ -252,4 +276,478 @@ QDialog {
                 stop:0 #e6ecef, stop:0.5 #bdd5df, stop:1 #a7c9da);
     color: #000000;
     font-family: "Segoe UI", Roboto, Arial;
+}
+
+/* Results widget container */
+QWidget#resultsWidget {
+    background: rgba(240,245,255,1.0);
+    border-left: 1px solid rgba(180,200,220,0.5);
+}
+
+/* Splitter handle */
+QSplitter::handle:horizontal {
+    background: rgba(0,0,0,0.05);
+    width: 2px;
+}
+
+QSplitter::handle:horizontal:hover {
+    background: rgba(37,150,190,0.4);
+    width: 4px;
+}
+
+/* Context Menu Styling */
+QMenu {
+    background-color: rgba(255,255,255,0.95);
+    border: 1px solid rgba(37,150,190,0.3);
+    border-radius: 6px;
+    padding: 4px;
+}
+
+QMenu::item {
+    background-color: transparent;
+    padding: 6px 20px;
+    border-radius: 4px;
+    color: #2C3E50;
+}
+
+QMenu::item:selected {
+    background-color: rgba(37,150,190,0.2);
+    color: #000000;
+}
+
+QMenu::item:selected:!enabled {
+    background-color: transparent;
+}
+
+QMenu::separator {
+    height: 1px;
+    background: rgba(0,0,0,0.15);
+    margin: 4px 10px;
+}
+
+/* Tab Widget Styling */
+QTabWidget::pane {
+    background: rgba(240,245,255,0.95);
+    border: 1px solid rgba(180,200,220,0.3);
+    border-radius: 10px;
+    padding: 12px;
+}
+
+QTabBar::tab {
+    background: rgba(200,215,235,0.5);
+    border: 1px solid rgba(180,200,220,0.3);
+    border-bottom: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 8px 16px;
+    margin-right: 2px;
+    color: #2C3E50;
+    font-weight: 600;
+}
+
+/* Custom tab bar styling for separate tab bar */
+QTabBar#customTabBar {
+    background: transparent;
+    margin: 0px 10px 0px 10px;
+}
+
+QTabBar#customTabBar::tab {
+    background: rgba(200,215,235,0.5);
+    border: 1px solid rgba(180,200,220,0.3);
+    border-bottom: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 10px 18px;
+    margin-right: 2px;
+    color: #2C3E50;
+    font-weight: 600;
+    font-size: 11px;
+}
+
+QTabBar::tab:selected {
+    background: rgba(37,150,190,0.15);
+    border-color: rgba(37,150,190,0.4);
+    color: #1A365D;
+}
+
+QTabBar::tab:hover:!selected {
+    background: rgba(37,150,190,0.08);
+    border-color: rgba(37,150,190,0.25);
+}
+
+QTabBar::tab:!selected {
+    margin-top: 2px;
+}
+
+/* Tab Content Widgets - Ensure proper theming for all tab content */
+QWidget#playersTab, QWidget#guildsTab, QWidget#basesTab, QWidget#mapTab, QWidget#toolsTab, QWidget#exclusionsTab {
+    background: rgba(240,245,255,0.85);
+    border-radius: 10px;
+    color: #000000;
+}
+
+/* Stacked Widget and Tab Content Body */
+QStackedWidget {
+    background: rgba(240,245,255,0.85);
+    border-radius: 10px;
+    color: #000000;
+}
+
+/* Ensure all tab content widgets inherit theme colors */
+QStackedWidget QWidget {
+    background: transparent;
+    color: #000000;
+}
+
+QStackedWidget QLabel {
+    color: #000000;
+}
+
+QStackedWidget QLineEdit {
+    background-color: rgba(0,0,0,0.05);
+    color: #000000;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 4px;
+    padding: 4px;
+}
+
+QStackedWidget QComboBox {
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #cccccc;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+QStackedWidget QPushButton {
+    background-color: #cccccc;
+    color: #000000;
+    padding: 6px;
+    border-radius: 4px;
+}
+
+QScrollArea#toolsScrollArea {
+    background: transparent;
+    border: none;
+}
+
+/* Results Widget Text Colors */
+QWidget#resultsWidget QLabel {
+    color: #2C3E50;  /* Dark text for light background */
+}
+
+QWidget#resultsWidget QLabel#sectionHeader {
+    color: #1A365D;
+    background: rgba(37,150,190,0.1);
+    border-color: rgba(37,150,190,0.2);
+}
+
+/* Stats Panel in Light Mode */
+QWidget#statsGrid {
+    background: rgba(240,245,255,0.8);
+}
+
+QLabel#statsHeader {
+    color: #1A365D;
+    background: rgba(37,150,190,0.1);
+}
+
+QLabel#statsField {
+    color: #4A5568;
+}
+
+QLabel#statsValue {
+    color: #1A202C;
+    background: rgba(255,255,255,0.5);
+}
+
+/* ===== Results Panel Refinement ===== */
+
+/* Glass Panel Effect */
+QFrame#glassPanel {
+    background: rgba(240,245,255,0.75);
+    border-radius: 10px;
+    border: 1px solid rgba(180,200,220,0.3);
+    padding: 12px;
+    margin: 4px 0px;
+}
+
+/* Section Headers (Chip Style) */
+QLabel#sectionHeader {
+    background: rgba(37,150,190,0.1);
+    border: 1px solid rgba(37,150,190,0.2);
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: #1A365D;
+}
+
+/* Value Cards */
+QFrame#valueCard {
+    background: rgba(255,255,255,0.6);
+    border: 1px solid rgba(180,200,220,0.4);
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin: 2px 0px;
+}
+
+QFrame#valueCard:hover {
+    background: rgba(37,150,190,0.12);
+    border-color: rgba(37,150,190,0.5);
+}
+
+/* Gradient Separator */
+QFrame#gradientSeparator {
+    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
+                stop:0 rgba(37,150,190,0),
+                stop:0.5 rgba(37,150,190,0.4),
+                stop:1 rgba(37,150,190,0));
+    border: none;
+}
+
+/* Stats Grid Enhancement */
+QWidget#statsGrid {
+    background: rgba(240,245,255,0.8);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+/* Icon Button (Copy button in stats) */
+QPushButton#iconButton {
+    background: rgba(37,150,190,0.1);
+    border: 1px solid rgba(37,150,190,0.25);
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: #1A5F8D;
+    font-size: 14px;
+}
+
+QPushButton#iconButton:hover {
+    background: rgba(37,150,190,0.2);
+    border-color: rgba(37,150,190,0.4);
+    color: #134A70;
+}
+
+QPushButton#iconButton:pressed {
+    background: rgba(37,150,190,0.3);
+}
+
+/* Results Widget Container with Gradient */
+QWidget#resultsWidget {
+    background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+                stop:0 rgba(240,245,255,0.95),
+                stop:1 rgba(230,240,250,0.95));
+    border-left: 2px solid rgba(37,150,190,0.2);
+    border-radius: 0px 10px 10px 0px;
+}
+
+/* ===== Collapsible Splitter Styles ===== */
+
+/* Collapsible Splitter Handle */
+QSplitter#collapsibleSplitter::handle:horizontal {
+    background: rgba(0,0,0,0.03);
+    width: 16px;
+}
+
+/* Collapse Toggle Button */
+QPushButton#collapseToggle {
+    background: rgba(37,150,190,0.15);
+    border: 1px solid rgba(37,150,190,0.3);
+    border-radius: 4px;
+    padding: 8px 2px;
+    color: #1A5F8D;
+    font-size: 12px;
+    min-width: 14px;
+    max-width: 14px;
+}
+
+QPushButton#collapseToggle:hover {
+    background: rgba(37,150,190,0.25);
+    border-color: rgba(37,150,190,0.5);
+    color: #134A70;
+}
+
+QPushButton#collapseToggle:pressed {
+    background: rgba(37,150,190,0.35);
+}
+
+/* ===== Detach/Attach Button Styles ===== */
+
+/* Detach Button */
+QPushButton#detachButton {
+    background: rgba(37,150,190,0.1);
+    border: 1px solid rgba(37,150,190,0.2);
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: #1A5F8D;
+    font-size: 14px;
+}
+
+QPushButton#detachButton:hover {
+    background: rgba(37,150,190,0.2);
+    border-color: rgba(37,150,190,0.4);
+    color: #134A70;
+}
+
+QPushButton#detachButton:pressed {
+    background: rgba(37,150,190,0.3);
+}
+
+/* Attach Button (in floating window) */
+QPushButton#attachButton {
+    background: rgba(37,150,190,0.1);
+    border: 1px solid rgba(37,150,190,0.2);
+    border-radius: 6px;
+    padding: 6px 12px;
+    color: #1A5F8D;
+    font-size: 12px;
+}
+
+QPushButton#attachButton:hover {
+    background: rgba(37,150,190,0.2);
+    border-color: rgba(37,150,190,0.4);
+    color: #134A70;
+}
+
+/* Detached Map Window */
+QMainWindow#detachedMapWindow {
+    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1,
+                stop:0 #e6ecef, stop:0.5 #bdd5df, stop:1 #a7c9da);
+}
+
+/* ===== Base Hover Overlay Styles ===== */
+
+/* Hover Overlay Container */
+QFrame#hoverOverlayContainer {
+    background: rgba(255,255,255,0.98);
+    border: 1px solid rgba(37,150,190,0.4);
+    border-radius: 8px;
+}
+
+/* Hover Overlay Guild Label */
+QLabel#hoverGuildLabel {
+    color: #1A5F8D;
+    font-weight: bold;
+}
+
+/* Hover Overlay Detail Labels */
+QLabel#hoverDetailLabel {
+    color: #4A5568;
+}
+
+/* ===== Search Panel Styling ===== */
+
+/* Search input styling */
+QLineEdit#searchInput {
+    background-color: rgba(255,255,255,0.9);
+    color: #1a1a1a;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 13px;
+}
+
+QLineEdit#searchInput:focus {
+    border: 1px solid rgba(37,150,190,0.5);
+    background-color: #ffffff;
+}
+
+/* Search tree widget styling */
+QTreeWidget#searchTree {
+    background-color: rgba(255,255,255,0.9);
+    color: #1a1a1a;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 4px;
+    alternate-background-color: rgba(0,0,0,0.03);
+}
+
+QTreeWidget#searchTree::item {
+    padding: 6px 4px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    color: #1a1a1a;
+}
+
+QTreeWidget#searchTree::item:selected {
+    background-color: rgba(37,150,190,0.25);
+    color: #1A5F8D;
+}
+
+QTreeWidget#searchTree::item:hover {
+    background-color: rgba(37,150,190,0.1);
+}
+
+QTreeWidget#searchTree QHeaderView::section {
+    background-color: rgba(200,215,235,0.8);
+    color: #1A365D;
+    padding: 8px;
+    border: 1px solid rgba(180,200,220,0.5);
+    font-weight: bold;
+}
+
+QTreeWidget#searchTree QHeaderView::section:hover {
+    background-color: rgba(37,150,190,0.2);
+}
+
+/* ===== Additional Light Mode Text Color Fixes ===== */
+
+/* Ensure all generic QTreeWidget items have black text */
+QTreeWidget::item {
+    color: #1a1a1a;
+}
+
+/* Force black text on all labels inside stacked widgets */
+QStackedWidget QLabel {
+    color: #1a1a1a;
+}
+
+/* Force black text on all tree widgets */
+QTreeWidget {
+    color: #1a1a1a;
+}
+
+/* Info labels with specific backgrounds */
+QLabel[wordWrap="true"] {
+    color: #1a1a1a;
+}
+
+/* Map tab sidebar text */
+QWidget#mapSidebar QLabel {
+    color: #1a1a1a;
+}
+
+/* Ensure search labels are black */
+QLabel {
+    color: #1a1a1a;
+}
+
+/* Guild tree in map tab - ensure child items have proper colors */
+QTreeWidget::item:!selected {
+    color: #1a1a1a;
+}
+
+/* Base coordinate items (cyan in tree) - keep distinct but readable */
+QTreeWidget::item[foreground="cyan"] {
+    color: #0077aa;
+}
+
+/* Ensure all spinbox and input text is black */
+QSpinBox, QDoubleSpinBox {
+    color: #1a1a1a;
+    background-color: #ffffff;
+}
+
+/* Text in all dialogs */
+QDialog QLabel {
+    color: #1a1a1a;
+}
+
+QDialog QCheckBox {
+    color: #1a1a1a;
+}
+
+/* Tooltip styling for light mode */
+QToolTip {
+    background-color: #ffffff;
+    color: #1a1a1a;
+    border: 1px solid rgba(0,0,0,0.2);
+    padding: 4px;
 }

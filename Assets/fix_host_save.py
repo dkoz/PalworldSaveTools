@@ -354,26 +354,26 @@ class FixHostSaveWindow (QWidget ):
 def fix_host_save ():
     window =FixHostSaveWindow ()
     return window 
-if __name__ == "__main__":
-    if len(sys.argv) > 3:
-        import shutil
-        save_path = sys.argv[1].strip().strip('"')
-        old_guid = sys.argv[2].strip()
-        new_guid = sys.argv[3].strip()
-        if not os.path.exists(save_path):
-            print(f"Error: Path not found {save_path}")
-            sys.exit(1)
-        QMessageBox.information = lambda *args, **kwargs: None
-        QMessageBox.warning = lambda *args, **kwargs: print(f"Warning: {args}")
-        def run_with_loading_mock(on_finished, task_func):
-            result = task_func()
-            on_finished(result)
-        globals()['run_with_loading'] = run_with_loading_mock
-        print(f"Starting migration: {old_guid} -> {new_guid}")
-        fix_save(os.path.dirname(save_path) if save_path.endswith('Level.sav') else save_path, new_guid, old_guid)
-        print("Migration complete.")
-    else:
-        app = QApplication([])
-        w = FixHostSaveWindow()
-        w.show()
-        sys.exit(app.exec())
+if __name__ =="__main__":
+    if len (sys .argv )>3 :
+        import shutil 
+        save_path =sys .argv [1 ].strip ().strip ('"')
+        old_guid =sys .argv [2 ].strip ()
+        new_guid =sys .argv [3 ].strip ()
+        if not os .path .exists (save_path ):
+            print (f"Error: Path not found {save_path }")
+            sys .exit (1 )
+        QMessageBox .information =lambda *args ,**kwargs :None 
+        QMessageBox .warning =lambda *args ,**kwargs :print (f"Warning: {args }")
+        def run_with_loading_mock (on_finished ,task_func ):
+            result =task_func ()
+            on_finished (result )
+        globals ()['run_with_loading']=run_with_loading_mock 
+        print (f"Starting migration: {old_guid } -> {new_guid }")
+        fix_save (os .path .dirname (save_path )if save_path .endswith ('Level.sav')else save_path ,new_guid ,old_guid )
+        print ("Migration complete.")
+    else :
+        app =QApplication ([])
+        w =FixHostSaveWindow ()
+        w .show ()
+        sys .exit (app .exec ())
