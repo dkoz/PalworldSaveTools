@@ -36,7 +36,7 @@ def build_player_levels ():
     constants .player_levels =dict (uid_level_map )
 def delete_player_pals (wsd ,to_delete_uids ):
     char_save_map =wsd .get ('CharacterSaveParameterMap',{}).get ('value',[])
-    removed_pals =0 
+    removed_pals =0
     uids_set ={uid .replace ('-','')for uid in to_delete_uids if uid }
     new_map =[]
     for entry in char_save_map :
@@ -47,13 +47,13 @@ def delete_player_pals (wsd ,to_delete_uids ):
             if owner_uid :
                 owner_uid =str (owner_uid ).replace ('-','')
             if struct_type in ('PalIndividualCharacterSaveParameter','PlayerCharacterSaveParameter')and owner_uid in uids_set :
-                removed_pals +=1 
-                continue 
+                removed_pals +=1
+                continue
         except :
-            pass 
+            pass
         new_map .append (entry )
-    wsd ['CharacterSaveParameterMap']['value']=new_map 
-    return removed_pals 
+    wsd ['CharacterSaveParameterMap']['value']=new_map
+    return removed_pals
 def clean_character_save_parameter_map (data_source ,valid_uids ):
     if 'CharacterSaveParameterMap'not in data_source :
         return 
@@ -421,11 +421,11 @@ def delete_non_base_map_objects (parent =None ):
     return deleted_count 
 def delete_invalid_structure_map_objects (parent =None ):
     if not constants .loaded_level_json :
-        return 0 
-    import json ,os 
+        return 0
+    import json ,os
     valid_assets =set ()
     try :
-        base_dir =os .path .dirname (os .path .abspath (__file__ ))
+        base_dir =os .path .dirname (os .path .dirname (os .path .abspath (__file__ )))
         fp =os .path .join (base_dir ,'resources','game_data','structuredata.json')
         with open (fp ,'r',encoding ='utf-8')as f :
             js =json .load (f )
@@ -433,8 +433,9 @@ def delete_invalid_structure_map_objects (parent =None ):
                 asset =x .get ('asset')
                 if isinstance (asset ,str ):
                     valid_assets .add (asset .lower ())
-    except :
-        pass 
+    except Exception as e :
+        print (f'Failed to load structure validation data: {e}')
+        return 0
     wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
     map_objs =wsd ['MapObjectSaveData']['value']['values']
     initial_count =len (map_objs )
@@ -884,4 +885,4 @@ def reset_selected_player_timestamp (player_uid ,parent =None ):
         return True 
     except Exception as e :
         print (f'Error resetting player timestamp: {e }')
-        return False 
+        return False
