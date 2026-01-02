@@ -309,6 +309,9 @@ def import_base_json (loaded_level_json ,exported_data ,target_guild_id ,offset 
                 t_raw .setdefault ('map_object_instance_ids_base_camp_points',[]).append (new_palbox_inst_id )
         except :
             pass 
+    if target_group:
+        guild_name = target_group['value']['RawData']['value'].get('guild_name', 'Unknown')
+        constants.base_guild_lookup[str(new_base_id)] = {'GuildName': guild_name, 'GuildID': tgt_gid_str}
     worker_id_map ={}
     try :
         src_worker_container_id =_s (exported_data ['base_camp']['value']['WorkerDirector']['value']['RawData']['value']['container_id'])

@@ -258,9 +258,9 @@ class MapGraphicsView (QGraphicsView ):
         self .max_zoom =zoom_config ['max']
         self .zoom_timer =QTimer ()
         self .zoom_timer .timeout .connect (self ._smooth_zoom_step )
-        self .target_zoom =1.0 
-        self .target_center =None 
-        self .is_animating =False 
+        self .target_zoom =1.0
+        self .target_center =None
+        self .is_animating =False
         self .coords_label =QLabel (f"{t ('cursor_coords')if t else 'Cursor'}: 0, 0",self )
         self .coords_label .setStyleSheet ("background-color: rgba(0, 0, 0, 150); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; min-width: 120px;")
         self .coords_label .move (10 ,self .height ()-30 )
@@ -269,6 +269,19 @@ class MapGraphicsView (QGraphicsView ):
         self .zoom_label .setStyleSheet ("background-color: rgba(0, 0, 0, 150); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; min-width: 80px;")
         self .zoom_label .move (self .width ()-90 ,self .height ()-30 )
         self .zoom_label .setAlignment (Qt .AlignCenter )
+    def animate_to_coords (self ,x ,y ,zoom_level =None ):
+        if zoom_level is None :
+            zoom_level =self .config ['zoom']['double_click_target']
+        self .target_zoom =zoom_level
+        self .target_center =QPointF (x ,y )
+        self .resetTransform ()
+        self .current_zoom =1.0
+        self .centerOn (self .target_center )
+        self .is_animating =True
+        fps =self .config ['zoom']['animation_fps']
+        interval =int (1000 /fps )
+        if not self .zoom_timer .isActive ():
+            self .zoom_timer .start (interval )
     def wheelEvent (self ,event ):
         zoom_in =event .angleDelta ().y ()>0
         if zoom_in :
@@ -1074,15 +1087,7 @@ class MapTab (QWidget ):
                     self .parent_window .refresh_all ()
                 if imported_coords :
                     world_x ,world_y ,img_x ,img_y =imported_coords 
-                    for marker in self .base_markers :
-                        base_coords =marker .base_data ['coords']
-                        if abs (base_coords [0 ]-world_x )<1 and abs (base_coords [1 ]-world_y )<1 :
-                            zoom_level =self .config ['zoom']['double_click_target']
-                            self .view .animate_to_marker (marker ,zoom_level =zoom_level )
-                            self .scene .clearSelection ()
-                            marker .setSelected (True )
-                            marker .start_glow ()
-                            break 
+                    self .view .animate_to_coords (img_x ,img_y ,zoom_level =self .config ['zoom']['double_click_target'])
                 QMessageBox .information (
                 self ,
                 t ('success.title')if t else 'Success',
