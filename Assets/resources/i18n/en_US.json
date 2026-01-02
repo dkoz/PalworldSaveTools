@@ -653,10 +653,6 @@
 "deletion.menu.paldefender": "PalDefender Commands",
 "deletion.menu.fix_timestamps": "Fix All Negative Timestamps",
 "toggle_theme": "Toggle Theme",
-"settings_title": "Settings",
-"settings_theme_label": "Theme:",
-"settings_language_label": "Language:",
-"settings_close_button": "Close",
 "button.ok": "OK",
 "button.cancel": "Cancel",
 "paldefender.filter_type": "Filter Type:",
@@ -672,5 +668,6 @@
 "deletion.warning.protected_guild": "Guild {gid} is in exclusion list and cannot be deleted.",
 "deletion.warning.protected_base": "Base {bid} is in exclusion list and cannot be deleted.",
 "warning.title": "Warning",
-"cursor_coords": "Cursor Coords"
+"cursor_coords": "Cursor Coords",
+"zoom": "Zoom"
 }

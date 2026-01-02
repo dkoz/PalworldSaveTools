@@ -265,7 +265,7 @@ class MapGraphicsView (QGraphicsView ):
         self .coords_label .setStyleSheet ("background-color: rgba(0, 0, 0, 150); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; min-width: 120px;")
         self .coords_label .move (10 ,self .height ()-30 )
         self .coords_label .setVisible (False )
-        self .zoom_label =QLabel ("Zoom: 100%",self )
+        self .zoom_label =QLabel ((t ("zoom")if t else "Zoom")+ ": 100%",self )
         self .zoom_label .setStyleSheet ("background-color: rgba(0, 0, 0, 150); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; min-width: 80px;")
         self .zoom_label .move (self .width ()-90 ,self .height ()-30 )
         self .zoom_label .setAlignment (Qt .AlignCenter )
@@ -284,7 +284,7 @@ class MapGraphicsView (QGraphicsView ):
             factor =self .max_zoom /(self .current_zoom /factor )
             self .current_zoom =self .max_zoom
         self .scale (factor ,factor )
-        self .zoom_label .setText (f"Zoom: {int (self .current_zoom *100 )}%")
+        self .zoom_label .setText ((t ("zoom")if t else "Zoom")+ f": {int (self .current_zoom *100 )}%")
         self .zoom_changed .emit (self .current_zoom )
     def mousePressEvent (self ,event ):
         item =self .itemAt (event .pos ())
@@ -371,7 +371,7 @@ class MapGraphicsView (QGraphicsView ):
             self .centerOn (self .target_center )
             self .is_animating =False
             self .zoom_timer .stop ()
-            self .zoom_label .setText (f"Zoom: {int (self .current_zoom *100 )}%")
+            self .zoom_label .setText ((t ("zoom")if t else "Zoom")+ f": {int (self .current_zoom *100 )}%")
             self .zoom_changed .emit (self .current_zoom )
             return
         easing_factor =self .config ['zoom']['animation_speed']
@@ -379,7 +379,7 @@ class MapGraphicsView (QGraphicsView ):
         factor =(self .current_zoom +zoom_step )/self .current_zoom
         self .current_zoom +=zoom_step
         self .scale (factor ,factor )
-        self .zoom_label .setText (f"Zoom: {int (self .current_zoom *100 )}%")
+        self .zoom_label .setText ((t ("zoom")if t else "Zoom")+ f": {int (self .current_zoom *100 )}%")
         self .zoom_changed .emit (self .current_zoom )
     def resizeEvent (self ,event ):
         super ().resizeEvent (event )
@@ -577,7 +577,7 @@ class MapTab (QWidget ):
             self .view .fitInView (self .scene .sceneRect (),Qt .KeepAspectRatio )
             viewport =self .view .viewport ()
             self .view .current_zoom =self .view .viewport ().width ()/self .map_width
-            self .view .zoom_label .setText (f"Zoom: {int (self .view .current_zoom *100 )}%")
+            self .view .zoom_label .setText ((t ("zoom")if t else "Zoom")+ f": {int (self .view .current_zoom *100 )}%")
             self .view .zoom_changed .emit (self .view .current_zoom )
     def _setup_animation (self ):
         self .anim_timer =QTimer (self )

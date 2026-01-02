@@ -54,39 +54,15 @@ MANAGEMENT_TOOL_KEYS =[
 "tool.restore_map",
 ]
 def center_on_parent (dialog ):
-    """Center a dialog on its parent window."""
+    """Center a dialog on the screen (following slot injector's logic)."""
     from PySide6 .QtWidgets import QApplication
-    from PySide6 .QtCore import QPoint
 
-    parent =dialog .parent ()
-    if parent is None :
-        parent =QApplication .activeWindow ()
-
-    dialog .adjustSize ()
-    dialog_size =dialog .size ()
-
-    if parent :
-        # Get parent's geometry in screen coordinates
-        parent_geo =parent .frameGeometry ()
-        x =parent_geo .x ()+(parent_geo .width ()-dialog_size .width ())//2
-        y =parent_geo .y ()+(parent_geo .height ()-dialog_size .height ())//2
-    else :
-        # Fallback to screen center
-        screen =QApplication .primaryScreen ()
-        screen_geo =screen .availableGeometry ()
-        x =screen_geo .x ()+(screen_geo .width ()-dialog_size .width ())//2
-        y =screen_geo .y ()+(screen_geo .height ()-dialog_size .height ())//2
-
-    # Clamp to screen boundaries
-    screen =QApplication .screenAt (QPoint (x ,y ))
-    if screen is None :
-        screen =QApplication .primaryScreen ()
-    screen_geo =screen .availableGeometry ()
-
-    x =max (screen_geo .x (),min (x ,screen_geo .x ()+screen_geo .width ()-dialog_size .width ()))
-    y =max (screen_geo .y (),min (y ,screen_geo .y ()+screen_geo .height ()-dialog_size .height ()))
-
-    dialog .move (x ,y )
+    screen =QApplication .primaryScreen ().availableGeometry ()
+    size =dialog .sizeHint ()
+    if not size .isValid ():
+        dialog .adjustSize ()
+        size =dialog .size ()
+    dialog .move ((screen .width ()-size .width ())//2 ,(screen .height ()-size .height ())//2 )
 class ConversionOptionsDialog (QDialog ):
     """Dialog for selecting conversion options."""
     def __init__ (self ,parent =None ):

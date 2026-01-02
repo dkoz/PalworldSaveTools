@@ -97,7 +97,6 @@ class MainWindow (QMainWindow ):
         self .header_widget .minimize_clicked .connect (self .showMinimized )
         self .header_widget .close_clicked .connect (self .close )
         self .header_widget .theme_toggle_clicked .connect (self ._toggle_theme )
-        self .header_widget .settings_clicked .connect (self ._show_settings )
         self .header_widget .about_clicked .connect (self ._show_about )
         self .header_widget .sidebar_toggle_clicked .connect (self ._toggle_dashboard )
         self .header_widget .warn_btn .clicked .connect (self ._show_warnings )
@@ -321,7 +320,6 @@ class MainWindow (QMainWindow ):
                 with open (theme_path ,'r',encoding ='utf-8')as f :
                     qss_content =f .read ()
                     self .setStyleSheet (qss_content )
-                    print (f"Loaded theme: {theme_file }")
             except Exception as e :
                 print (f"Failed to load theme {theme_file }: {e }")
                 self ._apply_fallback_styles ()
@@ -504,72 +502,7 @@ class MainWindow (QMainWindow ):
         if hasattr (self ,'drag_position'):
             delattr (self ,'drag_position')
         super ().mouseReleaseEvent (event )
-    def _show_settings (self ):
-        dialog =QDialog (self )
-        dialog .setWindowTitle (t ("Settings")if t else "Settings")
-        dialog .setMinimumWidth (400 )
-        layout =QVBoxLayout (dialog )
-        layout .setContentsMargins (20 ,20 ,20 ,20 )
-        layout .setSpacing (15 )
-        theme_layout =QHBoxLayout ()
-        theme_label =QLabel (t ("settings_theme_label")if t else "Theme:")
-        theme_combo =QComboBox ()
-        theme_combo .addItems (["dark","light"])
-        theme_combo .setCurrentText (self .user_settings .get ("theme","dark"))
-        theme_combo .currentTextChanged .connect (
-        lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo )
-        )
-        theme_layout .addWidget (theme_label )
-        theme_layout .addWidget (theme_combo )
-        layout .addLayout (theme_layout )
-        show_icons_cb =QCheckBox (t ("settings_show_icons")if t else "Show icons in tool list")
-        show_icons_cb .setChecked (self .user_settings .get ("show_icons",True ))
-        show_icons_cb .stateChanged .connect (
-        lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo )
-        )
-        layout .addWidget (show_icons_cb )
-        lang_layout =QHBoxLayout ()
-        lang_label =QLabel (t ("settings_language_label")if t else "Language:")
-        lang_combo =QComboBox ()
-        lang_combo .addItems (self .lang_map .keys ())
-        current_lang_code =self .user_settings .get ("language","en_US")
-        current_lang_name =next ((name for name ,code in self .lang_map .items ()if code ==current_lang_code ),"English")
-        lang_combo .setCurrentText (current_lang_name )
-        lang_combo .currentTextChanged .connect (
-        lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo )
-        )
-        lang_layout .addWidget (lang_label )
-        lang_layout .addWidget (lang_combo )
-        layout .addLayout (lang_layout )
-        button_layout =QHBoxLayout ()
-        button_layout .addStretch ()
-        close_btn =QPushButton (t ("settings_close_button")if t else "Close")
-        close_btn .clicked .connect (dialog .close )
-        button_layout .addWidget (close_btn )
-        layout .addLayout (button_layout )
-        center_on_parent (dialog )
-        dialog .show ()
-    def _auto_save_settings (self ,dialog ,theme_combo ,show_icons_cb ,lang_combo ):
-        old_lang =self .user_settings .get ("language")
-        old_theme =self .user_settings .get ("theme")
-        settings ={
-        "theme":theme_combo .currentText (),
-        "show_icons":show_icons_cb .isChecked (),
-        "language":self .lang_map .get (lang_combo .currentText (),"en_US")
-        }
-        self .user_settings =settings 
-        self ._save_user_settings ()
-        if old_theme !=settings ["theme"]:
-            self .is_dark_mode =settings ["theme"]=="dark"
-            self ._load_theme ()
-            self .header_widget .set_theme (self .is_dark_mode )
-        if old_lang !=settings ["language"]:
-            set_language (settings ["language"])
-            QMessageBox .information (
-            self ,
-            t ("Language Changed")if t else "Language Changed",
-            t ("Please restart the application for full language changes to take effect.")if t else "Please restart the application for full language changes to take effect."
-            )
+
     def _show_warnings (self ):
         warnings =[
         (t ("notice.backup")if t else "WARNING: ALWAYS BACKUP YOUR SAVES BEFORE USING THESE TOOLS!",{}),

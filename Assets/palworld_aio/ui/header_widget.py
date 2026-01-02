@@ -29,7 +29,6 @@ class HeaderWidget (QWidget ):
     minimize_clicked =Signal ()
     close_clicked =Signal ()
     theme_toggle_clicked =Signal ()
-    settings_clicked =Signal ()
     about_clicked =Signal ()
     sidebar_toggle_clicked =Signal ()
     def __init__ (self ,parent =None ):
@@ -108,10 +107,8 @@ class HeaderWidget (QWidget ):
         menu =QMenu ()
         action_toggle =menu .addAction (nf .icons ['nf-md-theme_light_dark']+" "+(t ("toggle_theme")if t else "Toggle Theme"))
         menu .addSeparator ()
-        action_settings =menu .addAction (nf .icons ['nf-md-cog']+" "+(t ("settings_title")if t else "Settings"))
         action_about =menu .addAction (nf .icons ['nf-md-information']+" "+(t ("about.title")if t else "About PST"))
         action_toggle .triggered .connect (self .theme_toggle_clicked .emit )
-        action_settings .triggered .connect (self .settings_clicked .emit )
         action_about .triggered .connect (self .about_clicked .emit )
         dropdown_btn .clicked .connect (
         lambda :menu .exec (dropdown_btn .mapToGlobal (QPoint (0 ,dropdown_btn .height ())))
@@ -204,4 +201,4 @@ class HeaderWidget (QWidget ):
         from ..widgets import MenuPopup 
         if self ._menu_popup is None :
             self ._menu_popup =MenuPopup (self )
-        return self ._menu_popup 
+        return self ._menu_popup
