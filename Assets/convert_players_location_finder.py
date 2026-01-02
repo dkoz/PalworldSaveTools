@@ -1,6 +1,6 @@
 import sys ,os ,gc ,time 
 from import_libs import *
-from Assets .loading_manager import run_with_loading 
+from loading_manager import run_with_loading 
 import tkinter as tk 
 from tkinter import filedialog 
 from PySide6 .QtCore import QEventLoop 

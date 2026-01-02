@@ -5,5 +5,4 @@ if "%1"=="--infologs" (
 ) else (
     python "%~dp0setup_pst.py"
 )
-pause
 exit /b %errorlevel%

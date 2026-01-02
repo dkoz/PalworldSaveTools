@@ -68,7 +68,6 @@ class StatsPanel (QWidget ):
                 key =f'{sec_key }_{field_key }'
                 self .stat_labels [key ]=value_label 
     def update_stats (self ,stats_dict ,section ='after'):
-
         section =section .lower ()
         key_map ={
         'players':'players',
@@ -83,14 +82,12 @@ class StatsPanel (QWidget ):
                 if label_key in self .stat_labels :
                     self .stat_labels [label_key ].setText (str (value ))
     def refresh_stats_before (self ,stats_dict ):
-
         self .stats_before =dict (stats_dict )
         self .update_stats (stats_dict ,'before')
         zero_stats ={k :0 for k in stats_dict }
         self .update_stats (zero_stats ,'after')
         self .update_stats (zero_stats ,'result')
     def refresh_stats_after (self ,stats_dict ):
-
         self .update_stats (stats_dict ,'after')
         if self .stats_before :
             result ={}
@@ -105,19 +102,16 @@ class StatsPanel (QWidget ):
                 result [external_key ]=before_val -after_val 
             self .update_stats (result ,'result')
     def refresh_labels (self ):
-
         for key ,(label ,label_key )in self .stat_key_labels .items ():
             if key .startswith ('header_'):
                 label .setText (t (label_key )if t else label_key .split ('.')[-1 ].title ())
             elif key .startswith ('field_'):
                 label .setText ((t (label_key )if t else label_key .split ('.')[-1 ].title ())+':')
     def _get_stat_value (self ,key ):
-
         if key in self .stat_labels :
             return self .stat_labels [key ].text ().strip ()
         return '0'
     def _copy_stats_to_clipboard (self ):
-
         copy_content ='PalworldSaveTools\n\n'
         fields =['guilds','bases','players','pals']
         sections =['before','after','result']

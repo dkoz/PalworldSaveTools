@@ -30,7 +30,7 @@ GITHUB_RAW_URL ='https://raw.githubusercontent.com/deafdudecomputers/PalworldSav
 def get_base_path ():
     if getattr (sys ,'frozen',False ):
         return os .path .dirname (sys .executable )
-    return os .path .dirname (os .path .dirname (os .path .abspath (__file__ )))
+    return os .getcwd ()
 def get_assets_path ():
     return os .path .dirname (os .path .dirname (os .path .abspath (__file__ )))
 def get_icon_path ():

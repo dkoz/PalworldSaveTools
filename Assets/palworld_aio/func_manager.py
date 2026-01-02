@@ -13,7 +13,6 @@ except ImportError :
     from .utils import sav_to_json ,json_to_sav ,are_equal_uuids ,as_uuid ,is_valid_level ,extract_value ,format_duration 
     from .data_manager import delete_base_camp 
 def build_player_levels ():
-
     if not constants .loaded_level_json :
         return 
     char_map =constants .loaded_level_json ['properties']['worldSaveData']['value'].get ('CharacterSaveParameterMap',{}).get ('value',[])
@@ -36,7 +35,6 @@ def build_player_levels ():
             continue 
     constants .player_levels =dict (uid_level_map )
 def delete_player_pals (wsd ,to_delete_uids ):
-
     char_save_map =wsd .get ('CharacterSaveParameterMap',{}).get ('value',[])
     removed_pals =0 
     uids_set ={uid .replace ('-','')for uid in to_delete_uids if uid }
@@ -57,7 +55,6 @@ def delete_player_pals (wsd ,to_delete_uids ):
     wsd ['CharacterSaveParameterMap']['value']=new_map 
     return removed_pals 
 def clean_character_save_parameter_map (data_source ,valid_uids ):
-
     if 'CharacterSaveParameterMap'not in data_source :
         return 
     entries =data_source ['CharacterSaveParameterMap'].get ('value',[])
@@ -180,7 +177,6 @@ def delete_inactive_players (days_threshold ,parent =None ):
         print (t ('cleanup.preview_summary',before =total_players_before ,marked =len (deleted_info ),after =total_players_after ,pals =removed_pals ))
     return len (to_delete_uids )
 def delete_inactive_bases (days_threshold ,parent =None ):
-
     if not constants .loaded_level_json :
         return 0 
     wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
@@ -216,7 +212,6 @@ def delete_inactive_bases (days_threshold ,parent =None ):
                 removed +=1 
     return removed 
 def delete_duplicated_players (parent =None ):
-
     if not constants .current_save_path or not constants .loaded_level_json :
         return 0 
     wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
@@ -292,7 +287,6 @@ def delete_duplicated_players (parent =None ):
     print (t ('players.duplicate.marked',count =len (deleted_players )))
     return len (deleted_players )
 def delete_unreferenced_data (parent =None ):
-
     if not constants .loaded_level_json :
         return {}
     build_player_levels ()
@@ -396,7 +390,6 @@ def delete_unreferenced_data (parent =None ):
     'dropped_items':removed_drops 
     }
 def delete_non_base_map_objects (parent =None ):
-
     if not constants .loaded_level_json :
         return 0 
     wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
@@ -748,7 +741,6 @@ def fix_missions (parent =None ):
     print (result_msg )
     return {'total':total ,'fixed':fixed ,'skipped':skipped }
 def reset_anti_air_turrets (parent =None ):
-
     if not constants .loaded_level_json :
         return None 
     try :
@@ -768,7 +760,6 @@ def reset_anti_air_turrets (parent =None ):
         return count if count >0 else 1 
     return 0 
 def reset_dungeons (parent =None ):
-
     if not constants .loaded_level_json :
         return None 
     try :
@@ -819,7 +810,6 @@ def unlock_viewing_cage_for_player (player_uid ,parent =None ):
         print (f'Error unlocking viewing cage: {e }')
         return False 
 def fix_all_negative_timestamps (parent =None ):
-
     if not constants .loaded_level_json :
         return 0 
     fixed_count =0 
@@ -866,7 +856,6 @@ def fix_all_negative_timestamps (parent =None ):
     print (f"Fixed {fixed_count } player timestamps to current tick.")
     return fixed_count 
 def reset_selected_player_timestamp (player_uid ,parent =None ):
-
     if not constants .loaded_level_json :
         return False 
     try :

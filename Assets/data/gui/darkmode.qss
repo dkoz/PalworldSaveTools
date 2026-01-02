@@ -675,3 +675,68 @@ QTreeWidget#searchTree QHeaderView::section {
 QTreeWidget#searchTree QHeaderView::section:hover {
     background-color: rgba(37,99,235,0.25);
 }
+
+/* ===== Loading Window Styles ===== */
+
+/* Main container (glass panel) */
+QFrame#mainContainer {
+    background: rgba(18,20,24,0.95);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Close button */
+QPushButton#closeBtn {
+    background: transparent;
+    color: #dfeefc;
+    font-size: 20px;
+    font-weight: bold;
+    border: none;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+QPushButton#closeBtn:hover {
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px;
+}
+
+/* Loading text label */
+QLabel#loadingLabel {
+    color: #dfeefc;
+    font-family: 'Segoe UI';
+    font-size: 15px;
+    font-weight: 700;
+    background: transparent;
+    border: none;
+}
+
+/* Icon label */
+QLabel#iconLabel {
+    background: transparent;
+    border: none;
+}
+
+/* Loading progress bar */
+QProgressBar#loadingProgress {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    background: rgba(18,20,24,0.95);
+    color: #dfeefc;
+    height: 8px;
+}
+
+QProgressBar#loadingProgress::chunk {
+    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #7DD3FC, stop:1 #A78BFA);
+    border-radius: 4px;
+}
+
+/* Timer label */
+QLabel#timerLabel {
+    color: #7DD3FC;
+    font-family: 'Consolas';
+    font-size: 18px;
+    font-weight: bold;
+    background: transparent;
+    border: none;
+}

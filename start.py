@@ -22,10 +22,15 @@ else :
         QGraphicsOpacityEffect ,QFrame ,QHBoxLayout ,QSpacerItem ,QSizePolicy 
         )
         from PySide6 .QtGui import QPixmap 
-        from PySide6 .QtCore import Qt ,QPropertyAnimation ,QEasingCurve ,QTimer ,QObject ,Signal ,Slot 
+        from PySide6 .QtCore import Qt ,QPropertyAnimation ,QEasingCurve ,QTimer ,QObject ,Signal ,Slot ,qInstallMessageHandler 
         GUI_AVAILABLE =True 
     except Exception :
         GUI_AVAILABLE =False 
+if GUI_AVAILABLE :
+    def qt_message_handler (mode ,context ,message ):
+        if "QThreadStorage"in str (message )and "destroyed before end of thread"in str (message ):
+            return 
+    qInstallMessageHandler (qt_message_handler )
 DEBUG =bool (os .environ .get ("PST_DEBUG","")in ("1","true","True"))
 USE_ANSI =True 
 if os .name =="nt":
@@ -581,7 +586,6 @@ def update_gui_progress (step :int ,message :str ,pct :int =0 ):
         except Exception :
             pass 
 def show_startup_preference_dialog ():
-
     if not GUI_AVAILABLE :
         return "menu"
     try :
@@ -627,7 +631,6 @@ def show_startup_preference_dialog ():
             traceback .print_exc ()
         return "menu"
 def save_boot_preference (preference ):
-
     user_cfg_path =PROJECT_DIR /"Assets"/"data"/"configs"/"user.cfg"
     try :
         settings ={}
@@ -651,12 +654,9 @@ def spawn_menu_and_exit (venv_py :Path ):
     time .sleep (0.2 )
     os ._exit (0 )
 def spawn_aio_and_exit (venv_py :Path ):
-
     try :
-        subprocess .Popen (
-        [str (venv_py ),"-m","Assets.palworld_aio.main"],
-        cwd =str (PROJECT_DIR )
-        )
+        main_py =PROJECT_DIR /"Assets"/"palworld_aio"/"main.py"
+        subprocess .Popen ([str (venv_py ),str (main_py )],cwd =str (PROJECT_DIR ))
     except Exception :
         if DEBUG :
             traceback .print_exc ()
@@ -728,9 +728,9 @@ def main ():
                     except Exception :
                         pass 
                 if boot_preference is None :
-                    boot_preference =show_startup_preference_dialog ()
+                    boot_preference ="palworld_aio"
                     save_boot_preference (boot_preference )
-                QTimer .singleShot (350 ,lambda :spawn_menu_and_exit (venv_py ))
+                QTimer .singleShot (350 ,lambda :spawn_aio_and_exit (venv_py ))
             _signals .finished .connect (on_finished )
             _worker_thread =threading .Thread (target =backend_worker ,args =(venv_py ,_signals ),daemon =True )
             _worker_thread .start ()

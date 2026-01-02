@@ -14,10 +14,8 @@ try :
 except ImportError :
     from ..import constants 
 def get_assets_path ():
-
     return os .path .dirname (os .path .dirname (os .path .dirname (os .path .abspath (__file__ ))))
 def load_tool_icons ():
-
     icon_file =os .path .join (get_assets_path (),"toolicon.json")
     if not os .path .exists (icon_file ):
         return {}
@@ -43,7 +41,6 @@ MANAGEMENT_TOOL_KEYS =[
 "tool.restore_map",
 ]
 class ToolButton (QWidget ):
-
     clicked =Signal ()
     def __init__ (self ,label_text ,tooltip_text ,icon_path =None ,parent =None ):
         super ().__init__ (parent )
@@ -72,14 +69,12 @@ class ToolButton (QWidget ):
             self .clicked .emit ()
         super ().mousePressEvent (event )
 class ToolsTab (QWidget ):
-
     def __init__ (self ,parent =None ):
         super ().__init__ (parent )
         self .parent_window =parent 
         self .tool_icons =load_tool_icons ()
         self ._setup_ui ()
     def _setup_ui (self ):
-
         main_layout =QVBoxLayout (self )
         main_layout .setContentsMargins (10 ,10 ,10 ,10 )
         main_layout .setSpacing (15 )
@@ -128,7 +123,6 @@ class ToolsTab (QWidget ):
         note .setStyleSheet ("color: #FFD24D; padding: 10px;")
         main_layout .addWidget (note )
     def _get_tool_icon_path (self ,tool_key ):
-
         if tool_key in self .tool_icons :
             icon_name =self .tool_icons [tool_key ]
             icon_path =os .path .join (get_assets_path (),"data","icon",f"{icon_name }.ico")
@@ -136,7 +130,6 @@ class ToolsTab (QWidget ):
                 return icon_path 
         return None 
     def _import_and_call (self ,module_name ,function_name ,*args ):
-
         try :
             assets_path =get_assets_path ()
             if assets_path not in sys .path :
@@ -155,7 +148,6 @@ class ToolsTab (QWidget ):
             )
             raise 
     def _run_converting_tool (self ,index ):
-
         try :
             dialog =None 
             if index ==0 :
@@ -178,7 +170,6 @@ class ToolsTab (QWidget ):
         except Exception as e :
             print (f"Error running converting tool {index }: {e }")
     def _run_management_tool (self ,index ):
-
         try :
             dialog =None 
             if index ==0 :
@@ -199,5 +190,4 @@ class ToolsTab (QWidget ):
         except Exception as e :
             print (f"Error running management tool {index }: {e }")
     def refresh (self ):
-
         pass 

@@ -9,7 +9,6 @@ except ImportError :
     from ..import constants 
     from ..widgets import StatsPanel 
 class ResultsWidget (QWidget ):
-
     def __init__ (self ,parent =None ):
         super ().__init__ (parent )
         self .setObjectName ("resultsWidget")
@@ -62,14 +61,12 @@ class ResultsWidget (QWidget ):
         stats_layout .addWidget (self .stats_panel )
         layout .addWidget (stats_frame )
     def _create_gradient_separator (self ):
-
         separator =QFrame ()
         separator .setObjectName ("gradientSeparator")
         separator .setFrameShape (QFrame .HLine )
         separator .setMaximumHeight (2 )
         return separator 
     def _create_value_card (self ,label_text ):
-
         container =QFrame ()
         container .setObjectName ("valueCard")
         card_layout =QVBoxLayout (container )
@@ -86,40 +83,33 @@ class ResultsWidget (QWidget ):
         card_layout .addWidget (value_label )
         return {'container':container ,'value_label':value_label }
     def set_player (self ,name ):
-
         if name :
             self .player_value .setText (str (name ))
         else :
             self .player_value .setText ('N/A')
     def set_guild (self ,name ):
-
         if name :
             self .guild_value .setText (str (name ))
         else :
             self .guild_value .setText ('N/A')
     def set_base (self ,base_id ):
-
         if base_id :
             self .base_value .setText (str (base_id ))
         else :
             self .base_value .setText ('N/A')
     def clear_selection (self ):
-
         self .player_value .setText ('N/A')
         self .guild_value .setText ('N/A')
         self .base_value .setText ('N/A')
     def update_stats (self ,stats ):
-
         if hasattr (self ,'stats_panel')and self .stats_panel :
             self .stats_panel .update_stats (stats )
     def refresh_stats_before (self ):
-
         from ..save_manager import save_manager 
         stats =save_manager .get_current_stats ()
         if hasattr (self ,'stats_panel')and self .stats_panel :
             self .stats_panel .refresh_stats_before (stats )
     def refresh_stats_after (self ):
-
         from ..save_manager import save_manager 
         stats =save_manager .get_current_stats ()
         if hasattr (self ,'stats_panel')and self .stats_panel :

@@ -140,7 +140,6 @@ def delete_base_camp (base_entry ,guild_id ,level_json =None ):
             raw ['map_object_instance_ids_base_camp_points']=[i for i in raw .get ('map_object_instance_ids_base_camp_points',[])if not are_equal_uuids (i ,base_id_str )]
             break 
 def delete_guild (guild_id ):
-
     wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
     group_map =wsd .get ('GroupSaveDataMap',{}).get ('value',[])
     base_list =wsd .get ('BaseCampSaveData',{}).get ('value',[])

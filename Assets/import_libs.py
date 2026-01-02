@@ -48,7 +48,6 @@ from palobject import *
 from palworld_save_tools .gvas import *
 from palworld_save_tools .rawdata import *
 from palworld_save_tools .json_tools import *
-from generate_map import *
 from palworld_coord import sav_to_map 
 from common import ICON_PATH 
 from collections import defaultdict 

@@ -10,7 +10,6 @@ try :
 except ImportError :
     from .import constants 
 def extract_guild_bases_from_save ():
-
     if not constants .loaded_level_json :
         return []
     wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
@@ -48,7 +47,6 @@ def extract_guild_bases_from_save ():
                     continue 
     return guild_bases 
 def extract_stats_from_save ():
-
     if not constants .loaded_level_json :
         return {}
     wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
@@ -68,7 +66,6 @@ def extract_stats_from_save ():
     'Total Worker/Dropped Pals':0 
     }
 def add_logo_overlay (overlay ,scale ,base_dir ,is_dark_mode =True ):
-
     logo_name ='PalworldSaveTools_Blue.png'if is_dark_mode else 'PalworldSaveTools_Black.png'
     logo_path =os .path .join (base_dir ,'resources',logo_name )
     if os .path .exists (logo_path ):
@@ -85,7 +82,6 @@ def add_logo_overlay (overlay ,scale ,base_dir ,is_dark_mode =True ):
             print (f"Logo overlay failed: {e }")
     return False 
 def render_text_pil (text ,size =20 ,color =(255 ,0 ,0 )):
-
     font_paths =[
     r"C:\Windows\Fonts\msgothic.ttc",
     r"C:\Windows\Fonts\YuGothicUI.ttf",
@@ -111,7 +107,6 @@ def render_text_pil (text ,size =20 ,color =(255 ,0 ,0 )):
     d2 .text ((5 ,5 ),text ,font =font_obj ,fill =color )
     return img 
 def generate_world_map (output_path =None ):
-
     if not constants .loaded_level_json :
         print (t ('error.no_save_loaded')if t else 'No save file loaded.')
         return None 

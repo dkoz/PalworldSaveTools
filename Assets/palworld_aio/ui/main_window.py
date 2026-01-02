@@ -3,6 +3,7 @@ import json
 import webbrowser 
 import urllib .request 
 import re 
+from functools import partial 
 from PySide6 .QtWidgets import (
 QMainWindow ,QWidget ,QVBoxLayout ,QHBoxLayout ,QLabel ,
 QPushButton ,QFrame ,QMenuBar ,QMenu ,QStatusBar ,
@@ -13,6 +14,7 @@ from PySide6 .QtCore import Qt ,QTimer ,Signal
 from PySide6 .QtGui import QIcon ,QFont ,QAction ,QPixmap ,QCloseEvent 
 from i18n import t ,set_language ,load_resources 
 from common import get_versions 
+from import_libs import run_with_loading 
 GITHUB_RAW_URL ="https://raw.githubusercontent.com/deafdudecomputers/PalworldSaveTools/main/Assets/common.py"
 GITHUB_LATEST_ZIP ="https://github.com/deafdudecomputers/PalworldSaveTools/releases/latest"
 try :
@@ -192,7 +194,7 @@ class MainWindow (QMainWindow ):
     def _setup_tools_tab (self ):
         from .tools_tab import ToolsTab 
         self .tools_tab =ToolsTab (self )
-        self .tab_bar .addTab (t ('tools.tab')if t else 'Tools')
+        self .tab_bar .addTab (t ('tools_tab')if t else 'Tools')
         self .stacked_widget .addWidget (self .tools_tab )
     def _setup_exclusions_tab (self ):
         exclusions_tab =QWidget ()
@@ -226,7 +228,6 @@ class MainWindow (QMainWindow ):
         self .tab_bar .addTab (t ('deletion.menu.exclusions')if t else 'Exclusions')
         self .stacked_widget .addWidget (exclusions_tab )
     def _setup_menus (self ):
-
         menu_actions ={
         'file':[
         (t ('menu.file.load_save')if t else 'Load Save',self ._load_save ),
@@ -261,7 +262,7 @@ class MainWindow (QMainWindow ):
         (t ('deletion.menu.save_exclusions')if t else 'Save Exclusions',self ._save_exclusions ),
         ],
         'languages':[
-        (t (f'lang.{code }')if t else code ,lambda c =code :self ._change_language (c ))
+        (t (f'lang.{code }')if t else code ,partial (self ._change_language ,code ))
         for code in ['en_US','zh_CN','ru_RU','fr_FR','es_ES','de_DE','ja_JP','ko_KR']
         ],
         }
@@ -274,10 +275,8 @@ class MainWindow (QMainWindow ):
         save_manager .load_finished .connect (self ._on_load_finished )
         save_manager .save_finished .connect (self ._on_save_finished )
     def _on_tab_changed (self ,index ):
-
         self .stacked_widget .setCurrentIndex (index )
     def _load_user_settings (self ):
-
         base_path =constants .get_assets_path ()
         user_cfg_path =os .path .join (base_path ,'data','configs','user.cfg')
         default_settings ={
@@ -304,7 +303,6 @@ class MainWindow (QMainWindow ):
             os .makedirs (os .path .dirname (user_cfg_path ),exist_ok =True )
             self ._save_user_settings ()
     def _save_user_settings (self ):
-
         base_path =constants .get_assets_path ()
         user_cfg_path =os .path .join (base_path ,'data','configs','user.cfg')
         try :
@@ -314,7 +312,6 @@ class MainWindow (QMainWindow ):
         except Exception as e :
             print (f"Failed to save user settings: {e }")
     def _load_theme (self ):
-
         base_path =constants .get_assets_path ()
         theme_file ='darkmode.qss'if self .is_dark_mode else 'lightmode.qss'
         theme_path =os .path .join (base_path ,'data','gui',theme_file )
@@ -331,7 +328,6 @@ class MainWindow (QMainWindow ):
             print (f"Theme file not found: {theme_path }")
             self ._apply_fallback_styles ()
     def _apply_fallback_styles (self ):
-
         self .setStyleSheet (f"""
             QMainWindow {{
                 background-color: {constants .BG };
@@ -386,14 +382,13 @@ class MainWindow (QMainWindow ):
             }}
         """)
     def _toggle_theme (self ):
-
         self .is_dark_mode =not self .is_dark_mode 
+        self .user_settings ['theme']='dark'if self .is_dark_mode else 'light'
         self ._save_user_settings ()
         self ._load_theme ()
         if hasattr (self ,'header_widget'):
             self .header_widget .set_theme (self .is_dark_mode )
     def _toggle_dashboard (self ):
-
         if self ._dashboard_collapsed :
             self .results_widget .show ()
             self .splitter .setSizes (self ._dashboard_sizes )
@@ -404,7 +399,6 @@ class MainWindow (QMainWindow ):
             self ._dashboard_collapsed =True 
         self .header_widget .set_sidebar_collapsed (self ._dashboard_collapsed )
     def check_github_update (self ,force_test =False ):
-
         try :
             r =urllib .request .urlopen (GITHUB_RAW_URL ,timeout =5 )
             content =r .read ().decode ("utf-8")
@@ -427,7 +421,6 @@ class MainWindow (QMainWindow ):
         except Exception :
             return True ,None 
     def _check_update (self ):
-
         try :
             ok ,latest =self .check_github_update (force_test =False )
             if not ok and latest :
@@ -456,8 +449,8 @@ class MainWindow (QMainWindow ):
         self ._refresh_bases ()
         self ._refresh_map ()
         self ._refresh_exclusions ()
+        self .results_widget .refresh_stats_after ()
     def _refresh_stats (self ):
-
         stats =save_manager .get_current_stats ()
         self .results_widget .update_stats (stats )
     def _refresh_players (self ):
@@ -492,7 +485,6 @@ class MainWindow (QMainWindow ):
         for bid in constants .exclusions .get ('bases',[]):
             self .excl_bases_panel .add_item ([bid ])
     def mousePressEvent (self ,event ):
-
         if event .button ()==Qt .LeftButton :
             if hasattr (self ,'header_widget')and self .header_widget .underMouse ():
                 self .drag_position =event .globalPosition ().toPoint ()-self .frameGeometry ().topLeft ()
@@ -502,19 +494,16 @@ class MainWindow (QMainWindow ):
         else :
             super ().mousePressEvent (event )
     def mouseMoveEvent (self ,event ):
-
         if event .buttons ()==Qt .LeftButton and hasattr (self ,'drag_position'):
             self .move (event .globalPosition ().toPoint ()-self .drag_position )
             event .accept ()
         else :
             super ().mouseMoveEvent (event )
     def mouseReleaseEvent (self ,event ):
-
         if hasattr (self ,'drag_position'):
             delattr (self ,'drag_position')
         super ().mouseReleaseEvent (event )
     def _show_settings (self ):
-
         dialog =QDialog (self )
         dialog .setWindowTitle (t ("Settings")if t else "Settings")
         dialog .setMinimumWidth (400 )
@@ -522,62 +511,49 @@ class MainWindow (QMainWindow ):
         layout .setContentsMargins (20 ,20 ,20 ,20 )
         layout .setSpacing (15 )
         theme_layout =QHBoxLayout ()
-        theme_label =QLabel (t ("Theme:")if t else "Theme:")
+        theme_label =QLabel (t ("settings_theme_label")if t else "Theme:")
         theme_combo =QComboBox ()
         theme_combo .addItems (["dark","light"])
         theme_combo .setCurrentText (self .user_settings .get ("theme","dark"))
         theme_combo .currentTextChanged .connect (
-        lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo )
+        lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo )
         )
         theme_layout .addWidget (theme_label )
         theme_layout .addWidget (theme_combo )
         layout .addLayout (theme_layout )
-        show_icons_cb =QCheckBox (t ("Show icons in tool list")if t else "Show icons in tool list")
+        show_icons_cb =QCheckBox (t ("settings_show_icons")if t else "Show icons in tool list")
         show_icons_cb .setChecked (self .user_settings .get ("show_icons",True ))
         show_icons_cb .stateChanged .connect (
-        lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo )
+        lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo )
         )
         layout .addWidget (show_icons_cb )
         lang_layout =QHBoxLayout ()
-        lang_label =QLabel (t ("Language:")if t else "Language:")
+        lang_label =QLabel (t ("settings_language_label")if t else "Language:")
         lang_combo =QComboBox ()
         lang_combo .addItems (self .lang_map .keys ())
         current_lang_code =self .user_settings .get ("language","en_US")
         current_lang_name =next ((name for name ,code in self .lang_map .items ()if code ==current_lang_code ),"English")
         lang_combo .setCurrentText (current_lang_name )
         lang_combo .currentTextChanged .connect (
-        lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo )
+        lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo )
         )
         lang_layout .addWidget (lang_label )
         lang_layout .addWidget (lang_combo )
         layout .addLayout (lang_layout )
-        boot_layout =QHBoxLayout ()
-        boot_label =QLabel (t ("Boot Preference:")if t else "Boot Preference:")
-        boot_pref_combo =QComboBox ()
-        boot_pref_combo .addItems (["menu","palworld_aio"])
-        boot_pref_combo .setCurrentText (self .user_settings .get ("boot_preference","menu"))
-        boot_pref_combo .currentTextChanged .connect (
-        lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo )
-        )
-        boot_layout .addWidget (boot_label )
-        boot_layout .addWidget (boot_pref_combo )
-        layout .addLayout (boot_layout )
         button_layout =QHBoxLayout ()
         button_layout .addStretch ()
-        close_btn =QPushButton (t ("Close")if t else "Close")
+        close_btn =QPushButton (t ("settings_close_button")if t else "Close")
         close_btn .clicked .connect (dialog .close )
         button_layout .addWidget (close_btn )
         layout .addLayout (button_layout )
         dialog .show ()
-    def _auto_save_settings (self ,dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo ):
-
+    def _auto_save_settings (self ,dialog ,theme_combo ,show_icons_cb ,lang_combo ):
         old_lang =self .user_settings .get ("language")
         old_theme =self .user_settings .get ("theme")
         settings ={
         "theme":theme_combo .currentText (),
         "show_icons":show_icons_cb .isChecked (),
-        "language":self .lang_map .get (lang_combo .currentText (),"en_US"),
-        "boot_preference":boot_pref_combo .currentText ()
+        "language":self .lang_map .get (lang_combo .currentText (),"en_US")
         }
         self .user_settings =settings 
         self ._save_user_settings ()
@@ -593,10 +569,9 @@ class MainWindow (QMainWindow ):
             t ("Please restart the application for full language changes to take effect.")if t else "Please restart the application for full language changes to take effect."
             )
     def _show_warnings (self ):
-
         warnings =[
         (t ("notice.backup")if t else "WARNING: ALWAYS BACKUP YOUR SAVES BEFORE USING THESE TOOLS!",{}),
-        (t ("notice.patch")if t else "MAKE SURE TO UPDATE YOUR SAVES AFTER EVERY GAME PATCH!",{"game_version":get_versions ()[1 ]}),
+        (t ("notice.patch",game_version =get_versions ()[1 ])if t else "MAKE SURE TO UPDATE YOUR SAVES AFTER EVERY GAME PATCH!",{}),
         (t ("notice.errors")if t else "IF YOU DO NOT UPDATE YOUR SAVES AFTER A PATCH, YOU MAY ENCOUNTER ERRORS!",{})
         ]
         combined ="\n\n".join (w for w ,_ in warnings if w )
@@ -608,7 +583,6 @@ class MainWindow (QMainWindow ):
         combined 
         )
     def _show_about (self ):
-
         tools_version ,game_version =get_versions ()
         h2_color ="#4a90e2"if self .is_dark_mode else "#1a5fb4"
         text_color ="#e0e0e0"if self .is_dark_mode else "#333"
@@ -657,7 +631,6 @@ class MainWindow (QMainWindow ):
             self .results_widget .set_base (data [0 ])
             self .results_widget .set_guild (data [2 ])
     def closeEvent (self ,event :QCloseEvent ):
-
         boot_preference =self .user_settings .get ("boot_preference","menu")
         if boot_preference =="palworld_aio":
             QApplication .quit ()
@@ -731,39 +704,10 @@ class MainWindow (QMainWindow ):
         menu .exec (panel .tree .viewport ().mapToGlobal (pos ))
     def _load_save (self ):
         if constants .loaded_level_json is not None :
-            msg =QMessageBox (self )
-            msg .setIcon (QMessageBox .Question )
-            msg .setWindowTitle (t ('Warning')if t else 'Warning')
-            msg .setText (t ('save.already_loaded.options')if t else 'A save is already loaded. What would you like to do?')
-            refresh_btn =msg .addButton (t ('save.refresh_current')if t else 'Refresh Current Save',QMessageBox .AcceptRole )
-            load_new_btn =msg .addButton (t ('save.load_new')if t else 'Load New Save (Restart)',QMessageBox .ActionRole )
-            cancel_btn =msg .addButton (t ('button.cancel')if t else 'Cancel',QMessageBox .RejectRole )
-            msg .exec ()
-            clicked =msg .clickedButton ()
-            if clicked ==refresh_btn :
-                try :
-                    save_manager .reload_current_save ()
-                    self .refresh_all ()
-                    QMessageBox .information (
-                    self ,
-                    t ('success.title')if t else 'Success',
-                    t ('save.refreshed')if t else 'Save data refreshed successfully!'
-                    )
-                except Exception as e :
-                    QMessageBox .critical (
-                    self ,
-                    t ('error.title')if t else 'Error',
-                    f"{t ('save.refresh_failed')if t else 'Failed to refresh save'}: {str (e )}"
-                    )
-                return 
-            elif clicked ==load_new_btn :
-                self ._restart_program ()
-                return 
-            else :
-                return 
+            self ._restart_program ()
+            return 
         save_manager .load_save (parent =self )
     def _restart_program (self ):
-
         import sys 
         python =sys .executable 
         os .execl (python ,python ,*sys .argv )
@@ -794,7 +738,6 @@ class MainWindow (QMainWindow ):
         self .refresh_all ()
         QMessageBox .information (self ,t ('Done'),t ('deletion.empty_guilds_removed',count =removed ))
     def _delete_inactive_bases (self ):
-
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error')if t else 'Error',t ('error.no_save_loaded')if t else 'No save file loaded.')
             return 
@@ -808,10 +751,8 @@ class MainWindow (QMainWindow ):
         cnt =delete_inactive_bases (days ,self )
         self ._delete_orphaned_bases ()
         self .refresh_all ()
-        self .results_widget .refresh_stats_after ()
         QMessageBox .information (self ,t ('Done')if t else 'Done',t ('bases.deleted_count',count =cnt )if t else f'Deleted {cnt } bases')
     def _delete_orphaned_bases (self ):
-
         if not constants .loaded_level_json :
             return 
         wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
@@ -883,7 +824,7 @@ class MainWindow (QMainWindow ):
             return 
         fixed =remove_invalid_items_from_save (self )
         self .refresh_all ()
-        QMessageBox .information (self ,t ('Done'),f"Fixed {fixed } files")
+        QMessageBox .information (self ,t ('done'),t ('fixed_files',fixed =fixed ))
     def _remove_invalid_structures (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
@@ -933,7 +874,6 @@ class MainWindow (QMainWindow ):
         else :
             QMessageBox .warning (self ,t ('Error')if t else 'Error',t ('timestamps.reset_failed')if t else 'Failed to reset player timestamp')
     def _open_paldefender (self ):
-
         dialog =PalDefenderDialog (self )
         dialog .exec ()
     def _rebuild_all_guilds (self ):
@@ -963,7 +903,6 @@ class MainWindow (QMainWindow ):
         else :
             QMessageBox .warning (self ,t ('Error'),t ('guild.move.failed'))
     def _show_map (self ):
-
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error')if t else 'Error',
             t ('error.no_save_loaded')if t else 'No save file loaded.')
@@ -990,11 +929,19 @@ class MainWindow (QMainWindow ):
         save_exclusions ()
         QMessageBox .information (self ,t ('Saved'),t ('deletion.saved_exclusions'))
     def _change_language (self ,code ):
-        set_language (code )
-        load_resources (code )
-        self ._refresh_texts ()
+        old_lang =self .user_settings .get ("language")
+        if old_lang !=code :
+            self .user_settings ["language"]=code 
+            self ._save_user_settings ()
+            set_language (code )
+        lang_name =t (f'lang.{code }')if t else code 
+        QMessageBox .information (
+        self ,
+        t ("lang.selected")if t else "Language Selected",
+        t ("lang.set_restart",lang_name =lang_name )if t else f"Language set to {lang_name }. Restarting application..."
+        )
+        self ._restart_program ()
     def _refresh_texts (self ):
-
         tools_version ,_ =get_versions ()
         self .setWindowTitle (t ('app.title',version =tools_version )+' - '+t ('tool.deletion'))
         if hasattr (self ,'results_widget')and self .results_widget :
@@ -1021,12 +968,21 @@ class MainWindow (QMainWindow ):
             constants .exclusions [excl_type ].remove (value )
             self ._refresh_exclusions ()
     def _delete_player (self ,uid ):
+        if uid in constants .exclusions .get ('players',[]):
+            QMessageBox .warning (self ,t ('warning.title')if t else 'Warning',t ('deletion.warning.protected_player')if t else f'Player {uid } is in exclusion list and cannot be deleted.')
+            return 
         delete_player (uid )
         self .refresh_all ()
     def _delete_guild (self ,gid ):
+        if gid in constants .exclusions .get ('guilds',[]):
+            QMessageBox .warning (self ,t ('warning.title')if t else 'Warning',t ('deletion.warning.protected_guild')if t else f'Guild {gid } is in exclusion list and cannot be deleted.')
+            return 
         delete_guild (gid )
         self .refresh_all ()
     def _delete_base (self ,bid ,gid ):
+        if bid in constants .exclusions .get ('bases',[]):
+            QMessageBox .warning (self ,t ('warning.title')if t else 'Warning',t ('deletion.warning.protected_base')if t else f'Base {bid } is in exclusion list and cannot be deleted.')
+            return 
         from ..data_manager import delete_base_camp 
         wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
         base_list =wsd .get ('BaseCampSaveData',{}).get ('value',[])
@@ -1068,14 +1024,12 @@ class MainWindow (QMainWindow ):
                 exported_data =json .load (f )
             if import_base_json (constants .loaded_level_json ,exported_data ,gid ):
                 self .refresh_all ()
-                self .results_widget .refresh_stats_after ()
                 QMessageBox .information (self ,t ('success.title'),t ('base.import.success')if t else 'Base imported successfully! Remember to save Level.sav.')
             else :
                 QMessageBox .warning (self ,t ('error.title'),'Import failed')
         except Exception as e :
             QMessageBox .critical (self ,t ('error.title'),f'Import failed: {str (e )}')
     def _export_base (self ,bid ):
-
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error')if t else 'Error',t ('error.no_save_loaded')if t else 'No save file loaded.')
             return 
@@ -1120,7 +1074,6 @@ class MainWindow (QMainWindow ):
     def _clone_base (self ,bid ,gid ):
         if clone_base_complete (constants .loaded_level_json ,bid ,gid ):
             self .refresh_all ()
-            self .results_widget .refresh_stats_after ()
             QMessageBox .information (self ,t ('success.title'),'Base cloned successfully')
         else :
             QMessageBox .warning (self ,t ('error.title'),'Failed to clone base')

@@ -453,7 +453,7 @@ class MenuGUI (QMainWindow ):
         top_h .addItem (QSpacerItem (20 ,10 ,QSizePolicy .Expanding ,QSizePolicy .Minimum ))
         self .warn_btn =QToolButton ()
         self .warn_btn .setObjectName ("hdrBtn")
-        self .warn_btn .setToolTip (t ("PalworldSaveTools")if callable (t )else "Warnings")
+        self .warn_btn .setToolTip (f"Warnings (Palworld v{game_version })")
         self .warn_btn .setIcon (self .style ().standardIcon (QStyle .SP_MessageBoxWarning ))
         self .warn_btn .setStyleSheet ("color: #FFD24D;")
         self .warn_btn .clicked .connect (self ._show_warnings )
@@ -692,11 +692,13 @@ class MenuGUI (QMainWindow ):
         self .action_settings .setText (nf .icons ['nf-md-cog']+" "+t ("Settings"))
         self .action_about .setText (nf .icons ['nf-md-information']+" "+t ("About PST"))
         self .dropdown_btn .setToolTip (t ("Menu"))
-        self .warn_btn .setToolTip (t ("PalworldSaveTools"))
+        self .warn_btn .setToolTip (f"Warnings (Palworld v{game_version })")
     def _show_warnings (self ):
+        patch_text =t ("notice.patch")
+        patch_msg =patch_text .replace ("{game_version}",get_versions ()[1 ])
         warnings =[
         (t ("notice.backup"),{}),
-        (t ("notice.patch",game_version =get_versions ()[1 ]),{}),
+        (patch_msg ,{}),
         (t ("notice.errors"),{})
         ]
         combined ="\n\n".join (w for w ,_ in warnings if w )
@@ -780,13 +782,13 @@ class MenuGUI (QMainWindow ):
         theme_combo =QComboBox ()
         theme_combo .addItems (["dark","light"])
         theme_combo .setCurrentText (settings .get ("theme","dark"))
-        theme_combo .currentTextChanged .connect (lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo ))
+        theme_combo .currentTextChanged .connect (lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ))
         theme_layout .addWidget (theme_label )
         theme_layout .addWidget (theme_combo )
         layout .addLayout (theme_layout )
         show_icons_cb =QCheckBox ("Show icons in tool list")
         show_icons_cb .setChecked (settings .get ("show_icons",True ))
-        show_icons_cb .stateChanged .connect (lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo ))
+        show_icons_cb .stateChanged .connect (lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ))
         layout .addWidget (show_icons_cb )
         lang_layout =QHBoxLayout ()
         lang_label =QLabel ("Language:")
@@ -795,19 +797,10 @@ class MenuGUI (QMainWindow ):
         current_lang_code =settings .get ("language","en_US")
         current_lang_name =next ((name for name ,code in self .lang_map .items ()if code ==current_lang_code ),"English")
         lang_combo .setCurrentText (current_lang_name )
-        lang_combo .currentTextChanged .connect (lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo ))
+        lang_combo .currentTextChanged .connect (lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ))
         lang_layout .addWidget (lang_label )
         lang_layout .addWidget (lang_combo )
         layout .addLayout (lang_layout )
-        boot_pref_layout =QHBoxLayout ()
-        boot_pref_label =QLabel ("Boot Preference:")
-        boot_pref_combo =QComboBox ()
-        boot_pref_combo .addItems (["menu","palworld_aio"])
-        boot_pref_combo .setCurrentText (settings .get ("boot_preference","menu"))
-        boot_pref_combo .currentTextChanged .connect (lambda :self ._auto_save_settings (dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo ))
-        boot_pref_layout .addWidget (boot_pref_label )
-        boot_pref_layout .addWidget (boot_pref_combo )
-        layout .addLayout (boot_pref_layout )
         button_layout =QHBoxLayout ()
         button_layout .addStretch ()
         close_btn =QPushButton ("Close")
@@ -844,13 +837,12 @@ class MenuGUI (QMainWindow ):
     def _preview_show_icons (self ,show ):
         self .user_settings ["show_icons"]=show 
         self ._populate_tool_buttons ()
-    def _auto_save_settings (self ,dialog ,theme_combo ,show_icons_cb ,lang_combo ,boot_pref_combo ):
+    def _auto_save_settings (self ,dialog ,theme_combo ,show_icons_cb ,lang_combo ):
         old_lang =self .user_settings .get ("language")
         settings ={
         "theme":theme_combo .currentText (),
         "show_icons":show_icons_cb .isChecked (),
-        "language":self .lang_map .get (lang_combo .currentText (),"en_US"),
-        "boot_preference":boot_pref_combo .currentText ()
+        "language":self .lang_map .get (lang_combo .currentText (),"en_US")
         }
         self .user_settings =settings 
         user_cfg_path =os .path .join (get_assets_path (),"data","configs","user.cfg")

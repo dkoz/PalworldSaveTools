@@ -5,6 +5,10 @@ import matplotlib .pyplot as plt
 sys .path .append (os .path .dirname (__file__ ))
 from import_libs import *
 from common import open_file_with_default_app 
+try :
+    from palworld_aio import constants 
+except ImportError :
+    import constants 
 x_min ,x_max =-1000 ,1000 
 y_min ,y_max =-1000 ,1000 
 image_path =os .path .join (os .path .dirname (__file__ ),"resources","worldmap.png")
@@ -53,7 +57,8 @@ Image .MAX_IMAGE_PIXELS =None
 def extract_info_from_log ():
     print (t ("mapgen.extract"))
     try :
-        with open ('Scan Save Logger/scan_save.log','r',encoding ='utf-8')as f :
+        log_file =os .path .join (constants .get_base_path (),'Scan Save Logger','scan_save.log')
+        with open (log_file ,'r',encoding ='utf-8')as f :
             log_content =f .read ()
     except :
         raise ValueError ("UTF-8 read error.")
@@ -160,8 +165,7 @@ def create_world_map ():
     if os .path .exists ('bases.csv'):os .remove ('bases.csv')
 def generate_map ():
     start =time .time ()
-    script_dir =os .path .dirname (os .path .abspath (__file__ ))
-    main_dir =os .path .dirname (script_dir )
+    main_dir =constants .get_base_path ()
     log_file =os .path .join (main_dir ,'Scan Save Logger','scan_save.log')
     if not os .path .exists (log_file ):
         print (t ("error.no_log"))

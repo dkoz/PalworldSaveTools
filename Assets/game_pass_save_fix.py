@@ -1,8 +1,8 @@
 from import_libs import *
-from Assets .palworld_aio .utils import sav_to_json ,json_to_sav 
-from Assets .fix_host_save import ask_string_with_icon 
-from Assets .common import get_assets_directory 
-from Assets .loading_manager import run_with_loading 
+from palworld_aio .utils import sav_to_json ,json_to_sav 
+from fix_host_save import ask_string_with_icon 
+from common import get_assets_directory 
+from loading_manager import run_with_loading 
 import nerdfont as nf 
 from PySide6 .QtWidgets import QWidget ,QVBoxLayout ,QHBoxLayout ,QPushButton ,QComboBox ,QFrame ,QMessageBox ,QFileDialog ,QStyleFactory ,QApplication 
 from PySide6 .QtCore import Qt ,Signal ,QObject ,QTimer ,QMetaObject ,Q_ARG 
@@ -133,7 +133,7 @@ class GamePassSaveFixWidget (QWidget ):
             try :
                 meta_json =sav_to_json (meta_path )
                 old_name =meta_json ["properties"]["SaveData"]["value"].get ("WorldName",{}).get ("value","Unknown World")
-                new_name =ask_string_with_icon (t ("world.rename.title"),t ("world.rename.prompt",old =old_name ),ICON_PATH ,mode ="text")
+                new_name =ask_string_with_icon (t ("world.rename.title"),t ("world.rename.prompt",old =old_name ),ICON_PATH )
                 if new_name :
                     meta_json ["properties"]["SaveData"]["value"]["WorldName"]["value"]=new_name 
                     json_to_sav (meta_json ,meta_path )

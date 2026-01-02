@@ -58,7 +58,7 @@ ps6_a =find_pyside6_assets ()
 if ps6_a :build_exe_options ["include_files"].append (ps6_a )
 setup (
 name ="PalworldSaveTools",
-version ="1.1.44",
+version="1.1.45",
 options ={"build_exe":build_exe_options },
 executables =[
 Executable (

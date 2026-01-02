@@ -7,7 +7,6 @@ try :
 except ImportError :
     from ..import constants 
 class BaseHoverOverlay (QWidget ):
-
     def __init__ (self ,parent =None ):
         super ().__init__ (parent )
         self .setObjectName ("baseHoverOverlay")
@@ -19,7 +18,6 @@ class BaseHoverOverlay (QWidget ):
         self ._hide_timer .setSingleShot (True )
         self ._hide_timer .timeout .connect (self ._do_hide )
     def _setup_ui (self ):
-
         self .container =QFrame (self )
         self .container .setObjectName ("hoverOverlayContainer")
         layout =QVBoxLayout (self )
@@ -63,7 +61,6 @@ class BaseHoverOverlay (QWidget ):
             }
         """)
     def show_for_base (self ,base_data :dict ,global_pos :QPoint ):
-
         self ._hide_timer .stop ()
         guild_name =base_data .get ('guild_name','Unknown')
         leader_name =base_data .get ('leader_name','Unknown')
@@ -81,11 +78,8 @@ class BaseHoverOverlay (QWidget ):
         self .show ()
         self .raise_ ()
     def hide_overlay (self ):
-
         self ._hide_timer .start (50 )
     def _do_hide (self ):
-
         self .hide ()
     def cancel_hide (self ):
-
         self ._hide_timer .stop ()

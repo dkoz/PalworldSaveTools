@@ -161,7 +161,6 @@ class ConfirmDialog (QDialog ):
         dialog =ConfirmDialog (title ,message ,parent )
         return dialog .exec ()==QDialog .Accepted 
 class PalDefenderDialog (QDialog ):
-
     def __init__ (self ,parent =None ):
         super ().__init__ (parent )
         self .setWindowTitle ('Generate PalDefender killnearestbase Commands')
@@ -239,13 +238,10 @@ class PalDefenderDialog (QDialog ):
         self .output_text .setStyleSheet (f"background-color: {constants .GLASS }; color: {constants .TEXT };")
         layout .addWidget (self .output_text )
     def _append_output (self ,text ):
-
         self .output_text .append (text )
     def _clear_output (self ):
-
         self .output_text .clear ()
     def _on_generate (self ):
-
         self ._clear_output ()
         try :
             filter_type =self .filter_group .checkedId ()
@@ -257,10 +253,9 @@ class PalDefenderDialog (QDialog ):
         except Exception as e :
             QMessageBox .critical (self ,t ('error.title')if t else 'Error',str (e ))
     def _parse_log (self ,inactivity_days =None ,max_level =None ):
-
         import re 
         import palworld_coord 
-        base_dir =constants .get_assets_path ()
+        base_dir =constants .get_base_path ()
         log_file =os .path .join (base_dir ,'Scan Save Logger','scan_save.log')
         if not os .path .exists (log_file ):
             self ._append_output (f"Log file not found: {log_file }")

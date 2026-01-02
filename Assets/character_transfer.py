@@ -13,6 +13,7 @@ target_section_ranges ,target_save_type ,target_raw_gvas ,targ_json_gvas =None ,
 selected_source_player ,selected_target_player =None ,None 
 source_guild_dict ,target_guild_dict =dict (),dict ()
 source_section_load_handle ,target_section_load_handle =None ,None 
+target_world_tick =0 
 STRUCT_START =b'\x0f\x00\x00\x00StructProperty\x00'
 MAP_START =b'\x0c\x00\x00\x00MapProperty\x00'
 ARRAY_START =b'\x0e\x00\x00\x00ArrayProperty\x00'
@@ -404,46 +405,73 @@ modified_target_players =set ()
 modified_targets_data ={}
 def transfer_all_characters ():
     def worker ():
-        skipped_uids =set ()
+        import time 
+        global selected_source_player ,selected_target_player ,host_guid ,targ_uid ,host_json ,host_json_gvas ,targ_json ,targ_json_gvas 
         total_players =source_player_list .topLevelItemCount ()
-        count =0 
+        print (f"Starting bulk transfer for {total_players } players...")
+        total_start =time .perf_counter ()
         for i in range (total_players ):
-            count +=1 
+            player_start =time .perf_counter ()
             item =source_player_list .topLevelItem (i )
             player_uuid =item .text (1 )
             if player_uuid in modified_target_players :
-                print (f"Player {player_uuid } already transferred. Skipping duplicate transfer.")
                 continue 
-            src_file =os .path .join (os .path .dirname (level_sav_path ),"Players",f"{player_uuid .replace ('-','').upper ()}.sav")
-            if not os .path .exists (src_file ):
-                src_file =os .path .join (os .path .dirname (level_sav_path ),"../Players",f"{player_uuid .replace ('-','').upper ()}.sav")
-            if not os .path .exists (src_file ):
-                print (f"Skipping missing player file {src_file } ({count }/{total_players })")
-                skipped_uids .add (player_uuid )
-                continue 
-            print (f"Transferring player {count }/{total_players }: {player_uuid }")
-            global selected_source_player ,selected_target_player 
             selected_source_player =player_uuid 
             selected_target_player =player_uuid 
-            main (skip_msgbox =True ,skip_gui =True )
+            try :
+                host_guid =UUID .from_str (selected_source_player )
+                targ_uid =UUID .from_str (selected_target_player )
+            except Exception as e :
+                print (f"UUID Error for {player_uuid }: {e }")
+                continue 
+            host_json_gvas =load_player_file (level_sav_path ,selected_source_player )
+            if not host_json_gvas :
+                continue 
+            host_json =host_json_gvas .properties 
+            targ_json_gvas =fast_deepcopy (host_json_gvas )
+            targ_json =targ_json_gvas .properties 
+            t0 =time .perf_counter ()
+            char_res =transfer_character_only (host_guid ,targ_uid )
+            t_char =time .perf_counter ()-t0 
+            t0 =time .perf_counter ()
+            transfer_tech_and_data ()
+            t_tech =time .perf_counter ()-t0 
+            t0 =time .perf_counter ()
+            transfer_inventory_only ()
+            t_inv =time .perf_counter ()-t0 
+            t0 =time .perf_counter ()
+            transfer_guild (targ_lvl ,targ_json ,host_guid ,targ_uid ,source_guild_dict )
+            t_guild =time .perf_counter ()-t0 
+            t0 =time .perf_counter ()
+            transfer_pals_only ()
+            t_pals =time .perf_counter ()-t0 
+            sync_player_timestamps (targ_uid ,targ_lvl )
+            modified_target_players .add (selected_target_player )
+            modified_targets_data [selected_target_player ]=(fast_deepcopy (targ_json ),targ_json_gvas )
+            print (f"[{i +1 }/{total_players }] {player_uuid } | Char: {t_char :.3f}s | Inv: {t_inv :.3f}s | Pals: {t_pals :.3f}s | Total: {time .perf_counter ()-player_start :.3f}s")
+        gather_and_update_dynamic_containers ()
+        print (f"Bulk transfer completed in {time .perf_counter ()-total_start :.2f}s.")
+    def on_bulk_finished ():
+        load_players (targ_lvl ,is_source =False )
+        global selected_source_player ,selected_target_player ,host_guid ,targ_uid ,exported_map 
+        selected_source_player =None 
+        selected_target_player =None 
+        host_guid =None 
+        targ_uid =None 
+        exported_map =None 
+        current_selection_label .setText ("Source: None, Target: None")
+        source_player_list .clearSelection ()
+        target_player_list .clearSelection ()
+        msg =QMessageBox (QMessageBox .Information ,t ("Transfer Successful"),t ("All players transferred!"))
+        try :
+            msg .setWindowIcon (QIcon (ICON_PATH ))
+        except :
+            pass 
+        msg .exec ()
     thread =threading .Thread (target =worker )
     thread .start ()
     thread .join ()
-    load_players (targ_lvl ,is_source =False )
-    selected_source_player =None 
-    selected_target_player =None 
-    host_guid =None 
-    targ_uid =None 
-    exported_map =None 
-    current_selection_label .setText ("Source: None, Target: None")
-    source_player_list .clearSelection ()
-    target_player_list .clearSelection ()
-    msg =QMessageBox (QMessageBox .Information ,t ("Transfer Successful"),t ("Transfer successful in memory! Hit 'Save Changes' to save."))
-    try :
-        msg .setWindowIcon (QIcon (ICON_PATH ))
-    except Exception :
-        pass 
-    msg .exec ()
+    on_bulk_finished ()
 def main (skip_msgbox =False ,skip_gui =False ):
     global host_guid ,targ_uid ,exported_map ,selected_source_player ,selected_target_player 
     if not all ([level_sav_path ,t_level_sav_path ,selected_source_player ]):
@@ -495,6 +523,7 @@ def main (skip_msgbox =False ,skip_gui =False ):
     if not transfer_pals_only ():print ("[FAIL] Pals");return 
     print ("[SUCCESS] Pals")
     gather_and_update_dynamic_containers ()
+    sync_player_timestamps (targ_uid ,targ_lvl )
     modified_target_players .add (selected_target_player )
     modified_targets_data [selected_target_player ]=(fast_deepcopy (targ_json ),targ_json_gvas )
     if not skip_gui :
@@ -527,41 +556,35 @@ def gather_and_update_dynamic_containers ():
         dynamic_guids .add (lid )
         tgt_dict [lid ]=dc 
     targ_lvl ['DynamicItemSaveData']['value']['values']=list (tgt_dict .values ())
-def transfer_character_only (host_guid ,targ_uid ):
-    host_instance_id =host_json ["SaveData"]["value"]["IndividualId"]["value"]["InstanceId"]["value"]
-    exported_map =None 
-    for character_save_param in level_json ["CharacterSaveParameterMap"]["value"]:
-        try :
-            uid =character_save_param ["key"]["PlayerUId"]["value"]
-            inst =character_save_param ["key"]["InstanceId"]["value"]
-            if uid ==host_guid and inst ==host_instance_id :
-                exported_map =character_save_param 
-                break 
-        except :
-            pass 
-    if not exported_map :
-        print (f"[ERROR] Could not find exported_map for {host_guid }")
+def sync_player_timestamps (targ_uid ,target_lvl ):
+    global target_world_tick 
+    try :
+        if not target_world_tick :
+            return False 
+        t_uid_str =str (targ_uid ).lower ()
+        if 'CharacterSaveParameterMap'in target_lvl :
+            for char in target_lvl ['CharacterSaveParameterMap']['value']:
+                if str (char ['key']['PlayerUId']['value']).lower ()==t_uid_str :
+                    raw =char ['value']['RawData']['value']
+                    raw ['last_online_real_time']=target_world_tick 
+                    if 'object'in raw and 'SaveParameter'in raw ['object']:
+                        params =raw ['object']['SaveParameter']['value']
+                        if 'LastOnlineRealTime'in params :
+                            params ['LastOnlineRealTime']['value']=target_world_tick 
+        if 'GroupSaveDataMap'in target_lvl :
+            for gdata in target_lvl ['GroupSaveDataMap']['value']:
+                try :
+                    raw_g =gdata ['value']['RawData']['value']
+                    players =raw_g .get ('players',[])
+                    for p_info in players :
+                        if str (p_info .get ('player_uid')).lower ()==t_uid_str :
+                            if 'player_info'in p_info :
+                                p_info ['player_info']['last_online_real_time']=target_world_tick 
+                except :
+                    continue 
+        return True 
+    except :
         return False 
-    targ_instance_id =targ_json ["SaveData"]["value"]["IndividualId"]["value"]["InstanceId"]["value"]
-    char_list =targ_lvl .setdefault ("CharacterSaveParameterMap",{}).setdefault ("value",[])
-    updated =False 
-    for c in char_list :
-        key =c .get ("key",{})
-        if key .get ("PlayerUId",{}).get ("value")==targ_uid and key .get ("InstanceId",{}).get ("value")==targ_instance_id :
-            c ["value"]=fast_deepcopy (exported_map ["value"])
-            updated =True 
-            break 
-    if not updated :
-        char_list .append (fast_deepcopy (exported_map ))
-    targ_lvl .setdefault ("CharacterContainerSaveData",{"value":[]})
-    targ_lvl .setdefault ("ItemContainerSaveData",{"value":[]})
-    for container_list in ("CharacterContainerSaveData","ItemContainerSaveData"):
-        existing_ids ={c .get ("key",{}).get ("ID",{}).get ("value")for c in targ_lvl [container_list ]["value"]}
-        for c in level_json .get (container_list ,{}).get ("value",[]):
-            cid =c ["key"]["ID"]["value"]
-            if cid not in existing_ids :
-                targ_lvl [container_list ]["value"].append (fast_deepcopy (c ))
-    return True 
 def transfer_guild (targ_lvl ,targ_json ,host_guid ,targ_uid ,source_guild_dict ):
     if "GroupSaveDataMap"not in targ_lvl or targ_lvl ["GroupSaveDataMap"].get ("value")is None :
         targ_lvl ["GroupSaveDataMap"]={"value":[]}
@@ -644,17 +667,51 @@ def transfer_tech_and_data ():
     except :
         return False 
     return True 
+def transfer_character_only (host_guid ,targ_uid ):
+    host_instance_id =host_json ["SaveData"]["value"]["IndividualId"]["value"]["InstanceId"]["value"]
+    exported_map =None 
+    for character_save_param in level_json ["CharacterSaveParameterMap"]["value"]:
+        try :
+            uid =character_save_param ["key"]["PlayerUId"]["value"]
+            inst =character_save_param ["key"]["InstanceId"]["value"]
+            if uid ==host_guid and inst ==host_instance_id :
+                exported_map =character_save_param 
+                break 
+        except :
+            pass 
+    if not exported_map :
+        print (f"[ERROR] Could not find exported_map for {host_guid }")
+        return False 
+    targ_instance_id =targ_json ["SaveData"]["value"]["IndividualId"]["value"]["InstanceId"]["value"]
+    char_list =targ_lvl .setdefault ("CharacterSaveParameterMap",{}).setdefault ("value",[])
+    updated =False 
+    for c in char_list :
+        key =c .get ("key",{})
+        if key .get ("PlayerUId",{}).get ("value")==targ_uid and key .get ("InstanceId",{}).get ("value")==targ_instance_id :
+            c ["value"]=fast_deepcopy (exported_map ["value"])
+            updated =True 
+            break 
+    if not updated :
+        char_list .append (fast_deepcopy (exported_map ))
+    targ_lvl .setdefault ("CharacterContainerSaveData",{"value":[]})
+    targ_lvl .setdefault ("ItemContainerSaveData",{"value":[]})
+    for container_list in ("CharacterContainerSaveData","ItemContainerSaveData"):
+        existing_ids ={c .get ("key",{}).get ("ID",{}).get ("value")for c in targ_lvl [container_list ]["value"]}
+        for c in level_json .get (container_list ,{}).get ("value",[]):
+            cid =c ["key"]["ID"]["value"]
+            if cid not in existing_ids :
+                targ_lvl [container_list ]["value"].append (fast_deepcopy (c ))
+    return True 
 def transfer_inventory_only ():
     try :
         inv_src =gather_inventory_ids (host_json )
         inv_tgt =gather_inventory_ids (targ_json )
     except :
-        print ("Inventory ID read failed.")
         return False 
-    containers_src ={}
-    containers_tgt ={}
     inv_lookup_src ={v :k for k ,v in inv_src .items ()}
     inv_lookup_tgt ={v :k for k ,v in inv_tgt .items ()}
+    containers_src ={}
+    containers_tgt ={}
     for c in level_json .get ("ItemContainerSaveData",{}).get ("value",[]):
         cid =c ["key"]["ID"]["value"]
         if cid in inv_lookup_src :
@@ -675,103 +732,96 @@ def transfer_pals_only ():
     except :
         return False 
     zero =UUID .from_str ("00000000-0000-0000-0000-000000000000")
-    used_ids =set ()
-    try :
-        for ch in level_json ["CharacterSaveParameterMap"]["value"]:
-            used_ids .add (str (ch ["key"]["InstanceId"]["value"]))
-        for ch in targ_lvl ["CharacterSaveParameterMap"]["value"]:
-            used_ids .add (str (ch ["key"]["InstanceId"]["value"]))
-    except :
-        pass 
+    if not hasattr (transfer_pals_only ,"used_ids"):
+        transfer_pals_only .used_ids =set ()
+        for cmap_name in ["level_json","targ_lvl"]:
+            data =level_json if cmap_name =="level_json"else targ_lvl 
+            for ch in data .get ("CharacterSaveParameterMap",{}).get ("value",[]):
+                transfer_pals_only .used_ids .add (str (ch ["key"]["InstanceId"]["value"]))
     def bump_guid_str (s ):
         v =str (s ).lower ()
         t =str .maketrans ("0123456789abcdef","123456789abcdef0")
         bumped =v .translate (t )
-        while bumped in used_ids :
+        while bumped in transfer_pals_only .used_ids :
             bumped =bumped .translate (t )
-        used_ids .add (bumped )
+        transfer_pals_only .used_ids .add (bumped )
         return bumped 
-    targ_guild_id =None 
-    gmap_all =targ_lvl .get ("GroupSaveDataMap",{}).get ("value",[])
-    for entry in gmap_all :
+    targ_guild_id =zero 
+    for entry in targ_lvl .get ("GroupSaveDataMap",{}).get ("value",[]):
         raw =entry ["value"]["RawData"]["value"]
-        gid =raw .get ("group_id",zero )
         plist =raw .get ("players",[])
-        for p in plist :
-            if str (p .get ("player_uid"))==str (targ_uid ):
-                targ_guild_id =gid 
-                break 
-        if targ_guild_id :break 
-    if not targ_guild_id :targ_guild_id =zero 
+        if any (str (p .get ("player_uid"))==str (targ_uid )for p in plist ):
+            targ_guild_id =raw .get ("group_id",zero )
+            break 
     src_params =[]
     id_map ={}
-    cmap =level_json ["CharacterSaveParameterMap"]["value"]
-    for ch in cmap :
+    for ch in level_json ["CharacterSaveParameterMap"]["value"]:
         try :
-            spv =ch ["value"]["RawData"]["value"]["object"]["SaveParameter"]["value"]
-        except :continue 
-        owner =spv .get ("OwnerPlayerUId")
-        if not owner or str (owner .get ("value"))!=str (host_guid ):continue 
-        old_inst =ch ["key"]["InstanceId"]["value"]
-        bumped =bump_guid_str (old_inst )
-        new_inst =UUID .from_str (bumped )
-        id_map [str (old_inst )]=new_inst 
-        cp =fast_deepcopy (ch )
-        cp ["key"]["InstanceId"]["value"]=new_inst 
-        cp_raw =cp ["value"]["RawData"]["value"]
-        cp_raw ["group_id"]=str (targ_guild_id )
-        v =cp_raw ["object"]["SaveParameter"]["value"]
-        v ["OwnerPlayerUId"]["value"]=targ_uid 
-        v .pop ("OldOwnerPlayerUIds",None )
-        v .pop ("MapObjectConcreteInstanceIdAssignedToExpedition",None )
-        v .pop ("WorkSuitabilityOptionInfo",None )
-        if "WorkRegion"in v :v ["WorkRegion"]["group_id"]["value"]=zero 
-        if "WorkerID"in v :v ["WorkerID"]["value"]=zero 
-        src_params .append (cp )
+            v =ch ["value"]["RawData"]["value"]["object"]["SaveParameter"]["value"]
+            owner =v .get ("OwnerPlayerUId")
+            if not owner or str (owner .get ("value"))!=str (host_guid ):
+                continue 
+            old_inst =ch ["key"]["InstanceId"]["value"]
+            bumped =bump_guid_str (old_inst )
+            new_inst =UUID .from_str (bumped )
+            id_map [str (old_inst )]=new_inst 
+            cp =fast_deepcopy (ch )
+            cp ["key"]["InstanceId"]["value"]=new_inst 
+            cp_raw =cp ["value"]["RawData"]["value"]
+            cp_raw ["group_id"]=str (targ_guild_id )
+            pv =cp_raw ["object"]["SaveParameter"]["value"]
+            pv ["OwnerPlayerUId"]["value"]=targ_uid 
+            for k in ["OldOwnerPlayerUIds","MapObjectConcreteInstanceIdAssignedToExpedition","WorkSuitabilityOptionInfo"]:
+                pv .pop (k ,None )
+            if "WorkRegion"in pv :pv ["WorkRegion"]["group_id"]["value"]=zero 
+            if "WorkerID"in pv :pv ["WorkerID"]["value"]=zero 
+            src_params .append (cp )
+        except :
+            continue 
     try :
         s_pal_id =host_json ["SaveData"]["value"]["PalStorageContainerId"]["value"]["ID"]["value"]
         s_oto_id =host_json ["SaveData"]["value"]["OtomoCharacterContainerId"]["value"]["ID"]["value"]
         t_pal_id =targ_json ["SaveData"]["value"]["PalStorageContainerId"]["value"]["ID"]["value"]
         t_oto_id =targ_json ["SaveData"]["value"]["OtomoCharacterContainerId"]["value"]["ID"]["value"]
-    except :return False 
-    src_pal =src_oto =tgt_pal =tgt_oto =None 
-    for c in level_json ["CharacterContainerSaveData"]["value"]:
-        cid =c ["key"]["ID"]["value"]
-        if cid ==s_pal_id :src_pal =c 
-        if cid ==s_oto_id :src_oto =c 
-    for c in targ_lvl ["CharacterContainerSaveData"]["value"]:
-        cid =c ["key"]["ID"]["value"]
-        if cid ==t_pal_id :tgt_pal =c 
-        if cid ==t_oto_id :tgt_oto =c 
+        ids_to_find ={s_pal_id ,s_oto_id }
+        src_containers ={c ["key"]["ID"]["value"]:c for c in level_json ["CharacterContainerSaveData"]["value"]if c ["key"]["ID"]["value"]in ids_to_find }
+        ids_to_find_targ ={t_pal_id ,t_oto_id }
+        targ_containers ={c ["key"]["ID"]["value"]:c for c in targ_lvl ["CharacterContainerSaveData"]["value"]if c ["key"]["ID"]["value"]in ids_to_find_targ }
+        src_pal ,src_oto =src_containers .get (s_pal_id ),src_containers .get (s_oto_id )
+        tgt_pal ,tgt_oto =targ_containers .get (t_pal_id ),targ_containers .get (t_oto_id )
+    except :
+        return False 
     if not all ([src_pal ,src_oto ,tgt_pal ,tgt_oto ]):return False 
+    param_map_by_inst ={str (p ["key"]["InstanceId"]["value"]):p for p in src_params }
     def remap_slots (slots ,new_cid ):
         for idx ,slot in enumerate (slots ):
             raw =slot .get ("RawData",{}).get ("value",{})
-            old =raw .get ("instance_id")
-            if old and str (old )in id_map :
-                new_i =id_map [str (old )]
+            old =str (raw .get ("instance_id",""))
+            if old in id_map :
+                new_i =id_map [old ]
                 raw ["instance_id"]=new_i 
-                for p in src_params :
-                    if str (p ["key"]["InstanceId"]["value"])==str (new_i ):
-                        pv =p ["value"]["RawData"]["value"]["object"]["SaveParameter"]["value"]
-                        pv ["SlotId"]["value"]["ContainerId"]["value"]["ID"]["value"]=new_cid 
-                        pv ["SlotId"]["value"]["SlotIndex"]["value"]=idx 
+                p =param_map_by_inst .get (str (new_i ))
+                if p :
+                    pv =p ["value"]["RawData"]["value"]["object"]["SaveParameter"]["value"]
+                    pv ["SlotId"]["value"]["ContainerId"]["value"]["ID"]["value"]=new_cid 
+                    pv ["SlotId"]["value"]["SlotIndex"]["value"]=idx 
     new_box =fast_deepcopy (src_pal ["value"]["Slots"]["value"].get ("values",[]))
     remap_slots (new_box ,t_pal_id )
     tgt_pal ["value"]["Slots"]["value"]["values"]=new_box 
     new_oto =fast_deepcopy (src_oto ["value"]["Slots"]["value"].get ("values",[]))
     remap_slots (new_oto ,t_oto_id )
     tgt_oto ["value"]["Slots"]["value"]["values"]=new_oto 
+    targ_uid_str =str (targ_uid )
     t_chars =targ_lvl ["CharacterSaveParameterMap"]["value"]
-    new_map =[ch for ch in t_chars if str (get_val_safe (ch ).get ("OwnerPlayerUId",{}).get ("value"))!=str (targ_uid )]
+    new_map =[ch for ch in t_chars if str (get_val_safe (ch ).get ("OwnerPlayerUId",{}).get ("value"))!=targ_uid_str ]
     new_map +=src_params 
     targ_lvl ["CharacterSaveParameterMap"]["value"]=new_map 
-    for entry in gmap_all :
+    for entry in targ_lvl .get ("GroupSaveDataMap",{}).get ("value",[]):
         raw =entry ["value"]["RawData"]["value"]
         if raw .get ("group_id")==targ_guild_id :
             handles =raw .get ("individual_character_handle_ids",[])
             for new_inst in id_map .values ():
-                handles .append ({"guid":str (targ_uid ),"instance_id":new_inst })
+                handles .append ({"guid":targ_uid_str ,"instance_id":new_inst })
             raw ["individual_character_handle_ids"]=handles 
     return True 
 def get_val_safe (p ):
@@ -951,11 +1001,17 @@ def target_level_file ():
     import gc 
     gc .collect ()
     def task ():
+        global target_world_tick 
         raw_gvas ,target_save_type_ =load_file (tmp )
         if not raw_gvas :
             return None 
         print ("Now loading the data from Target Save...")
         reader =MyReader (raw_gvas ,PALWORLD_TYPE_HINTS ,PALWORLD_CUSTOM_PROPERTIES )
+        try :
+            temp_lvl ,_ =reader .load_sections ([('GameTimeSaveData',STRUCT_START )],path ='.worldSaveData')
+            target_world_tick =temp_lvl ['GameTimeSaveData']['value']['RealDateTimeTicks']['value']
+        except :
+            target_world_tick =0 
         group_save_section ,group_save_section_range =reader .load_section ('GroupSaveDataMap',MAP_START ,reverse =True )
         target_section_load_handle =threading .Thread (target =load_all_target_sections_async ,args =(group_save_section ,group_save_section_range ,reader ))
         target_section_load_handle .start ()

@@ -14,7 +14,7 @@ from palworld_save_tools .palsav import decompress_sav_to_gvas
 from palworld_save_tools .paltypes import PALWORLD_TYPE_HINTS 
 from palobject import SKP_PALWORLD_CUSTOM_PROPERTIES 
 from palobject import MappingCacheObject ,toUUID 
-from import_libs import backup_whole_directory 
+from import_libs import backup_whole_directory ,run_with_loading 
 import palworld_coord 
 from i18n import t 
 try :
@@ -55,52 +55,53 @@ class SaveManager (QObject ):
         print (t ('loading.save'))
         constants .current_save_path =d 
         constants .backup_save_path =constants .current_save_path 
-        t0 =time .perf_counter ()
-        constants .loaded_level_json =sav_to_json (p )
-        t1 =time .perf_counter ()
-        print (t ('loading.converted',seconds =f'{t1 -t0 :.2f}'))
-        self ._build_player_levels ()
-        if not constants .loaded_level_json :
-            self .load_finished .emit (False )
-            return False 
-        data_source =constants .loaded_level_json ['properties']['worldSaveData']['value']
-        try :
-            if hasattr (MappingCacheObject ,'clear_cache'):
-                MappingCacheObject .clear_cache ()
-            constants .srcGuildMapping =MappingCacheObject .get (data_source ,use_mp =True )
-            if constants .srcGuildMapping ._worldSaveData .get ('GroupSaveDataMap')is None :
-                constants .srcGuildMapping .GroupSaveDataMap ={}
-        except Exception as e :
-            if path is None :
-                QMessageBox .critical (parent ,t ('error.title'),t ('error.guild_mapping_failed',err =e ))
-            else :
-                print (f"Error: {e }")
-            constants .srcGuildMapping =None 
-        constants .base_guild_lookup ={}
-        guild_name_map ={}
-        if constants .srcGuildMapping :
-            for gid_uuid ,gdata in constants .srcGuildMapping .GroupSaveDataMap .items ():
-                gid =str (gid_uuid )
-                guild_name =gdata ['value']['RawData']['value'].get ('guild_name','Unnamed Guild')
-                guild_name_map [gid .lower ()]=guild_name 
-                for base_id_uuid in gdata ['value']['RawData']['value'].get ('base_ids',[]):
-                    constants .base_guild_lookup [str (base_id_uuid )]={'GuildName':guild_name ,'GuildID':gid }
-        print (t ('loading.done'))
-        log_folder =os .path .join (base_path ,'Scan Save Logger')
-        if os .path .exists (log_folder ):
+        def load_task ():
+            t0 =time .perf_counter ()
+            constants .loaded_level_json =sav_to_json (p )
+            t1 =time .perf_counter ()
+            print (t ('loading.converted',seconds =f'{t1 -t0 :.2f}'))
+            self ._build_player_levels ()
+            if not constants .loaded_level_json :
+                self .load_finished .emit (False )
+                return False 
+            data_source =constants .loaded_level_json ['properties']['worldSaveData']['value']
             try :
-                shutil .rmtree (log_folder )
-            except :
-                pass 
-        os .makedirs (log_folder ,exist_ok =True )
-        player_pals_count ={}
-        self ._count_pals_found (data_source ,player_pals_count ,log_folder ,constants .current_save_path ,guild_name_map )
-        constants .PLAYER_PAL_COUNTS =player_pals_count 
-        self ._process_scan_log (data_source ,playerdir ,log_folder ,guild_name_map )
-        self .load_finished .emit (True )
-        return True 
+                if hasattr (MappingCacheObject ,'clear_cache'):
+                    MappingCacheObject .clear_cache ()
+                constants .srcGuildMapping =MappingCacheObject .get (data_source ,use_mp =True )
+                if constants .srcGuildMapping ._worldSaveData .get ('GroupSaveDataMap')is None :
+                    constants .srcGuildMapping .GroupSaveDataMap ={}
+            except Exception as e :
+                if path is None :
+                    QMessageBox .critical (parent ,t ('error.title'),t ('error.guild_mapping_failed',err =e ))
+                else :
+                    print (f"Error: {e }")
+                constants .srcGuildMapping =None 
+            constants .base_guild_lookup ={}
+            guild_name_map ={}
+            if constants .srcGuildMapping :
+                for gid_uuid ,gdata in constants .srcGuildMapping .GroupSaveDataMap .items ():
+                    gid =str (gid_uuid )
+                    guild_name =gdata ['value']['RawData']['value'].get ('guild_name','Unnamed Guild')
+                    guild_name_map [gid .lower ()]=guild_name 
+                    for base_id_uuid in gdata ['value']['RawData']['value'].get ('base_ids',[]):
+                        constants .base_guild_lookup [str (base_id_uuid )]={'GuildName':guild_name ,'GuildID':gid }
+            print (t ('loading.done'))
+            log_folder =os .path .join (base_path ,'Scan Save Logger')
+            if os .path .exists (log_folder ):
+                try :
+                    shutil .rmtree (log_folder )
+                except :
+                    pass 
+            os .makedirs (log_folder ,exist_ok =True )
+            player_pals_count ={}
+            self ._count_pals_found (data_source ,player_pals_count ,log_folder ,constants .current_save_path ,guild_name_map )
+            constants .PLAYER_PAL_COUNTS =player_pals_count 
+            self ._process_scan_log (data_source ,playerdir ,log_folder ,guild_name_map )
+            self .load_finished .emit (True )
+            return True 
+        run_with_loading (lambda _ :None ,load_task )
     def reload_current_save (self ):
-
         if not constants .current_save_path :
             raise Exception ("No save is currently loaded")
         level_sav_path =os .path .join (constants .current_save_path ,'Level.sav')
@@ -154,26 +155,28 @@ class SaveManager (QObject ):
         self .save_started .emit ()
         backup_whole_directory (constants .backup_save_path ,'Backups/AllinOneTools')
         level_sav_path =os .path .join (constants .current_save_path ,'Level.sav')
-        t0 =time .perf_counter ()
-        json_to_sav (constants .loaded_level_json ,level_sav_path )
-        t1 =time .perf_counter ()
-        players_folder =os .path .join (constants .current_save_path ,'Players')
-        for uid in constants .files_to_delete :
-            f =os .path .join (players_folder ,uid +'.sav')
-            f_dps =os .path .join (players_folder ,f'{uid }_dps.sav')
-            try :
-                os .remove (f )
-            except FileNotFoundError :
-                pass 
-            try :
-                os .remove (f_dps )
-            except FileNotFoundError :
-                pass 
-        constants .files_to_delete .clear ()
-        duration =t1 -t0 
-        print (f'Time taken to save changes: {duration :.2f} seconds')
-        self .save_finished .emit (duration )
-        return duration 
+        def save_task ():
+            t0 =time .perf_counter ()
+            json_to_sav (constants .loaded_level_json ,level_sav_path )
+            t1 =time .perf_counter ()
+            players_folder =os .path .join (constants .current_save_path ,'Players')
+            for uid in constants .files_to_delete :
+                f =os .path .join (players_folder ,uid +'.sav')
+                f_dps =os .path .join (players_folder ,f'{uid }_dps.sav')
+                try :
+                    os .remove (f )
+                except FileNotFoundError :
+                    pass 
+                try :
+                    os .remove (f_dps )
+                except FileNotFoundError :
+                    pass 
+            constants .files_to_delete .clear ()
+            duration =t1 -t0 
+            print (f'Time taken to save changes: {duration :.2f} seconds')
+            self .save_finished .emit (duration )
+            return duration 
+        run_with_loading (lambda _ :None ,save_task )
     def _build_player_levels (self ):
         char_map =constants .loaded_level_json ['properties']['worldSaveData']['value'].get ('CharacterSaveParameterMap',{}).get ('value',[])
         uid_level_map =defaultdict (lambda :'?')

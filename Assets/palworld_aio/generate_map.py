@@ -19,7 +19,6 @@ Image .MAX_IMAGE_PIXELS =None
 X_MIN ,X_MAX =-1000 ,1000 
 Y_MIN ,Y_MAX =-1000 ,1000 
 def _show_message_threadsafe (title ,message ,msg_type ='info'):
-
     from threading import Event ,current_thread 
     app =QApplication .instance ()
     if not app :
@@ -48,14 +47,12 @@ def _show_message_threadsafe (title ,message ,msg_type ='info'):
     event .wait (timeout =5 )
     return result [0 ]
 def to_image_coordinates (x_world ,y_world ,width ,height ):
-
     x_scale =width /(X_MAX -X_MIN )
     y_scale =height /(Y_MAX -Y_MIN )
     x_img =int ((x_world -X_MIN )*x_scale )
     y_img =int ((Y_MAX -y_world )*y_scale )
     return x_img ,y_img 
 def get_stats_from_save ():
-
     if not constants .loaded_level_json :
         return {}
     wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
@@ -100,7 +97,6 @@ def get_stats_from_save ():
     'Total Worker/Dropped Pals':str (total_workers )
     }
 def get_guild_base_data_from_save ():
-
     if not constants .loaded_level_json :
         return [],[]
     wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
@@ -145,7 +141,6 @@ def get_guild_base_data_from_save ():
         guild_data .append (current )
     return guild_data ,sorted (base_keys )
 def render_text_pil (text ,size =20 ,color =(255 ,0 ,0 ),font_path =None ):
-
     font_paths =[
     r"C:\Windows\Fonts\msgothic.ttc",
     r"C:\Windows\Fonts\YuGothicUI.ttf",
@@ -173,7 +168,6 @@ def render_text_pil (text ,size =20 ,color =(255 ,0 ,0 ),font_path =None ):
     d2 .text ((5 ,5 ),text ,font =font ,fill =color )
     return img 
 def create_world_map ():
-
     pygame .init ()
     base_dir =os .path .dirname (os .path .dirname (os .path .abspath (__file__ )))
     worldmap_path =os .path .join (base_dir ,'resources','worldmap.png')
@@ -264,7 +258,6 @@ def create_world_map ():
         os .remove ('bases.csv')
     return output_path 
 def generate_map (parent =None ):
-
     if not constants .loaded_level_json :
         _show_message_threadsafe (
         t ('error.title')if t else 'Error',

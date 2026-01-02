@@ -28,7 +28,6 @@ except ImportError :
     from ..guild_manager import rename_guild 
     from ..widgets import BaseHoverOverlay 
 class BaseMarker (QGraphicsPixmapItem ):
-
     def __init__ (self ,base_data ,x ,y ,base_icon_pixmap ,config ):
         super ().__init__ ()
         self .base_data =base_data 
@@ -52,18 +51,18 @@ class BaseMarker (QGraphicsPixmapItem ):
         self .glow_alpha =0 
         self .glow_increasing =True 
         self .is_hovered =False 
+        self .shine_pos =0 
     def _update_icon_size (self ,size ):
-
         self .current_size =size 
         scaled =self .base_icon_original .scaled (
         int (size ),int (size ),
         Qt .KeepAspectRatio ,
         Qt .SmoothTransformation 
         )
+        self .scaled_pixmap =scaled 
         self .setPixmap (scaled )
         self .setOffset (-size /2 ,-size /2 )
     def scale_to_zoom (self ,zoom_level ):
-
         if self .marker_type =='dot':
             if not self .config ['marker']['dot']['dynamic_sizing']:
                 return 
@@ -89,9 +88,31 @@ class BaseMarker (QGraphicsPixmapItem ):
         if new_size !=self .current_size :
             self ._update_icon_size (new_size )
     def paint (self ,painter ,option ,widget =None ):
-
         painter .setRenderHint (QPainter .Antialiasing )
         painter .setRenderHint (QPainter .SmoothPixmapTransform )
+        if self .marker_type =='icon':
+            shine_pixmap =self .scaled_pixmap .copy ()
+            mask_pixmap =QPixmap (self .current_size ,self .current_size )
+            mask_pixmap .fill (QColor (0 ,0 ,0 ,0 ))
+            mask_painter =QPainter (mask_pixmap )
+            mask_painter .setPen (Qt .NoPen )
+            mask_painter .setBrush (QColor (255 ,255 ,255 ,120 ))
+            shine_pos =self .shine_pos -50 
+            points =[
+            QPointF (shine_pos ,0 ),
+            QPointF (shine_pos +15 ,0 ),
+            QPointF (shine_pos -5 ,self .current_size ),
+            QPointF (shine_pos -20 ,self .current_size )
+            ]
+            mask_painter .drawPolygon (points )
+            mask_painter .setCompositionMode (QPainter .CompositionMode_DestinationIn )
+            mask_painter .drawPixmap (0 ,0 ,self .scaled_pixmap )
+            mask_painter .end ()
+            shine_painter =QPainter (shine_pixmap )
+            shine_painter .setCompositionMode (QPainter .CompositionMode_Plus )
+            shine_painter .drawPixmap (0 ,0 ,mask_pixmap )
+            shine_painter .end ()
+            self .setPixmap (shine_pixmap )
         glow_config =self .config ['glow']
         if glow_config ['enabled']and (self .isSelected ()or self .glow_alpha >0 or self .is_hovered ):
             alpha =max (self .glow_alpha ,glow_config ['hover_alpha']if self .is_hovered else 0 )
@@ -113,18 +134,14 @@ class BaseMarker (QGraphicsPixmapItem ):
             )
         super ().paint (painter ,option ,widget )
     def hoverEnterEvent (self ,event ):
-
         self .is_hovered =True 
         self .update ()
     def hoverLeaveEvent (self ,event ):
-
         self .is_hovered =False 
         self .update ()
     def start_glow (self ):
-
         self .glow_alpha =180 
     def update_glow (self ):
-
         glow_config =self .config ['glow']
         alpha_min =glow_config ['selected_alpha_min']
         alpha_max =glow_config ['selected_alpha_max']
@@ -143,9 +160,9 @@ class BaseMarker (QGraphicsPixmapItem ):
                 self .glow_alpha -=speed *1.5 
                 if self .glow_alpha <0 :
                     self .glow_alpha =0 
+        self .shine_pos =(self .shine_pos +2 )%100 
         self .update ()
 class EffectItem (QGraphicsObject ):
-
     def __init__ (self ,x ,y ,duration =1000 ):
         super ().__init__ ()
         self .center_x =x 
@@ -163,7 +180,6 @@ class EffectItem (QGraphicsObject ):
     def boundingRect (self ):
         return QRectF (-200 ,-200 ,400 ,400 )
 class DeleteEffect (EffectItem ):
-
     def paint (self ,painter ,option ,widget =None ):
         painter .setRenderHint (QPainter .Antialiasing )
         radius =self ._progress *150 
@@ -180,7 +196,6 @@ class DeleteEffect (EffectItem ):
             painter .setPen (Qt .NoPen )
             painter .drawEllipse (QPointF (0 ,0 ),40 ,40 )
 class ImportEffect (EffectItem ):
-
     def paint (self ,painter ,option ,widget =None ):
         painter .setRenderHint (QPainter .Antialiasing )
         for i in range (3 ):
@@ -201,7 +216,6 @@ class ImportEffect (EffectItem ):
                 size =8 -self ._progress *6 
                 painter .drawEllipse (QPointF (x ,y ),size ,size )
 class ExportEffect (EffectItem ):
-
     def paint (self ,painter ,option ,widget =None ):
         painter .setRenderHint (QPainter .Antialiasing )
         beam_height =self ._progress *200 
@@ -218,7 +232,6 @@ class ExportEffect (EffectItem ):
             painter .setBrush (QColor (150 ,220 ,255 ,particle_alpha ))
             painter .drawEllipse (QPointF (random .randint (-15 ,15 ),particle_y ),4 ,4 )
 class MapGraphicsView (QGraphicsView ):
-
     marker_clicked =Signal (object )
     marker_double_clicked =Signal (object )
     marker_right_clicked =Signal (object ,QPointF )
@@ -230,6 +243,7 @@ class MapGraphicsView (QGraphicsView ):
         self .config =config 
         self .setRenderHint (QPainter .Antialiasing )
         self .setRenderHint (QPainter .SmoothPixmapTransform )
+        self .setBackgroundBrush (Qt .transparent )
         self .setDragMode (QGraphicsView .ScrollHandDrag )
         self .setTransformationAnchor (QGraphicsView .AnchorUnderMouse )
         self .setResizeAnchor (QGraphicsView .AnchorUnderMouse )
@@ -247,8 +261,11 @@ class MapGraphicsView (QGraphicsView ):
         self .target_zoom =1.0 
         self .target_center =None 
         self .is_animating =False 
+        self .coords_label =QLabel (f"{t ('cursor_coords')if t else 'Cursor'}: 0, 0",self )
+        self .coords_label .setStyleSheet ("background-color: rgba(0, 0, 0, 150); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; min-width: 120px;")
+        self .coords_label .move (10 ,self .height ()-30 )
+        self .coords_label .setVisible (False )
     def wheelEvent (self ,event ):
-
         zoom_in =event .angleDelta ().y ()>0 
         if zoom_in :
             factor =self .zoom_factor 
@@ -265,7 +282,6 @@ class MapGraphicsView (QGraphicsView ):
         self .scale (factor ,factor )
         self .zoom_changed .emit (self .current_zoom )
     def mousePressEvent (self ,event ):
-
         item =self .itemAt (event .pos ())
         if isinstance (item ,BaseMarker ):
             if event .button ()==Qt .LeftButton :
@@ -281,7 +297,6 @@ class MapGraphicsView (QGraphicsView ):
                 self .scene ().clearSelection ()
         super ().mousePressEvent (event )
     def mouseDoubleClickEvent (self ,event ):
-
         item =self .itemAt (event .pos ())
         if isinstance (item ,BaseMarker ):
             if event .button ()==Qt .LeftButton :
@@ -291,7 +306,6 @@ class MapGraphicsView (QGraphicsView ):
                 return 
         super ().mouseDoubleClickEvent (event )
     def mouseMoveEvent (self ,event ):
-
         item =self .itemAt (event .pos ())
         if isinstance (item ,BaseMarker ):
             if self ._hovered_marker !=item :
@@ -304,15 +318,25 @@ class MapGraphicsView (QGraphicsView ):
             if self ._hovered_marker is not None :
                 self ._hovered_marker =None 
                 self .marker_hover_left .emit ()
+        scene_pos =self .mapToScene (event .pos ())
+        if self .scene ()and self .scene ().sceneRect ().contains (scene_pos ):
+            rect =self .scene ().sceneRect ()
+            width ,height =rect .width (),rect .height ()
+            img_x ,img_y =scene_pos .x (),scene_pos .y ()
+            x_world =(img_x /width )*2000 -1000 
+            y_world =1000 -(img_y /height )*2000 
+            self .coords_label .setText (f"{t ('cursor_coords')if t else 'Cursor'}: {int (x_world )}, {int (y_world )}")
+            self .coords_label .setVisible (True )
+        else :
+            self .coords_label .setVisible (False )
         super ().mouseMoveEvent (event )
     def leaveEvent (self ,event ):
-
         if self ._hovered_marker is not None :
             self ._hovered_marker =None 
             self .marker_hover_left .emit ()
+        self .coords_label .setVisible (False )
         super ().leaveEvent (event )
     def animate_to_marker (self ,marker ,zoom_level =None ):
-
         if zoom_level is None :
             zoom_level =self .config ['zoom']['double_click_target']
         self .target_zoom =zoom_level 
@@ -326,7 +350,6 @@ class MapGraphicsView (QGraphicsView ):
         if not self .zoom_timer .isActive ():
             self .zoom_timer .start (interval )
     def _smooth_zoom_step (self ):
-
         if not self .is_animating :
             self .zoom_timer .stop ()
             return 
@@ -348,8 +371,12 @@ class MapGraphicsView (QGraphicsView ):
         self .current_zoom +=zoom_step 
         self .scale (factor ,factor )
         self .zoom_changed .emit (self .current_zoom )
+    def resizeEvent (self ,event ):
+        super ().resizeEvent (event )
+        self .coords_label .move (10 ,self .height ()-30 )
+        if self .scene ():
+            self .fitInView (self .scene ().sceneRect (),Qt .IgnoreAspectRatio )
     def reset_view (self ):
-
         self .resetTransform ()
         self .current_zoom =1.0 
         if self .scene ():
@@ -358,7 +385,6 @@ class MapGraphicsView (QGraphicsView ):
                 self .current_zoom =self .viewport ().width ()/self .scene ().sceneRect ().width ()
         self .zoom_changed .emit (self .current_zoom )
 class MapTab (QWidget ):
-
     def __init__ (self ,parent =None ):
         super ().__init__ (parent )
         self .parent_window =parent 
@@ -377,20 +403,19 @@ class MapTab (QWidget ):
         self ._setup_ui ()
         self ._setup_animation ()
     def _load_config (self ):
-
         base_dir =os .path .dirname (os .path .dirname (os .path .dirname (os .path .abspath (__file__ ))))
         config_path =os .path .join (base_dir ,'data','configs','map_viewer.json')
         default_config ={
         "marker":{
-        "type":"dot",
+        "type":"icon",
         "dot":{
         "size":24 ,"color":[255 ,0 ,0 ],"border_width":3 ,
         "border_color":[180 ,0 ,0 ],"size_min":24 ,"size_max":24 ,
         "dynamic_sizing":False ,"dynamic_sizing_formula":"sqrt"
         },
         "icon":{
-        "path":"resources/baseicon.png","size_min":80 ,"size_max":80 ,
-        "base_size":80 ,"dynamic_sizing":False ,"dynamic_sizing_formula":"sqrt"
+        "path":"resources/baseicon.png","size_min":28 ,"size_max":28 ,
+        "base_size":28 ,"dynamic_sizing":False ,"dynamic_sizing_formula":"sqrt"
         }
         },
         "glow":{
@@ -400,7 +425,7 @@ class MapTab (QWidget ):
         },
         "zoom":{
         "factor":1.15 ,"min":0.1 ,"max":20.0 ,
-        "double_click_target":6.0 ,"animation_speed":0.2 ,"animation_fps":60 
+        "double_click_target":2.5 ,"animation_speed":0.2 ,"animation_fps":60 
         },
         "effects":{
         "delete":{"enabled":True ,"duration":1000 ,"max_radius":150 ,
@@ -423,7 +448,6 @@ class MapTab (QWidget ):
             self .config =default_config 
         return self .config 
     def _merge_config (self ,default ,user ):
-
         result =default .copy ()
         for key ,value in user .items ():
             if key in result and isinstance (result [key ],dict )and isinstance (value ,dict ):
@@ -432,7 +456,6 @@ class MapTab (QWidget ):
                 result [key ]=value 
         return result 
     def _create_dot_pixmap (self ,size ):
-
         from PySide6 .QtGui import QPainter ,QPen ,QBrush 
         from PySide6 .QtCore import QRectF 
         dot_config =self .config ['marker']['dot']
@@ -452,16 +475,18 @@ class MapTab (QWidget ):
         painter .end ()
         return pixmap 
     def _load_base_icon (self ):
-
         base_dir =os .path .dirname (os .path .dirname (os .path .dirname (os .path .abspath (__file__ ))))
         icon_path_config =self .config ['marker']['icon']['path']
         icon_path =os .path .join (base_dir ,icon_path_config )
         if os .path .exists (icon_path ):
             self .base_icon_pixmap =QPixmap (icon_path )
         else :
-            self .base_icon_pixmap =self ._create_dot_pixmap (32 )
+            alt_icon_path =os .path .join (base_dir ,'Assets','resources','baseicon.png')
+            if os .path .exists (alt_icon_path ):
+                self .base_icon_pixmap =QPixmap (alt_icon_path )
+            else :
+                self .base_icon_pixmap =self ._create_dot_pixmap (32 )
     def _setup_ui (self ):
-
         layout =QHBoxLayout (self )
         layout .setContentsMargins (0 ,0 ,0 ,0 )
         splitter =QSplitter (Qt .Horizontal )
@@ -512,23 +537,21 @@ class MapTab (QWidget ):
         self ._splitter =splitter 
         splitter .addWidget (self ._map_widget )
         splitter .addWidget (self ._sidebar_widget )
-        splitter .setSizes ([1000 ,420 ])
+        splitter .setSizes ([850 ,550 ])
         layout .addWidget (splitter )
         QTimer .singleShot (100 ,self ._fix_initial_layout )
     def _fix_initial_layout (self ):
-
         if self ._splitter :
-            self ._splitter .setSizes ([1000 ,420 ])
+            self ._splitter .setSizes ([850 ,550 ])
             self ._splitter .updateGeometry ()
             self .updateGeometry ()
+            if self .scene :
+                self .view .fitInView (self .scene .sceneRect (),Qt .IgnoreAspectRatio )
     def _on_marker_hover_enter (self ,base_data ,global_pos ):
-
         self .hover_overlay .show_for_base (base_data ,QPoint (int (global_pos .x ()),int (global_pos .y ())))
     def _on_marker_hover_leave (self ):
-
         self .hover_overlay .hide_overlay ()
     def _load_map (self ):
-
         base_dir =os .path .dirname (os .path .dirname (os .path .dirname (os .path .abspath (__file__ ))))
         map_path =os .path .join (base_dir ,'resources','worldmap.png')
         if os .path .exists (map_path ):
@@ -541,21 +564,19 @@ class MapTab (QWidget ):
         self .map_item =QGraphicsPixmapItem (pixmap )
         self .scene .addItem (self .map_item )
         self .scene .setSceneRect (self .map_item .boundingRect ())
-        self .view .fitInView (self .scene .sceneRect (),Qt .KeepAspectRatio )
-        if self .map_width >0 :
+        if self .map_width >0 and self .map_height >0 :
+            self .view .fitInView (self .scene .sceneRect (),Qt .IgnoreAspectRatio )
+            viewport =self .view .viewport ()
             self .view .current_zoom =self .view .viewport ().width ()/self .map_width 
             self .view .zoom_changed .emit (self .view .current_zoom )
     def _setup_animation (self ):
-
         self .anim_timer =QTimer (self )
         self .anim_timer .timeout .connect (self ._update_animations )
         self .anim_timer .start (50 )
     def _update_animations (self ):
-
         for marker in self .base_markers :
             marker .update_glow ()
     def refresh (self ):
-
         if not constants .loaded_level_json :
             return 
         self .guilds_data =self ._get_guild_bases ()
@@ -563,7 +584,6 @@ class MapTab (QWidget ):
         self ._update_markers ()
         self ._update_tree ()
     def _get_guild_bases (self ):
-
         guilds ={}
         try :
             wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
@@ -641,7 +661,6 @@ class MapTab (QWidget ):
             print (f"Error getting guild bases: {e }")
         return guilds 
     def _to_image_coordinates (self ,x_world ,y_world ,width ,height ):
-
         x_min ,x_max =-1000 ,1000 
         y_min ,y_max =-1000 ,1000 
         x_scale =width /(x_max -x_min )
@@ -650,7 +669,6 @@ class MapTab (QWidget ):
         img_y =int ((y_max -y_world )*y_scale )
         return img_x ,img_y 
     def _update_markers (self ):
-
         for marker in self .base_markers :
             self .scene .removeItem (marker )
         self .base_markers .clear ()
@@ -666,7 +684,6 @@ class MapTab (QWidget ):
                 self .scene .addItem (marker )
                 self .base_markers .append (marker )
     def _update_tree (self ):
-
         self .guild_tree .clear ()
         for gid ,guild in self .filtered_guilds .items ():
             guild_item =QTreeWidgetItem ([
@@ -688,7 +705,6 @@ class MapTab (QWidget ):
                 guild_item .addChild (base_item )
             self .guild_tree .addTopLevelItem (guild_item )
     def _on_search_changed (self ,text ):
-
         self .search_text =text .lower ()
         if not text :
             self .filtered_guilds =self .guilds_data 
@@ -716,10 +732,8 @@ class MapTab (QWidget ):
         self ._update_markers ()
         self ._update_tree ()
     def _on_item_expanded (self ,item ):
-
         pass 
     def _on_tree_item_clicked (self ,item ,column ):
-
         data =item .data (0 ,Qt .UserRole )
         if not data :
             return 
@@ -727,8 +741,8 @@ class MapTab (QWidget ):
         if item_type =='base':
             self ._update_info (item_data )
             self ._highlight_base (item_data )
+            self ._zoom_to_base (item_data )
     def _on_tree_item_double_clicked (self ,item ,column ):
-
         data =item .data (0 ,Qt .UserRole )
         if not data :
             return 
@@ -737,7 +751,6 @@ class MapTab (QWidget ):
             self ._update_info (item_data )
             self ._zoom_to_base (item_data ,zoom_level =self .config ['zoom']['double_click_target'])
     def _highlight_base (self ,base_data ):
-
         for marker in self .base_markers :
             if marker .base_data ==base_data :
                 self .scene .clearSelection ()
@@ -745,16 +758,14 @@ class MapTab (QWidget ):
                 marker .start_glow ()
                 break 
     def _zoom_to_base (self ,base_data ,zoom_level =6.0 ):
-
         for marker in self .base_markers :
-            if marker .base_data ==base_data :
+            if marker .base_data ['base_id']==base_data ['base_id']:
                 self .scene .clearSelection ()
                 marker .setSelected (True )
                 marker .start_glow ()
                 self .view .animate_to_marker (marker ,zoom_level =zoom_level )
                 break 
     def _play_effect (self ,effect_class ,x ,y ):
-
         effect =effect_class (x ,y )
         self .scene .addItem (effect )
         self .active_effects .append (effect )
@@ -771,7 +782,6 @@ class MapTab (QWidget ):
         anim .start ()
         effect ._animation =anim 
     def _update_info (self ,base_data ):
-
         info =f"""
         <b>Guild:</b> {base_data ['guild_name']}<br>
         <b>Leader:</b> {base_data ['leader_name']}<br>
@@ -780,18 +790,32 @@ class MapTab (QWidget ):
         """
         self .info_label .setText (info .strip ())
     def _on_marker_clicked (self ,base_data ):
-
         self ._update_info (base_data )
+        self ._zoom_to_base (base_data )
     def _on_marker_double_clicked (self ,base_data ):
-
         self ._update_info (base_data )
     def _on_zoom_changed (self ,zoom_level ):
-
         for marker in self .base_markers :
             marker .scale_to_zoom (zoom_level )
     def _on_marker_right_clicked (self ,base_data ,global_pos ):
-
+        self ._zoom_to_base (base_data )
         menu =QMenu (self )
+        menu .setStyleSheet ("""
+            QMenu {
+                background-color: rgba(18, 20, 24, 0.95);
+                border: 1px solid rgba(125, 211, 252, 0.3);
+                border-radius: 4px;
+                color: #e2e8f0;
+                padding: 4px;
+            }
+            QMenu::item {
+                padding: 6px 12px;
+                border-radius: 3px;
+            }
+            QMenu::item:selected {
+                background-color: rgba(59, 142, 208, 0.3);
+            }
+        """)
         delete_action =menu .addAction (t ('delete.base')if t else 'Delete Base')
         export_action =menu .addAction (t ('button.export')if t else 'Export Base')
         action =menu .exec (global_pos .toPoint ())
@@ -800,7 +824,6 @@ class MapTab (QWidget ):
         elif action ==export_action :
             self ._export_base (base_data )
     def _on_tree_context_menu (self ,pos ):
-
         item =self .guild_tree .itemAt (pos )
         if not item :
             return 
@@ -809,7 +832,24 @@ class MapTab (QWidget ):
             return 
         item_type ,item_data =data 
         menu =QMenu (self )
+        menu .setStyleSheet ("""
+            QMenu {
+                background-color: rgba(18, 20, 24, 0.95);
+                border: 1px solid rgba(125, 211, 252, 0.3);
+                border-radius: 4px;
+                color: #e2e8f0;
+                padding: 4px;
+            }
+            QMenu::item {
+                padding: 6px 12px;
+                border-radius: 3px;
+            }
+            QMenu::item:selected {
+                background-color: rgba(59, 142, 208, 0.3);
+            }
+        """)
         if item_type =='base':
+            self ._zoom_to_base (item_data )
             delete_action =menu .addAction (t ('delete.base')if t else 'Delete Base')
             export_action =menu .addAction (t ('button.export')if t else 'Export Base')
             action =menu .exec (self .guild_tree .viewport ().mapToGlobal (pos ))
@@ -829,7 +869,9 @@ class MapTab (QWidget ):
             elif action ==import_action :
                 self ._import_base_to_guild (item_data )
     def _delete_base (self ,base_data ):
-
+        if str (base_data ['base_id'])in constants .exclusions .get ('bases',[]):
+            QMessageBox .warning (self ,t ('warning.title')if t else 'Warning',t ('deletion.warning.protected_base')if t else f'Base {base_data ["base_id"]} is in exclusion list and cannot be deleted.')
+            return 
         reply =QMessageBox .question (
         self ,
         t ('confirm.title')if t else 'Confirm',
@@ -858,7 +900,6 @@ class MapTab (QWidget ):
                 f'Failed to delete base: {str (e )}'
                 )
     def _export_base (self ,base_data ):
-
         try :
             bid =str (base_data ['base_id'])
             data =export_base_json (constants .loaded_level_json ,bid )
@@ -898,7 +939,6 @@ class MapTab (QWidget ):
             f'Failed to export base: {str (e )}'
             )
     def _rename_guild (self ,guild_id ):
-
         current_name =self .guilds_data .get (guild_id ,{}).get ('guild_name','')
         new_name ,ok =QInputDialog .getText (
         self ,
@@ -924,18 +964,13 @@ class MapTab (QWidget ):
                 f'Failed to rename guild: {str (e )}'
                 )
     def _delete_guild (self ,guild_id ):
-
         from ..data_manager import delete_guild ,load_exclusions 
         guild_name =self .guilds_data .get (guild_id ,{}).get ('guild_name','Unknown')
         base_count =len (self .guilds_data .get (guild_id ,{}).get ('bases',[]))
         load_exclusions ()
         guild_id_clean =str (guild_id ).replace ('-','').lower ()
         if guild_id_clean in [ex .replace ('-','').lower ()for ex in constants .exclusions .get ('guilds',[])]:
-            QMessageBox .warning (
-            self ,
-            t ('warning.title')if t else 'Warning',
-            f'Guild "{guild_name }" is in exclusion list and cannot be deleted.'
-            )
+            QMessageBox .warning (self ,t ('warning.title')if t else 'Warning',t ('deletion.warning.protected_guild')if t else f'Guild {guild_id } is in exclusion list and cannot be deleted.')
             return 
         wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
         for b in wsd .get ('BaseCampSaveData',{}).get ('value',[]):
@@ -1000,7 +1035,6 @@ class MapTab (QWidget ):
                 f'Failed to delete guild: {str (e )}'
                 )
     def _import_base_to_guild (self ,guild_id ):
-
         file_path ,_ =QFileDialog .getOpenFileName (
         self ,
         t ('button.import')if t else 'Import Base',
