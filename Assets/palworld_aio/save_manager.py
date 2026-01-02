@@ -5,67 +5,57 @@ import shutil
 import json
 import logging
 import threading
+import re
 from collections import defaultdict
 from concurrent .futures import ThreadPoolExecutor ,as_completed
 from PySide6 .QtWidgets import QFileDialog ,QMessageBox
-from PySide6 .QtCore import QObject ,Signal ,QTimer
+from PySide6 .QtCore import QObject ,Signal
 from palworld_save_tools .gvas import GvasFile
 from palworld_save_tools .palsav import decompress_sav_to_gvas
 from palworld_save_tools .paltypes import PALWORLD_TYPE_HINTS
 from palobject import SKP_PALWORLD_CUSTOM_PROPERTIES
 from palobject import MappingCacheObject ,toUUID
-from import_libs import backup_whole_directory
+from import_libs import backup_whole_directory ,run_with_loading
 import palworld_coord
 from i18n import t
 try :
     from palworld_aio import constants
     from palworld_aio .utils import sav_to_json ,json_to_sav ,extract_value ,sanitize_filename ,format_duration_short
-    from palworld_aio .widgets import LoadingPopup
 except ImportError :
     from .import constants
     from .utils import sav_to_json ,json_to_sav ,extract_value ,sanitize_filename ,format_duration_short
-    from .widgets import LoadingPopup 
 class SaveManager (QObject ):
     load_started =Signal ()
     load_finished =Signal (bool )
     save_started =Signal ()
     save_finished =Signal (float )
     stats_updated =Signal (str )
-    _callback_signal =Signal (object, object)  # Internal signal for thread-safe callbacks
-
     def __init__ (self ):
         super ().__init__ ()
         self .dps_tasks =[]
-        self._callback_signal.connect(self._execute_callback)
     def load_save (self ,path =None ,parent =None ):
         if constants .loaded_level_json is not None :
-            from .utils import restart_program
+            from .utils import restart_program 
             restart_program ()
         base_path =constants .get_base_path ()
         if path is None :
             p ,_ =QFileDialog .getOpenFileName (parent ,'Select Level.sav','','SAV Files (*.sav)')
         else :
-            p =path
+            p =path 
         if not p :
-            return False
+            return False 
         if not p .endswith ('Level.sav'):
             QMessageBox .critical (parent ,t ('error.title'),t ('error.not_level_sav'))
-            return False
+            return False 
         d =os .path .dirname (p )
         playerdir =os .path .join (d ,'Players')
         if not os .path .isdir (playerdir ):
             QMessageBox .critical (parent ,t ('error.title'),t ('error.players_folder_missing'))
-            return False
-
-        # Create and show loading popup
-        loading_popup = LoadingPopup(parent)
-        loading_popup.show_with_fade()
-
+            return False 
         self .load_started .emit ()
         print (t ('loading.save'))
-        constants .current_save_path =d
-        constants .backup_save_path =constants .current_save_path
-
+        constants .current_save_path =d 
+        constants .backup_save_path =constants .current_save_path 
         def load_task ():
             t0 =time .perf_counter ()
             constants .loaded_level_json =sav_to_json (p )
@@ -73,7 +63,8 @@ class SaveManager (QObject ):
             print (t ('loading.converted',seconds =f'{t1 -t0 :.2f}'))
             self ._build_player_levels ()
             if not constants .loaded_level_json :
-                return False
+                self .load_finished .emit (False )
+                return False 
             data_source =constants .loaded_level_json ['properties']['worldSaveData']['value']
             try :
                 if hasattr (MappingCacheObject ,'clear_cache'):
@@ -86,14 +77,14 @@ class SaveManager (QObject ):
                     QMessageBox .critical (parent ,t ('error.title'),t ('error.guild_mapping_failed',err =e ))
                 else :
                     print (f"Error: {e }")
-                constants .srcGuildMapping =None
+                constants .srcGuildMapping =None 
             constants .base_guild_lookup ={}
             guild_name_map ={}
             if constants .srcGuildMapping :
                 for gid_uuid ,gdata in constants .srcGuildMapping .GroupSaveDataMap .items ():
                     gid =str (gid_uuid )
                     guild_name =gdata ['value']['RawData']['value'].get ('guild_name','Unnamed Guild')
-                    guild_name_map [gid .lower ()]=guild_name
+                    guild_name_map [gid .lower ()]=guild_name 
                     for base_id_uuid in gdata ['value']['RawData']['value'].get ('base_ids',[]):
                         constants .base_guild_lookup [str (base_id_uuid )]={'GuildName':guild_name ,'GuildID':gid }
             print (t ('loading.done'))
@@ -102,44 +93,15 @@ class SaveManager (QObject ):
                 try :
                     shutil .rmtree (log_folder )
                 except :
-                    pass
+                    pass 
             os .makedirs (log_folder ,exist_ok =True )
             player_pals_count ={}
             self ._count_pals_found (data_source ,player_pals_count ,log_folder ,constants .current_save_path ,guild_name_map )
-            constants .PLAYER_PAL_COUNTS =player_pals_count
+            constants .PLAYER_PAL_COUNTS =player_pals_count 
             self ._process_scan_log (data_source ,playerdir ,log_folder ,guild_name_map )
-            return True
-
-        def on_complete(result):
-            """Called when loading is complete."""
-            loading_popup.hide_with_fade(lambda: loading_popup.deleteLater())
-            self.load_finished.emit(result if result is not None else False)
-
-        # Run task in thread
-        thread = threading.Thread(target=lambda: self._run_task_with_callback(load_task, on_complete), daemon=True)
-        thread.start()
-
-    def _run_task_with_callback(self, task, callback):
-        """Run a task and call callback with result on main thread."""
-        try:
-            result = task()
-        except Exception as e:
-            print(f"Error during task: {e}")
-            import traceback
-            traceback.print_exc()
-            result = False
-
-        # Emit signal to call callback on main thread
-        self._callback_signal.emit(callback, result)
-
-    def _execute_callback(self, callback, result):
-        """Execute callback on main thread (connected to _callback_signal)."""
-        try:
-            callback(result)
-        except Exception as e:
-            print(f"Error executing callback: {e}")
-            import traceback
-            traceback.print_exc()
+            self .load_finished .emit (True )
+            return True 
+        run_with_loading (lambda _ :None ,load_task )
     def reload_current_save (self ):
         if not constants .current_save_path :
             raise Exception ("No save is currently loaded")
@@ -190,7 +152,7 @@ class SaveManager (QObject ):
         return True 
     def save_changes (self ,parent =None ):
         if not constants .current_save_path or not constants .loaded_level_json :
-            return
+            return 
         self .save_started .emit ()
         backup_whole_directory (constants .backup_save_path ,'Backups/AllinOneTools')
         level_sav_path =os .path .join (constants .current_save_path ,'Level.sav')
@@ -205,23 +167,21 @@ class SaveManager (QObject ):
                 try :
                     os .remove (f )
                 except FileNotFoundError :
-                    pass
+                    pass 
                 try :
                     os .remove (f_dps )
                 except FileNotFoundError :
-                    pass
+                    pass 
             constants .files_to_delete .clear ()
-            duration =t1 -t0
+            duration =t1 -t0 
             print (f'Time taken to save changes: {duration :.2f} seconds')
-            return duration
-
-        def on_complete(result):
-            """Called when saving is complete."""
-            self.save_finished.emit(result if result is not None else 0.0)
-
-        # Run task in thread
-        thread = threading.Thread(target=lambda: self._run_task_with_callback(save_task, on_complete), daemon=True)
-        thread.start()
+            self .save_finished .emit (duration )
+            return duration 
+        run_with_loading (lambda _ :None ,save_task )
+    def _sanitize_for_alignment (self ,text ):
+        # Remove emojis, special Unicode characters, and other symbols that break monospace alignment
+        # Keep basic ASCII, Latin characters, and common punctuation
+        return re .sub (r'[^\x00-\x7F\u00C0-\u017F\u0080-\u00BF]', '', text )
     def _build_player_levels (self ):
         char_map =constants .loaded_level_json ['properties']['worldSaveData']['value'].get ('CharacterSaveParameterMap',{}).get ('value',[])
         uid_level_map =defaultdict (lambda :'?')
@@ -409,6 +369,7 @@ class SaveManager (QObject ):
             return owned_count 
         owned_counts =count_owned_pals (constants .loaded_level_json )
         scan_log_path =os .path .join (log_folder ,'scan_save.log')
+        players_log_path =os .path .join (log_folder ,'players.log')
         logger =logging .getLogger ('LoadSaveLogger')
         logger .handlers .clear ()
         logger .setLevel (logging .DEBUG )
@@ -420,6 +381,21 @@ class SaveManager (QObject ):
         ch .setFormatter (formatter )
         logger .addHandler (fh )
         logger .addHandler (ch )
+        # Players log setup
+        players_logger =logging .getLogger ('PlayersLogger')
+        players_logger .handlers .clear ()
+        players_logger .setLevel (logging .INFO )
+        players_logger .propagate =False
+        players_fh =logging .FileHandler (players_log_path ,encoding ='utf-8')
+        players_fh .setFormatter (logging .Formatter ('%(message)s'))
+        players_logger .addHandler (players_fh )
+        # Add header to players.log
+        players_logger .info ('=' * 150)
+        players_logger .info (' ' * 60 + 'PLAYERS LOG')
+        players_logger .info ('=' * 150)
+        players_logger .info ('')
+        players_logger .info (f"{'Player Name':<30} | {'Last Seen':<15} | {'Level':<5} | {'Pals':<5} | {'UID':<36} | {'Guild Name':<20} | {'Guild ID':<36}")
+        players_logger .info ('-' * 150)
         tick =data_source ['GameTimeSaveData']['value']['RealDateTimeTicks']['value']
         total_players =total_caught =total_owned =total_bases =active_guilds =0 
         if constants .srcGuildMapping :
@@ -452,9 +428,12 @@ class SaveManager (QObject ):
                     last =next ((p .get ('player_info',{}).get ('last_online_real_time')for p in players if p .get ('player_uid')==uid ),None )
                     lastseen ='Unknown'if last is None else format_duration_short ((tick -int (last ))/10000000.0 )
                     logger .info (f'Player: {pname } | UID: {uid } | Level: {level } | Caught: {caught } | Owned: {owned } | Encounters: {encounters } | Uniques: {uniques } | Last Online: {lastseen }')
+                    # Log to players.log in the specified format (sanitize player name for alignment)
+                    sanitized_pname =self ._sanitize_for_alignment (pname )
+                    players_logger .info (f'{sanitized_pname:<30} | {lastseen:<15} | {level:<5} | {owned:<5} | {str(uid):<36} | {guild_name:<20} | {str(gid):<36}')
                     total_players +=1 
                     total_caught +=caught 
-                    total_owned +=owned 
+                    total_owned +=owned
                 logger .info ('')
                 logger .info ('='*60 )
         total_worker_dropped =constants .PLAYER_PAL_COUNTS .get ('worker_dropped',0 )
@@ -469,6 +448,9 @@ class SaveManager (QObject ):
         logger .info ('********** PST_STATS_END ************')
         for h in logger .handlers [:]:
             logger .removeHandler (h )
+            h .close ()
+        for h in players_logger .handlers [:]:
+            players_logger .removeHandler (h )
             h .close ()
     def _top_process_player (self ,p ,playerdir ,log_folder ):
         uid =p .get ('player_uid')
