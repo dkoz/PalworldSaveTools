@@ -13,6 +13,19 @@ class ResultsWidget (QWidget ):
         super ().__init__ (parent )
         self .setObjectName ("resultsWidget")
         self ._setup_ui ()
+    def refresh_labels (self ):
+        if hasattr (self ,'results_title'):
+            self .results_title .setText (t ('deletion.results_panel')if t else 'Selection & Stats')
+        if hasattr (self ,'stats_title'):
+            self .stats_title .setText (t ('deletion.stats_panel')if t else 'Statistics')
+        if hasattr (self ,'player_label'):
+            self .player_label .setText (t ('deletion.selected_player_label')if t else 'Selected Player:')
+        if hasattr (self ,'guild_label'):
+            self .guild_label .setText (t ('deletion.selected_guild_label')if t else 'Selected Guild:')
+        if hasattr (self ,'base_label'):
+            self .base_label .setText (t ('deletion.selected_base_label')if t else 'Selected Base:')
+        if hasattr (self ,'stats_panel'):
+            self .stats_panel .refresh_labels ()
     def _setup_ui (self ):
         self .setMinimumWidth (350 )
         self .setMaximumWidth (350 )
@@ -21,10 +34,10 @@ class ResultsWidget (QWidget ):
         layout .setContentsMargins (16 ,16 ,16 ,16 )
         layout .setSpacing (16 )
         layout .setAlignment (Qt .AlignTop )
-        title =QLabel (t ('deletion.results_panel')if t else 'Selection & Stats')
-        title .setObjectName ("sectionHeader")
-        title .setFont (QFont (constants .FONT_FAMILY ,14 ,QFont .Bold ))
-        layout .addWidget (title )
+        self .results_title =QLabel (t ('deletion.results_panel')if t else 'Selection & Stats')
+        self .results_title .setObjectName ("sectionHeader")
+        self .results_title .setFont (QFont (constants .FONT_FAMILY ,14 ,QFont .Bold ))
+        layout .addWidget (self .results_title )
         separator =self ._create_gradient_separator ()
         layout .addWidget (separator )
         selection_frame =QFrame ()
@@ -32,27 +45,33 @@ class ResultsWidget (QWidget ):
         selection_layout =QVBoxLayout (selection_frame )
         selection_layout .setSpacing (8 )
         player_card =self ._create_value_card (
-        t ('deletion.selected_player_label')if t else 'Selected Player:'
+        t ('deletion.selected_player_label')if t else 'Selected Player:',
+        'player'
         )
         self .player_value =player_card ['value_label']
+        self .player_label =player_card ['label']
         selection_layout .addWidget (player_card ['container'])
         guild_card =self ._create_value_card (
-        t ('deletion.selected_guild_label')if t else 'Selected Guild:'
+        t ('deletion.selected_guild_label')if t else 'Selected Guild:',
+        'guild'
         )
         self .guild_value =guild_card ['value_label']
+        self .guild_label =guild_card ['label']
         selection_layout .addWidget (guild_card ['container'])
         base_card =self ._create_value_card (
-        t ('deletion.selected_base_label')if t else 'Selected Base:'
+        t ('deletion.selected_base_label')if t else 'Selected Base:',
+        'base'
         )
         self .base_value =base_card ['value_label']
+        self .base_label =base_card ['label']
         selection_layout .addWidget (base_card ['container'])
         layout .addWidget (selection_frame )
         separator2 =self ._create_gradient_separator ()
         layout .addWidget (separator2 )
-        stats_title =QLabel (t ('deletion.stats_panel')if t else 'Statistics')
-        stats_title .setObjectName ("sectionHeader")
-        stats_title .setFont (QFont (constants .FONT_FAMILY ,14 ,QFont .Bold ))
-        layout .addWidget (stats_title )
+        self .stats_title =QLabel (t ('deletion.stats_panel')if t else 'Statistics')
+        self .stats_title .setObjectName ("sectionHeader")
+        self .stats_title .setFont (QFont (constants .FONT_FAMILY ,14 ,QFont .Bold ))
+        layout .addWidget (self .stats_title )
         stats_frame =QFrame ()
         stats_frame .setObjectName ("glassPanel")
         stats_layout =QVBoxLayout (stats_frame )
@@ -66,7 +85,7 @@ class ResultsWidget (QWidget ):
         separator .setFrameShape (QFrame .HLine )
         separator .setMaximumHeight (2 )
         return separator 
-    def _create_value_card (self ,label_text ):
+    def _create_value_card (self ,label_text ,card_type ):
         container =QFrame ()
         container .setObjectName ("valueCard")
         card_layout =QVBoxLayout (container )
@@ -81,7 +100,7 @@ class ResultsWidget (QWidget ):
         value_label .setStyleSheet (f"color: {constants .TEXT };")
         value_label .setWordWrap (True )
         card_layout .addWidget (value_label )
-        return {'container':container ,'value_label':value_label }
+        return {'container':container ,'value_label':value_label ,'label':label }
     def set_player (self ,name ):
         if name :
             self .player_value .setText (str (name ))

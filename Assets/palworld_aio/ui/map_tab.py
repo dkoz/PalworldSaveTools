@@ -424,6 +424,23 @@ class MapTab (QWidget ):
         self ._load_base_icon ()
         self ._setup_ui ()
         self ._setup_animation ()
+    def refresh_labels (self ):
+        if hasattr (self ,'search_input'):
+            self .search_input .setPlaceholderText (t ('map.search.placeholder')if t else 'Search guilds, leaders, bases...')
+        if hasattr (self ,'guild_tree'):
+            self .guild_tree .setHeaderLabels ([
+            t ('map.header.guild')if t else 'Guild',
+            t ('map.header.leader')if t else 'Leader',
+            t ('map.header.lastseen')if t else 'Last Seen',
+            t ('map.header.bases')if t else 'Bases'
+            ])
+        if hasattr (self ,'info_label'):
+            self .info_label .setText (t ('map.info.select_base')if t else 'Click on a base marker or list item to view details')
+        if hasattr (self ,'view'):
+            if hasattr (self .view ,'coords_label'):
+                self .view .coords_label .setText (f"{t ('cursor_coords')if t else 'Cursor'}: 0, 0")
+            if hasattr (self .view ,'zoom_label'):
+                self .view .zoom_label .setText ((t ("zoom")if t else "Zoom")+ ": 100%")
     def _load_config (self ):
         base_dir =os .path .dirname (os .path .dirname (os .path .dirname (os .path .abspath (__file__ ))))
         config_path =os .path .join (base_dir ,'data','configs','map_viewer.json')
