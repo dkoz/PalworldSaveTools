@@ -269,6 +269,49 @@ QDialog {
     font-family: "Segoe UI", Roboto, Arial;
 }
 
+/* Conversion Dialog Styling */
+QDialog QLabel#dialogTitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: #7DD3FC;
+    padding-bottom: 4px;
+}
+
+QFrame#dialogSeparator {
+    background: rgba(125,211,252,0.2);
+    max-height: 1px;
+    border: none;
+}
+
+QPushButton#dialogOption {
+    background: rgba(125,211,252,0.06);
+    border: 1px solid rgba(125,211,252,0.12);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 11px;
+    color: #E6EEF6;
+}
+
+QPushButton#dialogOption:hover {
+    background: rgba(125,211,252,0.12);
+    border-color: rgba(125,211,252,0.25);
+    color: #FFFFFF;
+}
+
+QPushButton#dialogCancel {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 5px;
+    padding: 6px 12px;
+    font-size: 10px;
+    color: #A6B8C8;
+}
+
+QPushButton#dialogCancel:hover {
+    background: rgba(255,255,255,0.06);
+    color: #FFFFFF;
+}
+
 /* Results widget container */
 QWidget#resultsWidget {
     background: rgba(18,20,24,0.85);

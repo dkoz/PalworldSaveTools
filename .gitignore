@@ -12,3 +12,7 @@ build/
 PalworldSaveTools.egg-info/
 Assets/data/configs/
 pst_venv/
+CLAUDE.md
+.claude/
+Scan Save Logger/
+updated_worldmap.png

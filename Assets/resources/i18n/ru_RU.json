@@ -9,6 +9,7 @@
   "notice.errors": "ЕСЛИ ВЫ НЕ ОБНОВИТЕ СОХРАНЕНИЯ, ВОЗМОЖНЫ ОШИБКИ!",
   "cat.converting": "Инструменты конвертации",
   "cat.management": "Инструменты управления",
+  "tool.convert.saves": "Конвертировать файлы сохранений",
   "tool.convert.level.to_json": "Конвертировать Level.sav в Level.json",
   "tool.convert.level.to_sav": "Конвертировать Level.json обратно в Level.sav",
   "tool.convert.players.to_json": "Конвертировать файлы игроков в формат JSON",

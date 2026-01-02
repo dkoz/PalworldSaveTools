@@ -265,21 +265,26 @@ class MapGraphicsView (QGraphicsView ):
         self .coords_label .setStyleSheet ("background-color: rgba(0, 0, 0, 150); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; min-width: 120px;")
         self .coords_label .move (10 ,self .height ()-30 )
         self .coords_label .setVisible (False )
+        self .zoom_label =QLabel ("Zoom: 100%",self )
+        self .zoom_label .setStyleSheet ("background-color: rgba(0, 0, 0, 150); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; min-width: 80px;")
+        self .zoom_label .move (self .width ()-90 ,self .height ()-30 )
+        self .zoom_label .setAlignment (Qt .AlignCenter )
     def wheelEvent (self ,event ):
-        zoom_in =event .angleDelta ().y ()>0 
+        zoom_in =event .angleDelta ().y ()>0
         if zoom_in :
-            factor =self .zoom_factor 
-            self .current_zoom *=factor 
+            factor =self .zoom_factor
+            self .current_zoom *=factor
         else :
-            factor =1 /self .zoom_factor 
-            self .current_zoom *=factor 
+            factor =1 /self .zoom_factor
+            self .current_zoom *=factor
         if self .current_zoom <self .min_zoom :
             factor =self .min_zoom /(self .current_zoom /factor )
-            self .current_zoom =self .min_zoom 
+            self .current_zoom =self .min_zoom
         elif self .current_zoom >self .max_zoom :
             factor =self .max_zoom /(self .current_zoom /factor )
-            self .current_zoom =self .max_zoom 
+            self .current_zoom =self .max_zoom
         self .scale (factor ,factor )
+        self .zoom_label .setText (f"Zoom: {int (self .current_zoom *100 )}%")
         self .zoom_changed .emit (self .current_zoom )
     def mousePressEvent (self ,event ):
         item =self .itemAt (event .pos ())
@@ -325,7 +330,10 @@ class MapGraphicsView (QGraphicsView ):
             img_x ,img_y =scene_pos .x (),scene_pos .y ()
             x_world =(img_x /width )*2000 -1000 
             y_world =1000 -(img_y /height )*2000 
-            self .coords_label .setText (f"{t ('cursor_coords')if t else 'Cursor'}: {int (x_world )}, {int (y_world )}")
+            # Convert to Old coordinates for display
+            save_x ,save_y =palworld_coord .map_to_sav (x_world ,y_world ,new =True )
+            old_x ,old_y =palworld_coord .sav_to_map (save_x ,save_y ,new =False )
+            self .coords_label .setText (f"{t ('cursor_coords')if t else 'Cursor'}: {int (old_x )}, {int (old_y )}")
             self .coords_label .setVisible (True )
         else :
             self .coords_label .setVisible (False )
@@ -352,30 +360,31 @@ class MapGraphicsView (QGraphicsView ):
     def _smooth_zoom_step (self ):
         if not self .is_animating :
             self .zoom_timer .stop ()
-            return 
+            return
         if self .target_center :
             self .centerOn (self .target_center )
-        zoom_diff =self .target_zoom -self .current_zoom 
+        zoom_diff =self .target_zoom -self .current_zoom
         if abs (zoom_diff )<0.05 :
-            factor =self .target_zoom /self .current_zoom 
+            factor =self .target_zoom /self .current_zoom
             self .scale (factor ,factor )
-            self .current_zoom =self .target_zoom 
+            self .current_zoom =self .target_zoom
             self .centerOn (self .target_center )
-            self .is_animating =False 
+            self .is_animating =False
             self .zoom_timer .stop ()
+            self .zoom_label .setText (f"Zoom: {int (self .current_zoom *100 )}%")
             self .zoom_changed .emit (self .current_zoom )
-            return 
+            return
         easing_factor =self .config ['zoom']['animation_speed']
-        zoom_step =zoom_diff *easing_factor 
-        factor =(self .current_zoom +zoom_step )/self .current_zoom 
-        self .current_zoom +=zoom_step 
+        zoom_step =zoom_diff *easing_factor
+        factor =(self .current_zoom +zoom_step )/self .current_zoom
+        self .current_zoom +=zoom_step
         self .scale (factor ,factor )
+        self .zoom_label .setText (f"Zoom: {int (self .current_zoom *100 )}%")
         self .zoom_changed .emit (self .current_zoom )
     def resizeEvent (self ,event ):
         super ().resizeEvent (event )
         self .coords_label .move (10 ,self .height ()-30 )
-        if self .scene ():
-            self .fitInView (self .scene ().sceneRect (),Qt .IgnoreAspectRatio )
+        self .zoom_label .move (self .width ()-90 ,self .height ()-30 )
     def reset_view (self ):
         self .resetTransform ()
         self .current_zoom =1.0 
@@ -546,7 +555,7 @@ class MapTab (QWidget ):
             self ._splitter .updateGeometry ()
             self .updateGeometry ()
             if self .scene :
-                self .view .fitInView (self .scene .sceneRect (),Qt .IgnoreAspectRatio )
+                self .view .fitInView (self .scene .sceneRect (),Qt .KeepAspectRatio )
     def _on_marker_hover_enter (self ,base_data ,global_pos ):
         self .hover_overlay .show_for_base (base_data ,QPoint (int (global_pos .x ()),int (global_pos .y ())))
     def _on_marker_hover_leave (self ):
@@ -565,9 +574,10 @@ class MapTab (QWidget ):
         self .scene .addItem (self .map_item )
         self .scene .setSceneRect (self .map_item .boundingRect ())
         if self .map_width >0 and self .map_height >0 :
-            self .view .fitInView (self .scene .sceneRect (),Qt .IgnoreAspectRatio )
+            self .view .fitInView (self .scene .sceneRect (),Qt .KeepAspectRatio )
             viewport =self .view .viewport ()
-            self .view .current_zoom =self .view .viewport ().width ()/self .map_width 
+            self .view .current_zoom =self .view .viewport ().width ()/self .map_width
+            self .view .zoom_label .setText (f"Zoom: {int (self .view .current_zoom *100 )}%")
             self .view .zoom_changed .emit (self .view .current_zoom )
     def _setup_animation (self ):
         self .anim_timer =QTimer (self )
@@ -640,9 +650,12 @@ class MapTab (QWidget ):
                             bx ,by =palworld_coord .sav_to_map (translation ['x'],translation ['y'],new =True )
                             if bx is not None :
                                 img_x ,img_y =self ._to_image_coordinates (bx ,by ,self .map_width ,self .map_height )
+                                # Convert to Old coordinates for display
+                                save_x ,save_y =palworld_coord .map_to_sav (bx ,by ,new =True )
+                                old_bx ,old_by =palworld_coord .sav_to_map (save_x ,save_y ,new =False )
                                 valid_bases .append ({
                                 'base_id':bid ,
-                                'coords':(bx ,by ),
+                                'coords':(old_bx ,old_by ),
                                 'img_coords':(img_x ,img_y ),
                                 'data':{'key':bid ,'value':base_val },
                                 'guild_id':gid ,
@@ -650,7 +663,7 @@ class MapTab (QWidget ):
                                 'leader_name':leader_name 
                                 })
                         except :
-                            pass 
+                            pass
                 guilds [gid ]={
                 'guild_name':g_val ['RawData']['value'].get ('guild_name',t ('map.unknown.guild')if t else 'Unknown'),
                 'leader_name':leader_name ,

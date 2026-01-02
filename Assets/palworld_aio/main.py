@@ -56,7 +56,29 @@ def run_aio ():
             init_language ('en_US')
     except Exception :
         init_language ('en_US')
-    if len (sys .argv )>1 :
+
+    # Check for test loading popup argument
+    if '--test-loading-popup' in sys.argv:
+        from palworld_aio.widgets import LoadingPopup
+
+        app = QApplication.instance()
+        if app is None:
+            app = QApplication(sys.argv)
+
+        # Create and show the loading popup for testing
+        popup = LoadingPopup()
+        popup.show_with_fade()
+
+        # Keep it visible for 5 seconds, then fade out
+        def hide_popup():
+            popup.hide_with_fade(lambda: app.quit())
+
+        from PySide6.QtCore import QTimer
+        QTimer.singleShot(5000, hide_popup)
+
+        sys.exit(app.exec())
+
+    if len (sys .argv )>1 and not sys.argv[1].startswith('--'):
         path_arg =' '.join (sys .argv [1 :]).strip ().strip ('"')
         app =QApplication .instance ()
         if app is None :

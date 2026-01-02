@@ -9,6 +9,7 @@
   "notice.errors": "Wenn der Speicher nicht aktualisiert wird, können Fehler auftreten!",
   "cat.converting": "Konvertierungstools",
   "cat.management": "Verwaltungstools",
+  "tool.convert.saves": "Speicherdateien konvertieren",
   "tool.convert.level.to_json": "Level.sav zu Level.json konvertieren",
   "tool.convert.level.to_sav": "Level.json zu Level.sav konvertieren",
   "tool.convert.players.to_json": "Players zu JSON konvertieren",

@@ -9,6 +9,7 @@
   "notice.errors": "若未更新存档，将会出现错误！",
   "cat.converting": "转换工具",
   "cat.management": "管理工具",
+  "tool.convert.saves": "转换存档文件",
   "tool.convert.level.to_json": "转换 Level.sav 为 Level.json",
   "tool.convert.level.to_sav": "转换 Level.json 为 Level.sav",
   "tool.convert.players.to_json": "转换 Players 为 json",

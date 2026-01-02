@@ -9,6 +9,7 @@
 "notice.errors": "IF YOU DO NOT UPDATE YOUR SAVES, YOU WILL GET ERRORS!",
 "cat.converting": "Converting Tools",
 "cat.management": "Management Tools",
+"tool.convert.saves": "Convert Save Files",
 "tool.convert.level.to_json": "Convert Level.sav file to Level.json",
 "tool.convert.level.to_sav": "Convert Level.json file back to Level.sav",
 "tool.convert.players.to_json": "Convert Player files to json format",

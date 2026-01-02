@@ -9,6 +9,7 @@
   "notice.errors": "Des erreurs peuvent survenir si la sauvegarde n'est pas mise à jour !",
   "cat.converting": "Outils de conversion",
   "cat.management": "Outils de gestion",
+  "tool.convert.saves": "Convertir les fichiers de sauvegarde",
   "tool.convert.level.to_json": "Convertir Level.sav en Level.json",
   "tool.convert.level.to_sav": "Convertir Level.json en Level.sav",
   "tool.convert.players.to_json": "Convertir Players en JSON",

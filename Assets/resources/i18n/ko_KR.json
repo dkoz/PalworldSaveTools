@@ -9,6 +9,7 @@
   "notice.errors": "저장 데이터를 업데이트하지 않으면 오류가 발생할 수 있습니다!",
   "cat.converting": "변환 도구",
   "cat.management": "관리 도구",
+  "tool.convert.saves": "저장 파일 변환",
   "tool.convert.level.to_json": "Level.sav → Level.json 변환",
   "tool.convert.level.to_sav": "Level.json → Level.sav 변환",
   "tool.convert.players.to_json": "Players → JSON 변환",

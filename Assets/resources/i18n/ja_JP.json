@@ -9,6 +9,7 @@
   "notice.errors": "セーブデータが更新されていない場合、エラーが発生する可能性があります！",
   "cat.converting": "変換ツール",
   "cat.management": "管理ツール",
+  "tool.convert.saves": "セーブファイルを変換",
   "tool.convert.level.to_json": "Level.sav を Level.json に変換",
   "tool.convert.level.to_sav": "Level.json を Level.sav に変換",
   "tool.convert.players.to_json": "Players を JSON に変換",

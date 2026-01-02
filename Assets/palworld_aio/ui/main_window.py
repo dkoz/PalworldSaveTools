@@ -10,11 +10,12 @@ QPushButton ,QFrame ,QMenuBar ,QMenu ,QStatusBar ,
 QSplitter ,QMessageBox ,QFileDialog ,QInputDialog ,QDialog ,QCheckBox ,QComboBox ,QApplication ,
 QTabBar ,QStackedWidget 
 )
-from PySide6 .QtCore import Qt ,QTimer ,Signal 
-from PySide6 .QtGui import QIcon ,QFont ,QAction ,QPixmap ,QCloseEvent 
-from i18n import t ,set_language ,load_resources 
-from common import get_versions 
-from import_libs import run_with_loading 
+from PySide6 .QtCore import Qt ,QTimer ,Signal
+from PySide6 .QtGui import QIcon ,QFont ,QAction ,QPixmap ,QCloseEvent
+from i18n import t ,set_language ,load_resources
+from common import get_versions
+from import_libs import run_with_loading
+from .tools_tab import center_on_parent 
 GITHUB_RAW_URL ="https://raw.githubusercontent.com/deafdudecomputers/PalworldSaveTools/main/Assets/common.py"
 GITHUB_LATEST_ZIP ="https://github.com/deafdudecomputers/PalworldSaveTools/releases/latest"
 try :
@@ -112,11 +113,11 @@ class MainWindow (QMainWindow ):
         self .splitter =QSplitter (Qt .Horizontal )
         self .splitter .setChildrenCollapsible (False )
         self .stacked_widget =QStackedWidget ()
+        self ._setup_tools_tab ()
         self ._setup_players_tab ()
         self ._setup_guilds_tab ()
         self ._setup_bases_tab ()
         self ._setup_map_tab ()
-        self ._setup_tools_tab ()
         self ._setup_exclusions_tab ()
         self .splitter .addWidget (self .stacked_widget )
         from .results_widget import ResultsWidget 
@@ -546,6 +547,7 @@ class MainWindow (QMainWindow ):
         close_btn .clicked .connect (dialog .close )
         button_layout .addWidget (close_btn )
         layout .addLayout (button_layout )
+        center_on_parent (dialog )
         dialog .show ()
     def _auto_save_settings (self ,dialog ,theme_combo ,show_icons_cb ,lang_combo ):
         old_lang =self .user_settings .get ("language")
@@ -607,6 +609,7 @@ class MainWindow (QMainWindow ):
         msg_box .setText (about_text )
         msg_box .setStandardButtons (QMessageBox .Ok )
         msg_box .setIcon (QMessageBox .Information )
+        center_on_parent (msg_box )
         msg_box .exec ()
     def _on_player_selected (self ,data ):
         if data :

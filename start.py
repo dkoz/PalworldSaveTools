@@ -139,7 +139,6 @@ def run_and_watch (cmd ,cwd =None ,env =None ,filter_keys =None ,update_callback
             sys .stdout .flush ()
     return proc .wait ()
 VENV_DIR =PROJECT_DIR /"pst_venv"
-MENU_PY =PROJECT_DIR /"menu.py"
 REQ_FILE =PROJECT_DIR /"requirements.txt"
 PYPROJECT =PROJECT_DIR /"pyproject.toml"
 TEMP_REQ_FILE_NAME ="Assets/resources/temp_req.txt"
@@ -452,7 +451,7 @@ def handle_raw_signal (raw :str ,pct :int ):
         _current_step =1 
     elif any (k in raw for k in ("Installing collected packages","Collecting","Downloading","Building wheel")):
         _current_step =2 
-    elif "menu.py"in raw or "Launching"in raw or "Successfully installed"in raw :
+    elif "palworld_aio"in raw or "main.py"in raw or "Launching"in raw or "Successfully installed"in raw :
         _current_step =3 
     if sub_pct is not None :
         try :
@@ -585,84 +584,45 @@ def update_gui_progress (step :int ,message :str ,pct :int =0 ):
             tiny_label .setText ("")
         except Exception :
             pass 
-def show_startup_preference_dialog ():
-    if not GUI_AVAILABLE :
-        return "menu"
-    try :
-        from PySide6 .QtWidgets import QDialog ,QVBoxLayout ,QPushButton ,QLabel ,QRadioButton ,QButtonGroup 
-        from PySide6 .QtCore import Qt 
-        from PySide6 .QtGui import QFont 
-        dialog =QDialog ()
-        dialog .setWindowTitle ("Startup Preference")
-        dialog .setModal (True )
-        dialog .setWindowFlags (Qt .Dialog |Qt .WindowStaysOnTopHint )
-        dialog .setFixedSize (400 ,220 )
-        layout =QVBoxLayout (dialog )
-        layout .setContentsMargins (20 ,20 ,20 ,20 )
-        layout .setSpacing (15 )
-        title_label =QLabel ("Which interface would you like to use?")
-        title_label .setFont (QFont ("",11 ,QFont .Bold ))
-        layout .addWidget (title_label )
-        desc_label =QLabel ("You can change this later in Settings.")
-        desc_label .setFont (QFont ("",9 ))
-        desc_label .setStyleSheet ("color: #888;")
-        layout .addWidget (desc_label )
-        button_group =QButtonGroup (dialog )
-        menu_radio =QRadioButton ("Menu (Classic interface with tool launcher)")
-        menu_radio .setChecked (True )
-        aio_radio =QRadioButton ("All-in-One Tools (Modern unified interface)")
-        button_group .addButton (menu_radio ,0 )
-        button_group .addButton (aio_radio ,1 )
-        layout .addWidget (menu_radio )
-        layout .addWidget (aio_radio )
-        layout .addStretch ()
-        ok_btn =QPushButton ("Continue")
-        ok_btn .setFixedHeight (32 )
-        ok_btn .clicked .connect (dialog .accept )
-        layout .addWidget (ok_btn )
-        if dialog .exec ()==QDialog .Accepted :
-            if aio_radio .isChecked ():
-                return "palworld_aio"
-            else :
-                return "menu"
-        return "menu"
-    except Exception :
-        if DEBUG :
-            traceback .print_exc ()
-        return "menu"
-def save_boot_preference (preference ):
-    user_cfg_path =PROJECT_DIR /"Assets"/"data"/"configs"/"user.cfg"
-    try :
-        settings ={}
-        if user_cfg_path .exists ():
-            with open (user_cfg_path ,'r')as f :
-                settings =json .load (f )
-        settings ["boot_preference"]=preference 
-        os .makedirs (user_cfg_path .parent ,exist_ok =True )
-        with open (user_cfg_path ,'w')as f :
-            json .dump (settings ,f ,indent =2 )
-    except Exception :
-        if DEBUG :
-            traceback .print_exc ()
-def spawn_menu_and_exit (venv_py :Path ):
-    try :
-        subprocess .Popen ([str (venv_py ),str (MENU_PY )])
-    except Exception :
-        if DEBUG :
-            traceback .print_exc ()
-    import time 
-    time .sleep (0.2 )
-    os ._exit (0 )
 def spawn_aio_and_exit (venv_py :Path ):
+    """Launch palworld_aio and block until it closes."""
+    global splash_window, app
+
     try :
+        # Close splash window first if it exists
+        if splash_window is not None :
+            try :
+                splash_window .close ()
+                splash_window .deleteLater ()
+            except Exception :
+                pass
+
+        # Quit the Qt application event loop if it's running
+        if app is not None :
+            try :
+                app .quit ()
+                app .processEvents ()
+            except Exception :
+                pass
+
         main_py =PROJECT_DIR /"Assets"/"palworld_aio"/"main.py"
-        subprocess .Popen ([str (venv_py ),str (main_py )],cwd =str (PROJECT_DIR ))
+
+        # Use subprocess.run() to block until palworld_aio closes
+        result =subprocess .run (
+            [str (venv_py ),str (main_py )],
+            cwd =str (PROJECT_DIR )
+        )
+
+        # Exit with the same code as palworld_aio
+        sys .exit (result .returncode )
+    except KeyboardInterrupt :
+        if DEBUG :
+            print ("Interrupted by user")
+        sys .exit (1 )
     except Exception :
         if DEBUG :
             traceback .print_exc ()
-    import time 
-    time .sleep (0.2 )
-    os ._exit (0 )
+        sys .exit (1 )
 def main ():
     global app ,splash_window ,short_label ,gui_progress_bar ,tiny_label ,_target_pct ,_worker_thread ,_signals 
     venv_py =Path (sys .executable )
@@ -717,19 +677,8 @@ def main ():
                     except Exception :
                         pass 
                 if get_config_value ("checkstartlogs",False ):
-                    input ("Press Enter to continue to menu...")
-                user_cfg_path =PROJECT_DIR /"Assets"/"data"/"configs"/"user.cfg"
-                boot_preference =None 
-                if user_cfg_path .exists ():
-                    try :
-                        with open (user_cfg_path ,'r')as f :
-                            data =json .load (f )
-                        boot_preference =data .get ("boot_preference")
-                    except Exception :
-                        pass 
-                if boot_preference is None :
-                    boot_preference ="palworld_aio"
-                    save_boot_preference (boot_preference )
+                    input ("Press Enter to continue to palworld_aio...")
+                # Launch palworld_aio directly
                 QTimer .singleShot (350 ,lambda :spawn_aio_and_exit (venv_py ))
             _signals .finished .connect (on_finished )
             _worker_thread =threading .Thread (target =backend_worker ,args =(venv_py ,_signals ),daemon =True )
@@ -818,9 +767,11 @@ def main ():
                     traceback .print_exc ()
             if rc_final ==0 :
                 if get_config_value ("checkstartlogs",False ):
-                    input ("Press Enter to continue to menu...")
+                    input ("Press Enter to continue to palworld_aio...")
+                # Launch palworld_aio directly
+                main_py =PROJECT_DIR /"Assets"/"palworld_aio"/"main.py"
                 try :
-                    subprocess .Popen ([str (venv_py ),str (MENU_PY )])
+                    subprocess .run ([str (venv_py ),str (main_py )],cwd =str (PROJECT_DIR ))
                 except Exception :
                     if DEBUG :
                         traceback .print_exc ()

@@ -9,6 +9,7 @@
   "notice.errors": "¡Si no se actualiza el guardado, pueden ocurrir errores!",
   "cat.converting": "Herramientas de conversión",
   "cat.management": "Herramientas de gestión",
+  "tool.convert.saves": "Convertir archivos de guardado",
   "tool.convert.level.to_json": "Convertir Level.sav a Level.json",
   "tool.convert.level.to_sav": "Convertir Level.json a Level.sav",
   "tool.convert.players.to_json": "Convertir Players a JSON",
