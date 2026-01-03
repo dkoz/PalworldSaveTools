@@ -1,9 +1,13 @@
-import sys 
-import os 
+import sys
+import os
 os .environ ['QT_LOGGING_RULES']='*=false'
 os .environ ['QT_DEBUG_PLUGINS']='0'
-base_dir =os .path .dirname (os .path .dirname (os .path .abspath (__file__ )))
-assets_dir =base_dir if os .path .basename (base_dir )=="Assets"else os .path .join (base_dir ,"Assets")
+if getattr (sys ,'frozen',False ):
+    base_dir =os .path .dirname (sys .executable )
+    assets_dir =os .path .join (base_dir ,"Assets")
+else :
+    base_dir =os .path .dirname (os .path .dirname (os .path .abspath (__file__ )))
+    assets_dir =base_dir if os .path .basename (base_dir )=="Assets"else os .path .join (base_dir ,"Assets")
 if assets_dir not in sys .path :
     sys .path .insert (0 ,assets_dir )
 for sub in ['palworld_coord','palworld_save_tools','palworld_xgp_import','resources','palworld_aio']:

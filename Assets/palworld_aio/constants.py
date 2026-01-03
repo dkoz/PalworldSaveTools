@@ -32,6 +32,8 @@ def get_base_path ():
         return os .path .dirname (sys .executable )
     return os .getcwd ()
 def get_assets_path ():
+    if getattr (sys ,'frozen',False ):
+        return os .path .join (os .path .dirname (sys .executable ),"Assets")
     return os .path .dirname (os .path .dirname (os .path .abspath (__file__ )))
 def get_icon_path ():
     return os .path .join (get_assets_path (),'resources','pal.ico')

@@ -1,5 +1,6 @@
-import sys ,os 
+import sys ,os
 sys .path .insert (0 ,os .path .abspath ("Assets"))
+sys .path .insert (0 ,os .path .abspath ("Assets/resources"))
 from cx_Freeze import setup ,Executable 
 def find_customtkinter_assets ():
     try :
@@ -25,7 +26,7 @@ def find_pyside6_assets ():
     return None 
 build_exe_options ={
 "packages":[
-"pygame","loguru","subprocess","pathlib","shutil","matplotlib","pandas",
+"i18n","pygame","loguru","subprocess","pathlib","shutil","matplotlib","pandas",
 "customtkinter","cityhash","tkinter","json","uuid","time","datetime",
 "struct","enum","collections","itertools","math","zlib","gzip","zipfile",
 "threading","multiprocessing","io","base64","binascii","hashlib","hmac",
@@ -62,7 +63,7 @@ version="1.1.45",
 options ={"build_exe":build_exe_options },
 executables =[
 Executable (
-"menu.py",
+"Assets/palworld_aio/main.py",
 base ="Console"if sys .platform =="win32"else None ,
 target_name ="PalworldSaveTools.exe",
 icon ="Assets/resources/pal.ico"
