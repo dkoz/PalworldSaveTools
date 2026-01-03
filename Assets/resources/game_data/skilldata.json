@@ -749,6 +749,14 @@
             "asset": "Unique_Umihebi_Fire_FireWindingTackle"
         },
         {
+            "name": "Predator Surge",
+            "asset": "PredatorWave"
+        },
+        {
+            "name": "Predator Blast",
+            "asset": "PredatorBeam"
+        },
+        {
             "name": "Predator Mark",
             "asset": "PredatorLockon"
         },
@@ -909,6 +917,10 @@
             "asset": "Unique_TropicalOstrich_DashKick"
         },
         {
+            "name": "Frenzied Charge",
+            "asset": "Unique_Yakushima_MouthTossin"
+        },
+        {
             "name": "Thalassonic Laser",
             "asset": "Unique_PoseidonOrca_TorrentLaser"
         },
@@ -947,6 +959,14 @@
         {
             "name": "Winged Assault",
             "asset": "Unique_YakushimaMonster003_BatCharge"
+        },
+        {
+            "name": "Fire Tackle",
+            "asset": "Unique_BluePlatypus_Toboggan_Fire"
+        },
+        {
+            "name": "Use Weapon",
+            "asset": "Weapon_Use"
         },
         {
             "name": "Sacred Rain",
