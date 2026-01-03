@@ -107,7 +107,7 @@ class HeaderWidget (QWidget ):
         self.warn_btn.setVisible(False)
         layout.addWidget(self.warn_btn)
         layout.addItem(QSpacerItem(20, 10, QSizePolicy.Expanding, QSizePolicy.Minimum))
-        self .sidebar_btn =QPushButton (nf.icons['nf-cod-triangle_left'])
+        self .sidebar_btn =QPushButton (nf.icons['nf-cod-triangle_right'])
         self .sidebar_btn .setObjectName ("sidebarChip")
         self .sidebar_btn .setFlat (True )
         self .sidebar_btn .setToolTip (t ("Collapse Sidebar")if t else "Collapse Sidebar")
@@ -176,10 +176,10 @@ class HeaderWidget (QWidget ):
         self .warn_btn .setVisible (show )
     def set_sidebar_collapsed (self ,collapsed ):
         if collapsed :
-            self .sidebar_btn .setText (nf.icons['nf-cod-triangle_right'])
+            self .sidebar_btn .setText (nf.icons['nf-cod-triangle_left'])
             self .sidebar_btn .setToolTip (t ("Expand Sidebar")if t else "Expand Sidebar")
         else :
-            self .sidebar_btn .setText (nf.icons['nf-cod-triangle_left'])
+            self .sidebar_btn .setText (nf.icons['nf-cod-triangle_right'])
             self .sidebar_btn .setToolTip (t ("Collapse Sidebar")if t else "Collapse Sidebar")
     def start_pulse_animation (self ,latest_version ):
         if self ._pulse_timer is not None :
@@ -222,7 +222,7 @@ class HeaderWidget (QWidget ):
             self .menu_chip_btn .setText (f"{nf .icons ['nf-md-menu']} {t ('menu_button')if t else 'Menu'}")
             self .menu_chip_btn .setToolTip (t ("Open Menu")if t else "Open Menu")
         if hasattr (self ,'sidebar_btn'):
-            collapsed =self .sidebar_btn .text ()==nf.icons['nf-cod-triangle_right']
+            collapsed =self .sidebar_btn .text ()==nf.icons['nf-cod-triangle_left']
             self .set_sidebar_collapsed (collapsed )
     def set_menu_actions (self ,actions_dict ):
         from ..widgets import MenuPopup 
