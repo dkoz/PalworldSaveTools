@@ -221,7 +221,7 @@
             "asset": "Pickaxe_Tier_02"
         },
         {
-            "name": "en Text +2",
+            "name": "en Text (Pickaxe_Tier_03)",
             "asset": "Pickaxe_Tier_03"
         },
         {
@@ -785,7 +785,7 @@
             "asset": "Launcher_Default"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Launcher_Meat)",
             "asset": "Launcher_Meat"
         },
         {
@@ -1245,7 +1245,7 @@
             "asset": "Shield_04"
         },
         {
-            "name": "en Text +4",
+            "name": "en Text (Shield_05)",
             "asset": "Shield_05"
         },
         {
@@ -6417,15 +6417,15 @@
             "asset": "TEST_CaptureItemModifier"
         },
         {
-            "name": "en Text",
+            "name": "en Text (ClawsPendant)",
             "asset": "ClawsPendant"
         },
         {
-            "name": "en Text",
+            "name": "en Text (ClothHat)",
             "asset": "ClothHat"
         },
         {
-            "name": "en Text",
+            "name": "en Text (FangNecklace)",
             "asset": "FangNecklace"
         },
         {
@@ -6449,23 +6449,23 @@
             "asset": "NightVisionGoggles"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Berries2)",
             "asset": "Berries2"
         },
         {
-            "name": "en Text",
+            "name": "en Text (EnergyDrink)",
             "asset": "EnergyDrink"
         },
         {
-            "name": "en Text",
+            "name": "en Text (FarmCrop_Tmp)",
             "asset": "FarmCrop_Tmp"
         },
         {
-            "name": "en Text",
+            "name": "en Text (FishMeat)",
             "asset": "FishMeat"
         },
         {
-            "name": "en Text",
+            "name": "en Text (FishMeat2)",
             "asset": "FishMeat2"
         },
         {
@@ -6477,31 +6477,31 @@
             "asset": "Meat"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Meat2)",
             "asset": "Meat2"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Seed_Tmp)",
             "asset": "Seed_Tmp"
         },
         {
-            "name": "en Text",
+            "name": "en Text (VenisonBoiledInTomato)",
             "asset": "VenisonBoiledInTomato"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Potato_old)",
             "asset": "Potato_old"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Corn)",
             "asset": "Corn"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Pumpkin)",
             "asset": "Pumpkin"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Baked_Potato)",
             "asset": "Baked_Potato"
         },
         {
@@ -6581,15 +6581,15 @@
             "asset": "AnimalSkin"
         },
         {
-            "name": "en Text",
+            "name": "en Text (AnimalSkin2)",
             "asset": "AnimalSkin2"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Scales)",
             "asset": "Scales"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Scales2)",
             "asset": "Scales2"
         },
         {
@@ -6597,11 +6597,11 @@
             "asset": "Claws"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Claws2)",
             "asset": "Claws2"
         },
         {
-            "name": "en Text",
+            "name": "en Text (ElectronicCircuit)",
             "asset": "ElectronicCircuit"
         },
         {
@@ -6609,11 +6609,11 @@
             "asset": "Fang"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Fang2)",
             "asset": "Fang2"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Flint)",
             "asset": "Flint"
         },
         {
@@ -6621,27 +6621,27 @@
             "asset": "Gunpowder"
         },
         {
-            "name": "en Text",
+            "name": "en Text (IronOre)",
             "asset": "IronOre"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Kitsunebi_Fire)",
             "asset": "Kitsunebi_Fire"
         },
         {
-            "name": "en Text",
+            "name": "en Text (LargeBullet)",
             "asset": "LargeBullet"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Leather2)",
             "asset": "Leather2"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Sharkkid_Scale)",
             "asset": "Sharkkid_Scale"
         },
         {
-            "name": "en Text",
+            "name": "en Text (SmallBullet)",
             "asset": "SmallBullet"
         },
         {
@@ -6649,19 +6649,19 @@
             "asset": "Pal_crystal_L"
         },
         {
-            "name": "en Text",
+            "name": "en Text (PAL_Growth_Stone_S)",
             "asset": "PAL_Growth_Stone_S"
         },
         {
-            "name": "en Text",
+            "name": "en Text (PAL_Growth_Stone_M)",
             "asset": "PAL_Growth_Stone_M"
         },
         {
-            "name": "en Text",
+            "name": "en Text (PAL_Growth_Stone_L)",
             "asset": "PAL_Growth_Stone_L"
         },
         {
-            "name": "en Text",
+            "name": "en Text (PAL_Growth_Stone_XL)",
             "asset": "PAL_Growth_Stone_XL"
         },
         {
@@ -6673,7 +6673,7 @@
             "asset": "Unko_L"
         },
         {
-            "name": "en Text",
+            "name": "en Text (WaterBucket)",
             "asset": "WaterBucket"
         },
         {
@@ -6685,11 +6685,11 @@
             "asset": "Computer"
         },
         {
-            "name": "en Text",
+            "name": "en Text (CashFang)",
             "asset": "CashFang"
         },
         {
-            "name": "en Text",
+            "name": "en Text (CashScales)",
             "asset": "CashScales"
         },
         {
@@ -6705,15 +6705,15 @@
             "asset": "SkillUnlock_DarkMutant"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Sand)",
             "asset": "Sand"
         },
         {
-            "name": "en Text",
+            "name": "en Text (MonsterEquipWeapon_Dummy)",
             "asset": "MonsterEquipWeapon_Dummy"
         },
         {
-            "name": "en Text",
+            "name": "en Text (MateItem01)",
             "asset": "MateItem01"
         },
         {
@@ -6749,19 +6749,19 @@
             "asset": "PalPassiveSkillChangeTest2"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Bat_NPC)",
             "asset": "Bat_NPC"
         },
         {
-            "name": "en Text",
+            "name": "en Text (CaptureRope)",
             "asset": "CaptureRope"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Handgun_NPC)",
             "asset": "Handgun_NPC"
         },
         {
-            "name": "en Text",
+            "name": "en Text (LaserRifle_NPC)",
             "asset": "LaserRifle_NPC"
         },
         {
@@ -6773,51 +6773,51 @@
             "asset": "PalSphere_Debug"
         },
         {
-            "name": "en Text",
+            "name": "en Text (PenguinLauncher)",
             "asset": "PenguinLauncher"
         },
         {
-            "name": "en Text",
+            "name": "en Text (RocketLauncher_NPC)",
             "asset": "RocketLauncher_NPC"
         },
         {
-            "name": "en Text",
+            "name": "en Text (SniperRifle_Default)",
             "asset": "SniperRifle_Default"
         },
         {
-            "name": "en Text",
+            "name": "en Text (AssaultRifle_NPC)",
             "asset": "AssaultRifle_NPC"
         },
         {
-            "name": "en Text",
+            "name": "en Text (AssaultRifle_NPC_GrassBoss)",
             "asset": "AssaultRifle_NPC_GrassBoss"
         },
         {
-            "name": "en Text",
+            "name": "en Text (BowGun_NPC)",
             "asset": "BowGun_NPC"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Shotgun_NPC)",
             "asset": "Shotgun_NPC"
         },
         {
-            "name": "en Text",
+            "name": "en Text (FlameThrower_NPC)",
             "asset": "FlameThrower_NPC"
         },
         {
-            "name": "en Text",
+            "name": "en Text (GatlingGun_NPC)",
             "asset": "GatlingGun_NPC"
         },
         {
-            "name": "en Text",
+            "name": "en Text (FragGrenade_NPC)",
             "asset": "FragGrenade_NPC"
         },
         {
-            "name": "en Text",
+            "name": "en Text (ThrowStone)",
             "asset": "ThrowStone"
         },
         {
-            "name": "en Text",
+            "name": "en Text (RecurveBow)",
             "asset": "RecurveBow"
         },
         {
@@ -6837,67 +6837,67 @@
             "asset": "FishingRod_Legendary"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Debug_Handgun_Poison)",
             "asset": "Debug_Handgun_Poison"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Debug_Handgun_Burn)",
             "asset": "Debug_Handgun_Burn"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Debug_Handgun_Wetness)",
             "asset": "Debug_Handgun_Wetness"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Debug_Handgun_Freeze)",
             "asset": "Debug_Handgun_Freeze"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Debug_Handgun_Electrical)",
             "asset": "Debug_Handgun_Electrical"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Debug_Handgun_Muddy)",
             "asset": "Debug_Handgun_Muddy"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Debug_Handgun_IvyCling)",
             "asset": "Debug_Handgun_IvyCling"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Debug_Handgun_Darkness)",
             "asset": "Debug_Handgun_Darkness"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Debug_Handgun_Stun)",
             "asset": "Debug_Handgun_Stun"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Debug_Handgun_AttackUp)",
             "asset": "Debug_Handgun_AttackUp"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Debug_Handgun_DefenseUp)",
             "asset": "Debug_Handgun_DefenseUp"
         },
         {
-            "name": "en Text",
+            "name": "en Text (AirGrapplingGun)",
             "asset": "AirGrapplingGun"
         },
         {
-            "name": "en Text",
+            "name": "en Text (MissileLauncher_NPC)",
             "asset": "MissileLauncher_NPC"
         },
         {
-            "name": "en Text",
+            "name": "en Text (GrenadeLauncher_NPC)",
             "asset": "GrenadeLauncher_NPC"
         },
         {
-            "name": "en Text",
+            "name": "en Text (Katana_NPC)",
             "asset": "Katana_NPC"
         },
         {
-            "name": "en Text",
+            "name": "en Text (BelieverFatCane)",
             "asset": "BelieverFatCane"
         },
         {
@@ -6905,7 +6905,7 @@
             "asset": "FishingRod_Test"
         },
         {
-            "name": "en Text",
+            "name": "en Text (GatlingGun_NPC_GrassBoss)",
             "asset": "GatlingGun_NPC_GrassBoss"
         },
         {

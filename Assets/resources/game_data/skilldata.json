@@ -1,6 +1,14 @@
 {
     "skills": [
         {
+            "name": "en Text (TidalWave)",
+            "asset": "TidalWave"
+        },
+        {
+            "name": "Unknown Skill (WaterWave)",
+            "asset": "WaterWave"
+        },
+        {
             "name": "Hydro Jet",
             "asset": "AquaJet"
         },
@@ -81,6 +89,10 @@
             "asset": "Unique_NaughtyCat_CatPress"
         },
         {
+            "name": "en Text (Throw)",
+            "asset": "Throw"
+        },
+        {
             "name": "Tornado Attack",
             "asset": "Unique_HawkBird_Storm"
         },
@@ -99,6 +111,14 @@
         {
             "name": "Cloud Tempest",
             "asset": "Unique_FengyunDeeper_CloudTempest"
+        },
+        {
+            "name": "en Text (Scratch)",
+            "asset": "Scratch"
+        },
+        {
+            "name": "Unknown Skill (WorkAttack)",
+            "asset": "WorkAttack"
         },
         {
             "name": "Kingly Slam",
@@ -167,6 +187,10 @@
         {
             "name": "Solar Blast",
             "asset": "SolarBeam"
+        },
+        {
+            "name": "en Text (SnowStorm)",
+            "asset": "SnowStorm"
         },
         {
             "name": "Ice Missile",
@@ -275,6 +299,10 @@
         {
             "name": "Spark Blast",
             "asset": "SpreadPulse"
+        },
+        {
+            "name": "Unknown Skill (Funnel_RaijinDaughter)",
+            "asset": "Funnel_RaijinDaughter"
         },
         {
             "name": "Shockwave",
@@ -395,6 +423,10 @@
         {
             "name": "Poison Fog",
             "asset": "PoisonFog"
+        },
+        {
+            "name": "Unknown Skill (Funnel_DreamDemon)",
+            "asset": "Funnel_DreamDemon"
         },
         {
             "name": "Poison Blast",
@@ -629,6 +661,10 @@
             "asset": "BubbleShower"
         },
         {
+            "name": "Unknown Skill (WaterBalloon)",
+            "asset": "WaterBalloon"
+        },
+        {
             "name": "Icicle Bullet",
             "asset": "IciclePierce"
         },
@@ -829,6 +865,14 @@
             "asset": "Unique_GoldenHorse_StoneDash"
         },
         {
+            "name": "Unknown Skill (Funnel_RaijinDaughter_Water)",
+            "asset": "Funnel_RaijinDaughter_Water"
+        },
+        {
+            "name": "Unknown Skill (BlueThunderHorse_PartnerSkill)",
+            "asset": "BlueThunderHorse_PartnerSkill"
+        },
+        {
             "name": "Geyser Gush",
             "asset": "SeaGush"
         },
@@ -889,8 +933,28 @@
             "asset": "ReflectiveShuriken"
         },
         {
+            "name": "Unknown Skill (HealingTree)",
+            "asset": "HealingTree"
+        },
+        {
             "name": "Chaotic Spray",
             "asset": "Unique_IceCrocodile_SpitAttack"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss002_PhantasmalDeathray)",
+            "asset": "Unique_YakushimaBoss002_PhantasmalDeathray"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss002_PhantasmalEye)",
+            "asset": "Unique_YakushimaBoss002_PhantasmalEye"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss002_PhantasmalBolt)",
+            "asset": "Unique_YakushimaBoss002_PhantasmalBolt"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss002_PhantasmalSphere)",
+            "asset": "Unique_YakushimaBoss002_PhantasmalSphere"
         },
         {
             "name": "Lock-On Lunge",
@@ -919,6 +983,22 @@
         {
             "name": "Frenzied Charge",
             "asset": "Unique_Yakushima_MouthTossin"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss001_Green_PhantasmalBolt)",
+            "asset": "Unique_YakushimaBoss001_Green_PhantasmalBolt"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss001_Green_PhantasmalEye)",
+            "asset": "Unique_YakushimaBoss001_Green_PhantasmalEye"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss001_Green_PhantasmalSphere)",
+            "asset": "Unique_YakushimaBoss001_Green_PhantasmalSphere"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss001_Green_PhantasmalDeathray)",
+            "asset": "Unique_YakushimaBoss001_Green_PhantasmalDeathray"
         },
         {
             "name": "Thalassonic Laser",
@@ -965,8 +1045,156 @@
             "asset": "Unique_BluePlatypus_Toboggan_Fire"
         },
         {
+            "name": "Unknown Skill (PoseidonOrca_PartnerSkill)",
+            "asset": "PoseidonOrca_PartnerSkill"
+        },
+        {
+            "name": "Unknown Skill (PoseidonOrca_PartnerSkill_SpearBullet)",
+            "asset": "PoseidonOrca_PartnerSkill_SpearBullet"
+        },
+        {
+            "name": "Unknown Skill (Human_Rolling)",
+            "asset": "Human_Rolling"
+        },
+        {
             "name": "Use Weapon",
             "asset": "Weapon_Use"
+        },
+        {
+            "name": "Unknown Skill (Unique_FlowerDinosaur_Electric_ThunderWhip)",
+            "asset": "Unique_FlowerDinosaur_Electric_ThunderWhip"
+        },
+        {
+            "name": "Unknown Skill (Unique_KingAlpaca_Ice_IcePress)",
+            "asset": "Unique_KingAlpaca_Ice_IcePress"
+        },
+        {
+            "name": "Unknown Skill (Unique_Baphomet_Dark_DarkKite)",
+            "asset": "Unique_Baphomet_Dark_DarkKite"
+        },
+        {
+            "name": "Unknown Skill (Unique_SakuraSaurus_Water_SplashTackle)",
+            "asset": "Unique_SakuraSaurus_Water_SplashTackle"
+        },
+        {
+            "name": "Unknown Skill (Unique_Deer_Ground_DirtyHorn)",
+            "asset": "Unique_Deer_Ground_DirtyHorn"
+        },
+        {
+            "name": "Unknown Skill (Unique_Gorilla_Ground_EarthPunch)",
+            "asset": "Unique_Gorilla_Ground_EarthPunch"
+        },
+        {
+            "name": "Unknown Skill (Unique_IceHorse_Dark_DarkBladeAttack)",
+            "asset": "Unique_IceHorse_Dark_DarkBladeAttack"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss002_2_PhantasmalDeathray)",
+            "asset": "Unique_YakushimaBoss002_2_PhantasmalDeathray"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss002_2_PhantasmalEye)",
+            "asset": "Unique_YakushimaBoss002_2_PhantasmalEye"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss002_2_PhantasmalBolt)",
+            "asset": "Unique_YakushimaBoss002_2_PhantasmalBolt"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss002_2_PhantasmalSphere)",
+            "asset": "Unique_YakushimaBoss002_2_PhantasmalSphere"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss001_Green_2_PhantasmalBolt)",
+            "asset": "Unique_YakushimaBoss001_Green_2_PhantasmalBolt"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss001_Green_2_PhantasmalEye)",
+            "asset": "Unique_YakushimaBoss001_Green_2_PhantasmalEye"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss001_Green_2_PhantasmalSphere)",
+            "asset": "Unique_YakushimaBoss001_Green_2_PhantasmalSphere"
+        },
+        {
+            "name": "Unknown Skill (Unique_YakushimaBoss001_Green_2_PhantasmalDeathray)",
+            "asset": "Unique_YakushimaBoss001_Green_2_PhantasmalDeathray"
+        },
+        {
+            "name": "Unknown Skill (Unique_Garm_BiteV2)",
+            "asset": "Unique_Garm_BiteV2"
+        },
+        {
+            "name": "Unknown Skill (Unique_ThunderDog_BiteV2)",
+            "asset": "Unique_ThunderDog_BiteV2"
+        },
+        {
+            "name": "Unknown Skill (Unique_ThunderDog_Bite)",
+            "asset": "Unique_ThunderDog_Bite"
+        },
+        {
+            "name": "Unknown Skill (Unique_GuardianDog_Bite)",
+            "asset": "Unique_GuardianDog_Bite"
+        },
+        {
+            "name": "Unknown Skill (Unique_GuardianDog_BiteV2)",
+            "asset": "Unique_GuardianDog_BiteV2"
+        },
+        {
+            "name": "Unknown Skill (Unique_GoldenHorse_Bite)",
+            "asset": "Unique_GoldenHorse_Bite"
+        },
+        {
+            "name": "Unknown Skill (Unique_GoldenHorse_BiteV2)",
+            "asset": "Unique_GoldenHorse_BiteV2"
+        },
+        {
+            "name": "Unknown Skill (Unique_AmaterasuWolf_Bite)",
+            "asset": "Unique_AmaterasuWolf_Bite"
+        },
+        {
+            "name": "Unknown Skill (Unique_AmaterasuWolf_BiteV2)",
+            "asset": "Unique_AmaterasuWolf_BiteV2"
+        },
+        {
+            "name": "Unknown Skill (Unique_AmaterasuWolf_Dark_Bite)",
+            "asset": "Unique_AmaterasuWolf_Dark_Bite"
+        },
+        {
+            "name": "Unknown Skill (Unique_AmaterasuWolf_Dark_BiteV2)",
+            "asset": "Unique_AmaterasuWolf_Dark_BiteV2"
+        },
+        {
+            "name": "Unknown Skill (Unique_BlackPuppy_Bite)",
+            "asset": "Unique_BlackPuppy_Bite"
+        },
+        {
+            "name": "Unknown Skill (Unique_BlackPuppy_BiteV2)",
+            "asset": "Unique_BlackPuppy_BiteV2"
+        },
+        {
+            "name": "Unknown Skill (Unique_VolcanoDragon_VolcanicLaser)",
+            "asset": "Unique_VolcanoDragon_VolcanicLaser"
+        },
+        {
+            "name": "Unknown Skill (Unique_VolcanoDragon_MagmaSpit)",
+            "asset": "Unique_VolcanoDragon_MagmaSpit"
+        },
+        {
+            "name": "Unknown Skill (Unique_Sekhmet_SomersaultScratch)",
+            "asset": "Unique_Sekhmet_SomersaultScratch"
+        },
+        {
+            "name": "Unknown Skill (Unique_Sekhmet_RollingScratch)",
+            "asset": "Unique_Sekhmet_RollingScratch"
+        },
+        {
+            "name": "Unknown Skill (Unique_NightBlueHorse_Tossin)",
+            "asset": "Unique_NightBlueHorse_Tossin"
+        },
+        {
+            "name": "Unknown Skill (Unique_BlueThunderHorse_Tossin)",
+            "asset": "Unique_BlueThunderHorse_Tossin"
         },
         {
             "name": "Sacred Rain",
@@ -975,6 +1203,18 @@
         {
             "name": "Divine Wing",
             "asset": "Unique_LegendDeer_RadiantWingRush"
+        },
+        {
+            "name": "Unknown Skill (Unique_LegendDeer_BarrierRelease_Normal)",
+            "asset": "Unique_LegendDeer_BarrierRelease_Normal"
+        },
+        {
+            "name": "Unknown Skill (Unique_LegendDeer_BarrierRelease_Grass)",
+            "asset": "Unique_LegendDeer_BarrierRelease_Grass"
+        },
+        {
+            "name": "Unknown Skill (Unique_LegendDeer_BarrierRelease_Water)",
+            "asset": "Unique_LegendDeer_BarrierRelease_Water"
         },
         {
             "name": "Purifying Light",
