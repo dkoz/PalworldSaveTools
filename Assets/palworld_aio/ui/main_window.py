@@ -8,7 +8,7 @@ from PySide6 .QtWidgets import (
 QMainWindow ,QWidget ,QVBoxLayout ,QHBoxLayout ,QLabel ,
 QPushButton ,QFrame ,QMenuBar ,QMenu ,QStatusBar ,
 QSplitter ,QMessageBox ,QFileDialog ,QInputDialog ,QDialog ,QCheckBox ,QComboBox ,QApplication ,
-QTabBar ,QStackedWidget 
+QStackedWidget
 )
 from PySide6 .QtCore import Qt ,QTimer ,Signal 
 from PySide6 .QtGui import QIcon ,QFont ,QAction ,QPixmap ,QCloseEvent 
@@ -99,17 +99,17 @@ class MainWindow (QMainWindow ):
         self .header_widget .close_clicked .connect (self .close )
         self .header_widget .theme_toggle_clicked .connect (self ._toggle_theme )
         self .header_widget .about_clicked .connect (self ._show_about )
-        self .header_widget .sidebar_toggle_clicked .connect (self ._toggle_dashboard )
         self .header_widget .warn_btn .clicked .connect (self ._show_warnings )
         self .header_widget .show_warning (True )
         main_layout .addWidget (self .header_widget )
-        self ._dashboard_collapsed =False 
+        self ._dashboard_collapsed =False
         self ._dashboard_sizes =[1000 ,400 ]
-        self .tab_bar =QTabBar ()
-        self .tab_bar .setObjectName ("customTabBar")
-        self .tab_bar .setExpanding (False )
+        from .custom_tab_bar import TabBarContainer
+        self .tab_bar_container =TabBarContainer ()
+        self .tab_bar =self .tab_bar_container .tab_bar
         self .tab_bar .currentChanged .connect (self ._on_tab_changed )
-        main_layout .addWidget (self .tab_bar )
+        self .tab_bar_container .sidebar_toggle_clicked .connect (self ._toggle_dashboard )
+        main_layout .addWidget (self .tab_bar_container )
         self .splitter =QSplitter (Qt .Horizontal )
         self .splitter .setChildrenCollapsible (False )
         self .stacked_widget =QStackedWidget ()
@@ -383,22 +383,24 @@ class MainWindow (QMainWindow ):
             }}
         """)
     def _toggle_theme (self ):
-        self .is_dark_mode =not self .is_dark_mode 
+        self .is_dark_mode =not self .is_dark_mode
         self .user_settings ['theme']='dark'if self .is_dark_mode else 'light'
         self ._save_user_settings ()
         self ._load_theme ()
         if hasattr (self ,'header_widget'):
             self .header_widget .set_theme (self .is_dark_mode )
+        if hasattr (self ,'tab_bar_container'):
+            self .tab_bar_container .set_theme (self .is_dark_mode )
     def _toggle_dashboard (self ):
         if self ._dashboard_collapsed :
             self .results_widget .show ()
             self .splitter .setSizes (self ._dashboard_sizes )
-            self ._dashboard_collapsed =False 
+            self ._dashboard_collapsed =False
         else :
             self ._dashboard_sizes =self .splitter .sizes ()
             self .results_widget .hide ()
-            self ._dashboard_collapsed =True 
-        self .header_widget .set_sidebar_collapsed (self ._dashboard_collapsed )
+            self ._dashboard_collapsed =True
+        self .tab_bar_container .set_sidebar_collapsed (self ._dashboard_collapsed )
     def _toggle_maximize (self ):
         if self .isMaximized ():
             self .showNormal ()
@@ -905,6 +907,7 @@ class MainWindow (QMainWindow ):
             self .tools_tab .refresh_labels ()
             self .results_widget .refresh_labels ()
             self .header_widget .refresh_labels ()
+            self .tab_bar_container .refresh_labels ()
             if hasattr (self .header_widget ,'_menu_popup')and self .header_widget ._menu_popup :
                 self .header_widget ._menu_popup .refresh_labels ()
             if hasattr (self ,'map_tab')and self .map_tab :

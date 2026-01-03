@@ -36,7 +36,17 @@ class InputDialog (QDialog ):
     def accept (self ):
         self .result_value =self .input_field .text ()
         super ().accept ()
-    @staticmethod 
+    def showEvent (self ,event ):
+        """Center on parent when first shown."""
+        super ().showEvent (event )
+        if not event .spontaneous ():
+            try :
+                from palworld_aio .ui .tools_tab import center_on_parent
+                center_on_parent (self )
+            except ImportError :
+                from ..ui .tools_tab import center_on_parent
+                center_on_parent (self )
+    @staticmethod
     def get_text (title ,prompt ,parent =None ,mode ='text'):
         dialog =InputDialog (title ,prompt ,parent ,mode )
         if dialog .exec ()==QDialog .Accepted :
@@ -70,7 +80,17 @@ class DaysInputDialog (QDialog ):
     def accept (self ):
         self .result_value =self .spin_box .value ()
         super ().accept ()
-    @staticmethod 
+    def showEvent (self ,event ):
+        """Center on parent when first shown."""
+        super ().showEvent (event )
+        if not event .spontaneous ():
+            try :
+                from palworld_aio .ui .tools_tab import center_on_parent
+                center_on_parent (self )
+            except ImportError :
+                from ..ui .tools_tab import center_on_parent
+                center_on_parent (self )
+    @staticmethod
     def get_days (title ,prompt ,parent =None ):
         dialog =DaysInputDialog (title ,prompt ,parent )
         if dialog .exec ()==QDialog .Accepted :
@@ -133,9 +153,19 @@ class KillNearestBaseDialog (QDialog ):
         command =f'/KillNearestBase {int (sav_x )} {int (sav_y )} {radius }'
         self .output_text .setPlainText (command )
     def copy_to_clipboard (self ):
-        from PySide6 .QtWidgets import QApplication 
+        from PySide6 .QtWidgets import QApplication
         clipboard =QApplication .clipboard ()
         clipboard .setText (self .output_text .toPlainText ())
+    def showEvent (self ,event ):
+        """Center on parent when first shown."""
+        super ().showEvent (event )
+        if not event .spontaneous ():
+            try :
+                from palworld_aio .ui .tools_tab import center_on_parent
+                center_on_parent (self )
+            except ImportError :
+                from ..ui .tools_tab import center_on_parent
+                center_on_parent (self )
 class ConfirmDialog (QDialog ):
     def __init__ (self ,title ,message ,parent =None ):
         super ().__init__ (parent )
@@ -156,7 +186,17 @@ class ConfirmDialog (QDialog ):
         button_layout .addWidget (yes_btn )
         button_layout .addWidget (no_btn )
         layout .addLayout (button_layout )
-    @staticmethod 
+    def showEvent (self ,event ):
+        """Center on parent when first shown."""
+        super ().showEvent (event )
+        if not event .spontaneous ():
+            try :
+                from palworld_aio .ui .tools_tab import center_on_parent
+                center_on_parent (self )
+            except ImportError :
+                from ..ui .tools_tab import center_on_parent
+                center_on_parent (self )
+    @staticmethod
     def confirm (title ,message ,parent =None ):
         dialog =ConfirmDialog (title ,message ,parent )
         return dialog .exec ()==QDialog .Accepted 
@@ -237,6 +277,16 @@ class PalDefenderDialog (QDialog ):
         self .output_text .setFont (QFont ('Consolas',10 ))
         self .output_text .setStyleSheet (f"background-color: {constants .GLASS }; color: {constants .TEXT };")
         layout .addWidget (self .output_text )
+    def showEvent (self ,event ):
+        """Center on parent when first shown."""
+        super ().showEvent (event )
+        if not event .spontaneous ():
+            try :
+                from palworld_aio .ui .tools_tab import center_on_parent
+                center_on_parent (self )
+            except ImportError :
+                from ..ui .tools_tab import center_on_parent
+                center_on_parent (self )
     def _append_output (self ,text ):
         self .output_text .append (text )
     def _clear_output (self ):

@@ -600,5 +600,7 @@
 "zoom": "缩放",
 "base.export_all": "导出所有基地",
 "base.export_guild": "导出公会的基地",
-"base.import_multi": "导入基地（多个文件）"
+"base.import_multi": "导入基地（多个文件）",
+"sidebar.open": "打开",
+"sidebar.close": "关闭"
 }

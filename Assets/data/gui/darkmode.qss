@@ -68,15 +68,21 @@ QPushButton#controlChip:hover {
 
 /* Sidebar collapse chip */
 QPushButton#sidebarChip {
-    background: transparent;
-    border: none;
-    padding: 8px 12px;
-    font-size: 20px;
-    color: #f2e558;
-    text-align: center;
+    background: rgba(255,210,77,0.08);
+    border: 1px solid rgba(255,210,77,0.12);
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 17px;
+    color: #FFD24D;
 }
 QPushButton#sidebarChip:hover {
-    color: #fffba8;
+    background: rgba(255,210,77,0.15);
+    border: 1px solid rgba(255,210,77,0.25);
+    color: #FFE89D;
+}
+QPushButton#sidebarChip:pressed {
+    background: rgba(255,210,77,0.20);
+    border: 1px solid rgba(255,210,77,0.30);
 }
 
 /* Theme toggle chip */
@@ -423,39 +429,21 @@ QTabBar::tab {
 }
 
 /* Custom tab bar styling for separate tab bar */
+QWidget#tabBarContainer {
+    border-bottom: 1px solid rgba(125,211,252,0.15);
+}
+
 QTabBar#customTabBar {
     background: transparent;
-    margin: 0px 10px 0px 10px;
+    margin: 8px 10px 0px 10px;
 }
 
 QTabBar#customTabBar::tab {
-    background: rgba(30,33,40,0.7);
-    border: 1px solid rgba(125,211,252,0.1);
-    border-bottom: none;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+    background: transparent;
+    border: none;
+    margin-right: 8px;
+    margin-bottom: 4px;
     padding: 10px 18px;
-    margin-right: 2px;
-    color: #A6B8C8;
-    font-weight: 600;
-    font-size: 11px;
-}
-
-QTabBar::tab:selected {
-    background: rgba(125,211,252,0.12);
-    border-color: rgba(125,211,252,0.3);
-    color: #7DD3FC;
-    font-weight: 700;
-}
-
-QTabBar::tab:hover:!selected {
-    background: rgba(125,211,252,0.05);
-    border-color: rgba(125,211,252,0.15);
-    color: #E6EEF6;
-}
-
-QTabBar::tab:!selected {
-    margin-top: 2px;
 }
 
 /* Tab Content Widgets - Ensure proper theming for all tab content */
@@ -470,6 +458,8 @@ QStackedWidget {
     background: rgba(18,20,24,0.65);
     border-radius: 10px;
     color: #dfeefc;
+    padding: 10px;
+    margin: 10px;
 }
 
 /* Ensure all tab content widgets inherit theme colors */

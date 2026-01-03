@@ -88,12 +88,23 @@ class LoadingPopup (QWidget ):
         self .fade_animation .finished .connect (on_fade_complete )
         self .fade_animation .start ()
     def _center_on_screen (self ):
-        from PySide6 .QtWidgets import QApplication 
-        screen =QApplication .primaryScreen ().availableGeometry ()
+        """Center the loading popup on its parent window if available, otherwise on screen."""
+        parent =self .parent ()
         size =self .size ()
-        x =(screen .width ()-size .width ())//2 
-        y =(screen .height ()-size .height ())//2 
-        self .move (x ,y )
+
+        if parent and hasattr (parent ,'geometry'):
+            # Center on parent window
+            parent_rect =parent .geometry ()
+            x =parent_rect .x ()+(parent_rect .width ()-size .width ())//2
+            y =parent_rect .y ()+(parent_rect .height ()-size .height ())//2
+            self .move (x ,y )
+        else :
+            # Fallback: center on screen
+            from PySide6 .QtWidgets import QApplication
+            screen =QApplication .primaryScreen ().availableGeometry ()
+            x =(screen .width ()-size .width ())//2
+            y =(screen .height ()-size .height ())//2
+            self .move (x ,y )
     def closeEvent (self ,event ):
         if hasattr (self ,'movie')and self .movie :
             self .movie .stop ()

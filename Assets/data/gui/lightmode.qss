@@ -68,15 +68,21 @@ QPushButton#controlChip:hover {
 
 /* Sidebar collapse chip */
 QPushButton#sidebarChip {
-    background: transparent;
-    border: none;
-    padding: 8px 12px;
-    font-size: 20px;
-    color: #b8a830;
-    text-align: center;
+    background: rgba(255,210,77,0.15);
+    border: 1px solid rgba(255,210,77,0.30);
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 17px;
+    color: #D4A800;
 }
 QPushButton#sidebarChip:hover {
-    color: #d4c238;
+    background: rgba(255,210,77,0.25);
+    border: 1px solid rgba(255,210,77,0.45);
+    color: #B38F00;
+}
+QPushButton#sidebarChip:pressed {
+    background: rgba(255,210,77,0.35);
+    border: 1px solid rgba(255,210,77,0.55);
 }
 
 /* Theme toggle chip */
@@ -430,42 +436,26 @@ QTabBar::tab {
 }
 
 /* Custom tab bar styling for separate tab bar */
+QWidget#tabBarContainer {
+    border-bottom: 1px solid rgba(180,200,220,0.4);
+}
+
 QTabBar#customTabBar {
     background: transparent;
-    margin: 0px 10px 0px 10px;
+    margin: 8px 10px 0px 10px;
 }
 
 QTabBar#customTabBar::tab {
-    background: rgba(200,215,235,0.5);
-    border: 1px solid rgba(180,200,220,0.3);
-    border-bottom: none;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+    background: transparent;
+    border: none;
+    margin-right: 8px;
+    margin-bottom: 4px;
     padding: 10px 18px;
-    margin-right: 2px;
-    color: #2C3E50;
-    font-weight: 600;
-    font-size: 11px;
-}
-
-QTabBar::tab:selected {
-    background: rgba(37,150,190,0.15);
-    border-color: rgba(37,150,190,0.4);
-    color: #1A365D;
-}
-
-QTabBar::tab:hover:!selected {
-    background: rgba(37,150,190,0.08);
-    border-color: rgba(37,150,190,0.25);
-}
-
-QTabBar::tab:!selected {
-    margin-top: 2px;
 }
 
 /* Tab Content Widgets - Ensure proper theming for all tab content */
 QWidget#playersTab, QWidget#guildsTab, QWidget#basesTab, QWidget#mapTab, QWidget#toolsTab, QWidget#exclusionsTab {
-    background: rgba(240,245,255,0.85);
+    background: rgba(240, 255, 249, 0.85);
     border-radius: 10px;
     color: #000000;
 }
@@ -475,6 +465,8 @@ QStackedWidget {
     background: rgba(240,245,255,0.85);
     border-radius: 10px;
     color: #000000;
+    padding: 10px;
+    margin: 10px;
 }
 
 /* Ensure all tab content widgets inherit theme colors */

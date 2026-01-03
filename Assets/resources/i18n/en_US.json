@@ -672,5 +672,7 @@
 "deletion.warning.protected_base": "Base {bid} is in exclusion list and cannot be deleted.",
 "warning.title": "Warning",
 "cursor_coords": "Cursor Coords",
-"zoom": "Zoom"
+"zoom": "Zoom",
+"sidebar.open": "Open",
+"sidebar.close": "Close"
 }

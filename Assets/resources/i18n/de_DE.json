@@ -600,5 +600,7 @@
 "zoom": "Zoom",
 "base.export_all": "Alle Basen exportieren",
 "base.export_guild": "Basen für Gilde exportieren",
-"base.import_multi": "Basen importieren (Mehrfachdatei)"
+"base.import_multi": "Basen importieren (Mehrfachdatei)",
+"sidebar.open": "Öffnen",
+"sidebar.close": "Schließen"
 }

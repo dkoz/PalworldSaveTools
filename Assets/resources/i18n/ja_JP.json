@@ -600,5 +600,7 @@
 "zoom": "ズーム",
 "base.export_all": "全てのベースをエクスポート",
 "base.export_guild": "ギルドのベースをエクスポート",
-"base.import_multi": "ベースをインポート (複数ファイル)"
+"base.import_multi": "ベースをインポート (複数ファイル)",
+"sidebar.open": "開く",
+"sidebar.close": "閉じる"
 }

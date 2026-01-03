@@ -52,13 +52,34 @@ MANAGEMENT_TOOL_KEYS =[
 "tool.restore_map",
 ]
 def center_on_parent (dialog ):
-    from PySide6 .QtWidgets import QApplication 
-    screen =QApplication .primaryScreen ().availableGeometry ()
+    """Center a dialog on its parent window.
+
+    If the dialog has a parent widget, centers it relative to the parent's geometry.
+    If no parent exists, centers on the primary screen as fallback.
+    """
+    parent =dialog .parent ()
+
+    # Ensure dialog size is calculated
     size =dialog .sizeHint ()
     if not size .isValid ():
         dialog .adjustSize ()
         size =dialog .size ()
-    dialog .move ((screen .width ()-size .width ())//2 ,(screen .height ()-size .height ())//2 )
+
+    if parent and hasattr (parent ,'geometry'):
+        # Center on parent window (matching QMessageBox behavior)
+        parent_rect =parent .geometry ()
+        dialog .move (
+            parent_rect .x ()+(parent_rect .width ()-size .width ())//2 ,
+            parent_rect .y ()+(parent_rect .height ()-size .height ())//2
+        )
+    else :
+        # Fallback: center on primary screen
+        from PySide6 .QtWidgets import QApplication
+        screen =QApplication .primaryScreen ().availableGeometry ()
+        dialog .move (
+            (screen .width ()-size .width ())//2 ,
+            (screen .height ()-size .height ())//2
+        )
 class ConversionOptionsDialog (QDialog ):
     def __init__ (self ,parent =None ):
         super ().__init__ (parent )

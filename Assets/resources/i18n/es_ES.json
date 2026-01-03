@@ -594,5 +594,7 @@
 "zoom": "Zoom",
 "base.export_all": "Exportar todas las bases",
 "base.export_guild": "Exportar bases del gremio",
-"base.import_multi": "Importar bases (múltiples archivos)"
+"base.import_multi": "Importar bases (múltiples archivos)",
+"sidebar.open": "Abrir",
+"sidebar.close": "Cerrar"
 }

@@ -580,5 +580,7 @@
 "zoom": "Zoom",
 "base.export_all": "Exporter toutes les bases",
 "base.export_guild": "Exporter les bases de la guilde",
-"base.import_multi": "Importer des bases (fichiers multiples)"
+"base.import_multi": "Importer des bases (fichiers multiples)",
+"sidebar.open": "Ouvrir",
+"sidebar.close": "Fermer"
 }

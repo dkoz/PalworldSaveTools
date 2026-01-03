@@ -600,5 +600,7 @@
 "zoom": "확대",
 "base.export_all": "모든 베이스 내보내기",
 "base.export_guild": "길드의 베이스 내보내기",
-"base.import_multi": "베이스 가져오기 (다중 파일)"
+"base.import_multi": "베이스 가져오기 (다중 파일)",
+"sidebar.open": "열기",
+"sidebar.close": "닫기"
 }
