@@ -1,7 +1,7 @@
 import os 
 from PySide6 .QtWidgets import (
 QWidget ,QHBoxLayout ,QLabel ,QPushButton ,QToolButton ,
-QSpacerItem ,QSizePolicy ,QMenu ,QStyle 
+QSpacerItem ,QSizePolicy ,QStyle 
 )
 from PySide6 .QtCore import Qt ,Signal ,QSize ,QPoint ,QTimer 
 from PySide6 .QtGui import QPixmap ,QFont ,QCursor ,QFontDatabase 
@@ -17,6 +17,7 @@ except :
         'nf-md-cog':'\U000f0493',
         'nf-md-information':'\U000f02fd',
         'nf-md-circle_medium':'\U000f09df',
+        'nf-fa-window_maximize':'\uf2d0',
         'nf-fa-close':'\uf00d'
         }
 from i18n import t 
@@ -27,6 +28,7 @@ except ImportError :
     from ..import constants 
 class HeaderWidget (QWidget ):
     minimize_clicked =Signal ()
+    maximize_clicked =Signal ()
     close_clicked =Signal ()
     theme_toggle_clicked =Signal ()
     about_clicked =Signal ()
@@ -76,22 +78,32 @@ class HeaderWidget (QWidget ):
         self .app_version_label .setToolTip ("Click to open GitHub repository")
         self .app_version_label .mousePressEvent =self ._open_github 
         layout .addWidget (self .app_version_label ,alignment =Qt .AlignVCenter )
-        self .game_version_label =QLabel (f"{nf .icons ['nf-fa-save']} {game_version }")
-        self .game_version_label .setObjectName ("gameVersionChip")
-        self .game_version_label .setFont (QFont ("Hack Nerd Font",11 ))
-        layout .addWidget (self .game_version_label ,alignment =Qt .AlignVCenter )
-        layout .addItem (QSpacerItem (20 ,10 ,QSizePolicy .Expanding ,QSizePolicy .Minimum ))
-        self .warn_btn =QToolButton ()
-        self .warn_btn .setObjectName ("hdrBtn")
-        self .warn_btn .setToolTip (f"Warnings (Palworld v{game_version })")
-        try :
-            self .warn_btn .setIcon (self .style ().standardIcon (QStyle .SP_MessageBoxWarning ))
-        except :
-            pass 
-        self .warn_btn .setStyleSheet ("color: #FFD24D;")
-        self .warn_btn .setIconSize (QSize (26 ,26 ))
-        self .warn_btn .setVisible (False )
-        layout .addWidget (self .warn_btn )
+        self.game_version_label = QLabel(f"{nf.icons['nf-fa-save']} {game_version}")
+        self.game_version_label.setObjectName("gameVersionChip")
+        self.game_version_label.setFont(QFont("Hack Nerd Font", 11))
+        layout.addWidget(self.game_version_label, alignment=Qt.AlignVCenter)
+        info_btn = QToolButton()
+        info_btn.setObjectName("hdrBtn")
+        info_btn.setToolTip(t("about.title") if t else "About PST")
+        try:
+            info_btn.setIcon(self.style().standardIcon(QStyle.SP_MessageBoxInformation))
+        except:
+            pass
+        info_btn.setIconSize(QSize(26, 26))
+        info_btn.clicked.connect(self.about_clicked.emit)
+        layout.addWidget(info_btn)
+        self.warn_btn = QToolButton()
+        self.warn_btn.setObjectName("hdrBtn")
+        self.warn_btn.setToolTip(f"Warnings (Palworld v{game_version})")
+        try:
+            self.warn_btn.setIcon(self.style().standardIcon(QStyle.SP_MessageBoxWarning))
+        except:
+            pass
+        self.warn_btn.setStyleSheet("color: #FFD24D;")
+        self.warn_btn.setIconSize(QSize(26, 26))
+        self.warn_btn.setVisible(False)
+        layout.addWidget(self.warn_btn)
+        layout.addItem(QSpacerItem(20, 10, QSizePolicy.Expanding, QSizePolicy.Minimum))
         self .sidebar_btn =QPushButton ("\u25C0")
         self .sidebar_btn .setObjectName ("controlChip")
         self .sidebar_btn .setFlat (True )
@@ -99,17 +111,13 @@ class HeaderWidget (QWidget ):
         self .sidebar_btn .setFont (QFont ("Consolas",14 ))
         self .sidebar_btn .clicked .connect (self .sidebar_toggle_clicked .emit )
         layout .addWidget (self .sidebar_btn )
-        dropdown_btn =QPushButton (nf .icons ['nf-md-menu'])
-        dropdown_btn .setObjectName ("controlChip")
-        dropdown_btn .setFlat (True )
-        dropdown_btn .setToolTip ("Menu")
-        dropdown_btn .setFont (QFont ("Hack Nerd Font",14 ))
-        self .dropdown_menu =QMenu ()
-        self ._update_dropdown_menu ()
-        dropdown_btn .clicked .connect (
-        lambda :self .dropdown_menu .exec (dropdown_btn .mapToGlobal (QPoint (0 ,dropdown_btn .height ())))
-        )
-        layout .addWidget (dropdown_btn )
+        theme_btn = QPushButton(nf.icons['nf-md-theme_light_dark'])
+        theme_btn.setObjectName("controlChip")
+        theme_btn.setFlat(True)
+        theme_btn.setToolTip(t("toggle_theme") if t else "Toggle Theme")
+        theme_btn.setFont(QFont("Hack Nerd Font", 14))
+        theme_btn.clicked.connect(self.theme_toggle_clicked.emit)
+        layout.addWidget(theme_btn)
         minimize_btn =QPushButton (nf .icons ['nf-md-circle_medium'])
         minimize_btn .setObjectName ("controlChip")
         minimize_btn .setFlat (True )
@@ -117,6 +125,13 @@ class HeaderWidget (QWidget ):
         minimize_btn .setFont (QFont ("Hack Nerd Font",14 ))
         minimize_btn .clicked .connect (self .minimize_clicked .emit )
         layout .addWidget (minimize_btn )
+        maximize_btn =QPushButton (nf .icons ['nf-fa-window_maximize'])
+        maximize_btn .setObjectName ("controlChip")
+        maximize_btn .setFlat (True )
+        maximize_btn .setToolTip ("Maximize")
+        maximize_btn .setFont (QFont ("Hack Nerd Font",14 ))
+        maximize_btn .clicked .connect (self .maximize_clicked .emit )
+        layout .addWidget (maximize_btn )
         close_btn =QPushButton (nf .icons ['nf-fa-close'])
         close_btn .setObjectName ("controlChip")
         close_btn .setFlat (True )
@@ -188,13 +203,6 @@ class HeaderWidget (QWidget ):
             self ._menu_popup =MenuPopup (self )
         btn_pos =self .menu_chip_btn .mapToGlobal (QPoint (0 ,self .menu_chip_btn .height ()))
         self ._menu_popup .show_at (btn_pos )
-    def _update_dropdown_menu (self ):
-        self .dropdown_menu .clear ()
-        action_toggle =self .dropdown_menu .addAction (nf .icons ['nf-md-theme_light_dark']+" "+(t ("toggle_theme")if t else "Toggle Theme"))
-        self .dropdown_menu .addSeparator ()
-        action_about =self .dropdown_menu .addAction (nf .icons ['nf-md-information']+" "+(t ("about.title")if t else "About PST"))
-        action_toggle .triggered .connect (self .theme_toggle_clicked .emit )
-        action_about .triggered .connect (self .about_clicked .emit )
     def refresh_labels (self ):
         if hasattr (self ,'menu_chip_btn'):
             self .menu_chip_btn .setText (f"{nf .icons ['nf-md-menu']} {t ('menu_button')if t else 'Menu'}")
@@ -202,8 +210,6 @@ class HeaderWidget (QWidget ):
         if hasattr (self ,'sidebar_btn'):
             collapsed =self .sidebar_btn .text ()=="\u25B6"
             self .set_sidebar_collapsed (collapsed )
-        if hasattr (self ,'dropdown_menu'):
-            self ._update_dropdown_menu ()
     def set_menu_actions (self ,actions_dict ):
         from ..widgets import MenuPopup 
         if self ._menu_popup is None :

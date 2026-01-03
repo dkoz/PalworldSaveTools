@@ -205,8 +205,29 @@ class ToolButton (QWidget ):
             bg_color =QColor (125 ,211 ,252 ,int (bg_opacity *255 ))
             painter .fillRect (self .rect (),bg_color )
 
-        # Draw 2px stroke around icon
+        # Call parent paint event first for other elements (including the icon)
+        super ().paintEvent (event )
+
+        # Now draw the rounded corners and stroke on top
         icon_rect =self .icon_label .geometry ()
+
+        # Save painter state
+        painter .save ()
+
+        # Set clip path for rounded icon
+        clip_path =QPainterPath ()
+        clip_path .addRoundedRect (QRectF (icon_rect ),6 ,6 )
+        painter .setClipPath (clip_path )
+
+        # The icon has already been drawn by the parent paintEvent, but we need to redraw it with clipping
+        # Get the pixmap from the icon label
+        if self .icon_label .pixmap ()and not self .icon_label .pixmap ().isNull ():
+            painter .drawPixmap (icon_rect .topLeft (),self .icon_label .pixmap ())
+
+        # Restore painter state to remove clipping
+        painter .restore ()
+
+        # Draw 2px stroke around icon
         stroke_color =QColor (125 ,211 ,252 ,255 )# #7DD3FC
         stroke_pen =QPen (stroke_color )
         stroke_pen .setWidth (2 )
@@ -214,9 +235,6 @@ class ToolButton (QWidget ):
         path =QPainterPath ()
         path .addRoundedRect (QRectF (icon_rect ),6 ,6 )
         painter .strokePath (path ,stroke_pen )
-
-        # Call parent paint event for other elements
-        super ().paintEvent (event )
     def mousePressEvent (self ,event ):
         if event .button ()==Qt .LeftButton :
             self .clicked .emit ()

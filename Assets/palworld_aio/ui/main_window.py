@@ -95,6 +95,7 @@ class MainWindow (QMainWindow ):
         self .header_widget =HeaderWidget ()
         self .header_widget .set_theme (self .is_dark_mode )
         self .header_widget .minimize_clicked .connect (self .showMinimized )
+        self .header_widget .maximize_clicked .connect (self ._toggle_maximize )
         self .header_widget .close_clicked .connect (self .close )
         self .header_widget .theme_toggle_clicked .connect (self ._toggle_theme )
         self .header_widget .about_clicked .connect (self ._show_about )
@@ -392,12 +393,17 @@ class MainWindow (QMainWindow ):
         if self ._dashboard_collapsed :
             self .results_widget .show ()
             self .splitter .setSizes (self ._dashboard_sizes )
-            self ._dashboard_collapsed =False 
+            self ._dashboard_collapsed =False
         else :
             self ._dashboard_sizes =self .splitter .sizes ()
             self .results_widget .hide ()
-            self ._dashboard_collapsed =True 
+            self ._dashboard_collapsed =True
         self .header_widget .set_sidebar_collapsed (self ._dashboard_collapsed )
+    def _toggle_maximize (self ):
+        if self .isMaximized ():
+            self .showNormal ()
+        else :
+            self .showMaximized ()
     def check_github_update (self ,force_test =False ):
         try :
             r =urllib .request .urlopen (GITHUB_RAW_URL ,timeout =5 )

@@ -172,9 +172,11 @@ QMenu::item {
     padding: 8px 12px;
     background: transparent;
     border-radius: 4px;
+    color: #dfeefc;
 }
 QMenu::item:selected {
     background: rgba(125,211,252,0.3);
+    color: #ffffff;
 }
 QMenu::item:disabled {
     color: rgba(255,255,255,0.4);
