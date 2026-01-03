@@ -12,10 +12,10 @@ except ImportError :
 class SearchPanel (QWidget ):
     item_selected =Signal (object )
     item_double_clicked =Signal (object )
-    def __init__ (self ,label_key ,columns ,column_widths =None ,parent =None ,multi_select =False ):
+    def __init__ (self ,label_key ,column_keys ,column_widths =None ,parent =None ,multi_select =False ):
         super ().__init__ (parent )
         self .label_key =label_key
-        self .columns =columns
+        self .column_keys =column_keys
         self .column_widths =column_widths or []
         self .multi_select =multi_select
         self ._setup_ui ()
@@ -35,6 +35,7 @@ class SearchPanel (QWidget ):
         layout .addLayout (search_layout )
         self .tree =QTreeWidget ()
         self .tree .setObjectName ("searchTree")
+        self .columns =[t (k )if k else '' for k in self .column_keys ]
         self .tree .setHeaderLabels (self .columns )
         self .tree .setAlternatingRowColors (True )
         self .tree .setRootIsDecorated (False )
@@ -95,3 +96,6 @@ class SearchPanel (QWidget ):
             self .add_item (values )
     def refresh_labels (self ):
         self .search_label .setText (t (self .label_key )if t else self .label_key )
+        self .search_input .setPlaceholderText (t ('search.placeholder')if t else 'Type to search...')
+        self .columns =[t (k )if k else '' for k in self .column_keys ]
+        self .tree .setHeaderLabels (self .columns )

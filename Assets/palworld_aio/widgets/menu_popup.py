@@ -207,6 +207,28 @@ class MenuPopup (QWidget ):
         self ._close_current_menu ()
         self ._clear_all_highlights ()
         super ().hideEvent (event )
+    def refresh_labels (self ):
+        labels ={
+        'file':t ('deletion.menu.file')if t else 'File',
+        'functions':t ('deletion.menu.delete')if t else 'Functions',
+        'maps':t ('deletion.menu.view')if t else 'Maps',
+        'exclusions':t ('deletion.menu.exclusions')if t else 'Exclusions',
+        'languages':t ('lang.label')if t else 'Languages',
+        }
+        for category ,btn in self .menu_buttons .items ():
+            if category in labels :
+                try :
+                    icon =nf .icons .get ({
+                    'file':'nf-md-file',
+                    'functions':'nf-md-function',
+                    'maps':'nf-md-map',
+                    'exclusions':'nf-md-playlist_remove',
+                    'languages':'nf-md-translate'
+                    }.get (category ,''),'')
+                except :
+                    icon =''
+                chevron ='\u25B6'
+                btn .setText (f"  {icon }  {labels [category ]}  {chevron }")
     def show_at (self ,global_pos ):
         self .adjustSize ()
         self .move (global_pos )

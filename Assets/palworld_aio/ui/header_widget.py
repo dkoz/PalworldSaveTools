@@ -104,14 +104,10 @@ class HeaderWidget (QWidget ):
         dropdown_btn .setFlat (True )
         dropdown_btn .setToolTip ("Menu")
         dropdown_btn .setFont (QFont ("Hack Nerd Font",14 ))
-        menu =QMenu ()
-        action_toggle =menu .addAction (nf .icons ['nf-md-theme_light_dark']+" "+(t ("toggle_theme")if t else "Toggle Theme"))
-        menu .addSeparator ()
-        action_about =menu .addAction (nf .icons ['nf-md-information']+" "+(t ("about.title")if t else "About PST"))
-        action_toggle .triggered .connect (self .theme_toggle_clicked .emit )
-        action_about .triggered .connect (self .about_clicked .emit )
+        self .dropdown_menu =QMenu ()
+        self ._update_dropdown_menu ()
         dropdown_btn .clicked .connect (
-        lambda :menu .exec (dropdown_btn .mapToGlobal (QPoint (0 ,dropdown_btn .height ())))
+        lambda :self .dropdown_menu .exec (dropdown_btn .mapToGlobal (QPoint (0 ,dropdown_btn .height ())))
         )
         layout .addWidget (dropdown_btn )
         minimize_btn =QPushButton (nf .icons ['nf-md-circle_medium'])
@@ -192,6 +188,22 @@ class HeaderWidget (QWidget ):
             self ._menu_popup =MenuPopup (self )
         btn_pos =self .menu_chip_btn .mapToGlobal (QPoint (0 ,self .menu_chip_btn .height ()))
         self ._menu_popup .show_at (btn_pos )
+    def _update_dropdown_menu (self ):
+        self .dropdown_menu .clear ()
+        action_toggle =self .dropdown_menu .addAction (nf .icons ['nf-md-theme_light_dark']+" "+(t ("toggle_theme")if t else "Toggle Theme"))
+        self .dropdown_menu .addSeparator ()
+        action_about =self .dropdown_menu .addAction (nf .icons ['nf-md-information']+" "+(t ("about.title")if t else "About PST"))
+        action_toggle .triggered .connect (self .theme_toggle_clicked .emit )
+        action_about .triggered .connect (self .about_clicked .emit )
+    def refresh_labels (self ):
+        if hasattr (self ,'menu_chip_btn'):
+            self .menu_chip_btn .setText (f"{nf .icons ['nf-md-menu']} {t ('menu_button')if t else 'Menu'}")
+            self .menu_chip_btn .setToolTip (t ("Open Menu")if t else "Open Menu")
+        if hasattr (self ,'sidebar_btn'):
+            collapsed =self .sidebar_btn .text ()=="\u25B6"
+            self .set_sidebar_collapsed (collapsed )
+        if hasattr (self ,'dropdown_menu'):
+            self ._update_dropdown_menu ()
     def set_menu_actions (self ,actions_dict ):
         from ..widgets import MenuPopup
         if self ._menu_popup is None :

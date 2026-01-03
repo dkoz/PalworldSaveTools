@@ -138,8 +138,8 @@ class MainWindow (QMainWindow ):
         layout .setContentsMargins (10 ,10 ,10 ,10 )
         self .players_panel =SearchPanel (
         'deletion.search_players',
-        [t ('deletion.col.player_name'),t ('deletion.col.last_seen'),t ('deletion.col.level'),
-        t ('deletion.col.pals'),'UID',t ('deletion.col.guild_name'),t ('deletion.col.guild_id')],
+        ['deletion.col.player_name','deletion.col.last_seen','deletion.col.level',
+        'deletion.col.pals','','deletion.col.guild_name','deletion.col.guild_id'],
         [140 ,120 ,60 ,60 ,150 ,180 ,180 ]
         )
         self .players_panel .item_selected .connect (self ._on_player_selected )
@@ -154,7 +154,7 @@ class MainWindow (QMainWindow ):
         splitter =QSplitter (Qt .Vertical )
         self .guilds_panel =SearchPanel (
         'deletion.search_guilds',
-        [t ('deletion.col.guild_name'),t ('deletion.col.guild_id')],
+        ['deletion.col.guild_name','deletion.col.guild_id'],
         [200 ,300 ]
         )
         self .guilds_panel .item_selected .connect (self ._on_guild_selected )
@@ -162,8 +162,8 @@ class MainWindow (QMainWindow ):
         splitter .addWidget (self .guilds_panel )
         self .guild_members_panel =SearchPanel (
         'deletion.guild_members',
-        [t ('deletion.col.member'),t ('deletion.col.last_seen'),t ('deletion.col.level'),
-        t ('deletion.col.pals'),'UID'],
+        ['deletion.col.member','deletion.col.last_seen','deletion.col.level',
+        'deletion.col.pals',''],
         [200 ,120 ,60 ,100 ,300 ]
         )
         self .guild_members_panel .item_selected .connect (self ._on_guild_member_selected )
@@ -178,7 +178,7 @@ class MainWindow (QMainWindow ):
         layout .setContentsMargins (10 ,10 ,10 ,10 )
         self .bases_panel =SearchPanel (
         'deletion.search_bases',
-        [t ('deletion.col.base_id'),t ('deletion.col.guild_id'),t ('deletion.col.guild_name')],
+        ['deletion.col.base_id','deletion.col.guild_id','deletion.col.guild_name'],
         [200 ,250 ,250 ],
         multi_select =True
         )
@@ -204,7 +204,7 @@ class MainWindow (QMainWindow ):
         layout .setSpacing (10 )
         self .excl_players_panel =SearchPanel (
         'deletion.exclusions.player_label',
-        [t ('deletion.excluded_player_uid')if t else 'Player UID'],
+        ['deletion.excluded_player_uid'],
         [300 ]
         )
         self .excl_players_panel .tree .customContextMenuRequested .connect (
@@ -212,7 +212,7 @@ class MainWindow (QMainWindow ):
         layout .addWidget (self .excl_players_panel )
         self .excl_guilds_panel =SearchPanel (
         'deletion.exclusions.guild_label',
-        [t ('deletion.excluded_guild_id')if t else 'Guild ID'],
+        ['deletion.excluded_guild_id'],
         [300 ]
         )
         self .excl_guilds_panel .tree .customContextMenuRequested .connect (
@@ -220,7 +220,7 @@ class MainWindow (QMainWindow ):
         layout .addWidget (self .excl_guilds_panel )
         self .excl_bases_panel =SearchPanel (
         'deletion.exclusions.base_label',
-        [t ('deletion.excluded_bases')if t else 'Base ID'],
+        ['deletion.excluded_bases'],
         [300 ]
         )
         self .excl_bases_panel .tree .customContextMenuRequested .connect (
@@ -879,14 +879,13 @@ class MainWindow (QMainWindow ):
             self .user_settings ["language"]=code
             self ._save_user_settings ()
             set_language (code )
-            self ._refresh_texts ()
-            self ._setup_menus ()
-        lang_name =t (f'lang.{code }')if t else code
+        lang_name =t (f'lang.{code }')if t else code 
         QMessageBox .information (
         self ,
         t ("lang.selected")if t else "Language Selected",
-        t ("lang.set_applied",lang_name =lang_name )if t else f"Language set to {lang_name }. GUI refreshed."
+        t ("lang.set_restart",lang_name =lang_name )if t else f"Language set to {lang_name }. Restarting application..."
         )
+        self ._restart_program ()
     def _refresh_texts (self ):
         tools_version ,_ =get_versions ()
         self .setWindowTitle (t ('app.title',version =tools_version )+' - '+t ('tool.deletion'))
@@ -901,19 +900,8 @@ class MainWindow (QMainWindow ):
             self .guild_members_panel .refresh_labels ()
         if hasattr (self ,'bases_panel'):
             self .bases_panel .refresh_labels ()
-        if hasattr (self ,'header_widget'):
-            self .header_widget .refresh_labels ()
-        if hasattr (self ,'excl_players_panel'):
-            self .excl_players_panel .refresh_labels ()
-        if hasattr (self ,'excl_guilds_panel'):
-            self .excl_guilds_panel .refresh_labels ()
-        if hasattr (self ,'excl_bases_panel'):
-            self .excl_bases_panel .refresh_labels ()
-        if hasattr (self ,'tab_bar')and self .tab_bar :
-            for i in range (self .tab_bar .count ()):
-                tab_keys =['deletion.search_guilds','deletion.search_bases','map.viewer','tools.tab']
-                if i <len (tab_keys ):
-                    self .tab_bar .setTabText (i ,t (tab_keys [i ])if t else tab_keys [i ].split ('.')[-1 ].title ())
+        if hasattr (self ,'menu_bar'):
+            self ._setup_menus ()
     def _add_exclusion (self ,excl_type ,value ):
         if value not in constants .exclusions [excl_type ]:
             constants .exclusions [excl_type ].append (value )

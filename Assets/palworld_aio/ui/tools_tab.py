@@ -226,6 +226,7 @@ class ToolsTab (QWidget ):
         super ().__init__ (parent )
         self .parent_window =parent 
         self .tool_icons =load_tool_icons ()
+        self .tool_buttons =[]
         self ._setup_ui ()
     def _setup_ui (self ):
         main_layout =QVBoxLayout (self )
@@ -249,6 +250,7 @@ class ToolsTab (QWidget ):
             btn =ToolButton (t (key )if t else key ,t (key )if t else key ,icon_path )
             btn .clicked .connect (lambda i =idx :self ._run_converting_tool (i ))
             left_layout .addWidget (btn )
+            self .tool_buttons .append ((btn ,key ))
         left_layout .addStretch (1 )
         right_frame =QFrame ()
         right_frame .setObjectName ("glass")
@@ -260,6 +262,7 @@ class ToolsTab (QWidget ):
             btn =ToolButton (t (key )if t else key ,t (key )if t else key ,icon_path )
             btn .clicked .connect (lambda i =idx :self ._run_management_tool (i ))
             right_layout .addWidget (btn )
+            self .tool_buttons .append ((btn ,key ))
         right_layout .addStretch (1 )
         content_layout .addWidget (left_frame ,1 )
         content_layout .addWidget (right_frame ,1 )
@@ -363,5 +366,9 @@ class ToolsTab (QWidget ):
         self .fade_animation .setEndValue (1.0 )
         self .fade_animation .setEasingCurve (QEasingCurve .OutCubic )
         self .fade_animation .start ()
+    def refresh_labels (self ):
+        for btn ,key in self .tool_buttons :
+            btn .text_label .setText (t (key )if t else key )
+            btn .text_label .setToolTip (t (key )if t else key )
     def refresh (self ):
         pass
