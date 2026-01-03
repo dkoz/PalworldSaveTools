@@ -66,6 +66,45 @@ QPushButton#controlChip:hover {
     border: 1px solid rgba(128,128,128,0.3);
 }
 
+/* Sidebar collapse chip */
+QPushButton#sidebarChip {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    font-size: 20px;
+    color: #b8a830;
+    text-align: center;
+}
+QPushButton#sidebarChip:hover {
+    color: #d4c238;
+}
+
+/* Theme toggle chip */
+QPushButton#themeChip {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    font-size: 20px;
+    color: #b8a830;
+    text-align: center;
+}
+QPushButton#themeChip:hover {
+    color: #d4c238;
+}
+
+/* Discord chip */
+QPushButton#discordChip {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    font-size: 20px;
+    color: #5865f2;
+    text-align: center;
+}
+QPushButton#discordChip:hover {
+    color: #4752c4;
+}
+
 /* Scroll area */
 QScrollArea {
     border-radius: 10px;

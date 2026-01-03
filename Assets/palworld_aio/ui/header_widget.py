@@ -19,7 +19,9 @@ except :
         'nf-md-circle_medium':'\U000f09df',
         'nf-fa-window_maximize':'\uf2d0',
         'nf-fa-close':'\uf00d',
-        'nf-md-discord':'\uf392'
+        'nf-fa-discord':'\uf392',
+        'nf-cod-triangle_left':'\ueb9b',
+        'nf-cod-triangle_right':'\ueb9c'
         }
 from i18n import t 
 from common import get_versions 
@@ -79,56 +81,53 @@ class HeaderWidget (QWidget ):
         self .app_version_label .setToolTip ("Click to open GitHub repository")
         self .app_version_label .mousePressEvent =self ._open_github 
         layout .addWidget (self .app_version_label ,alignment =Qt .AlignVCenter )
-        self .game_version_label =QLabel (f"{nf .icons ['nf-fa-save']} {game_version }")
-        self .game_version_label .setObjectName ("gameVersionChip")
-        self .game_version_label .setFont (QFont ("Hack Nerd Font",11 ))
-        layout .addWidget (self .game_version_label ,alignment =Qt .AlignVCenter )
-        info_btn =QToolButton ()
-        info_btn .setObjectName ("hdrBtn")
-        info_btn .setToolTip (t ("about.title")if t else "About PST")
-        try :
-            info_btn .setIcon (self .style ().standardIcon (QStyle .SP_MessageBoxInformation ))
-        except :
-            pass 
-        info_btn .setIconSize (QSize (26 ,26 ))
-        info_btn .clicked .connect (self .about_clicked .emit )
-        layout .addWidget (info_btn )
-        self .warn_btn =QToolButton ()
-        self .warn_btn .setObjectName ("hdrBtn")
-        self .warn_btn .setToolTip (f"Warnings (Palworld v{game_version })")
-        try :
-            self .warn_btn .setIcon (self .style ().standardIcon (QStyle .SP_MessageBoxWarning ))
-        except :
-            pass 
-        self .warn_btn .setStyleSheet ("color: #FFD24D;")
-        self .warn_btn .setIconSize (QSize (26 ,26 ))
-        self .warn_btn .setVisible (False )
-        layout .addWidget (self .warn_btn )
-        layout .addItem (QSpacerItem (20 ,10 ,QSizePolicy .Expanding ,QSizePolicy .Minimum ))
-        self .sidebar_btn =QPushButton ("\u25B6")
-        self .sidebar_btn .setObjectName ("controlChip")
+        self.game_version_label = QLabel(f"{nf.icons['nf-fa-save']} {game_version}")
+        self.game_version_label.setObjectName("gameVersionChip")
+        self.game_version_label.setFont(QFont("Hack Nerd Font", 11))
+        layout.addWidget(self.game_version_label, alignment=Qt.AlignVCenter)
+        info_btn = QToolButton()
+        info_btn.setObjectName("hdrBtn")
+        info_btn.setToolTip(t("about.title") if t else "About PST")
+        try:
+            info_btn.setIcon(self.style().standardIcon(QStyle.SP_MessageBoxInformation))
+        except:
+            pass
+        info_btn.setIconSize(QSize(26, 26))
+        info_btn.clicked.connect(self.about_clicked.emit)
+        layout.addWidget(info_btn)
+        self.warn_btn = QToolButton()
+        self.warn_btn.setObjectName("hdrBtn")
+        self.warn_btn.setToolTip(f"Warnings (Palworld v{game_version})")
+        try:
+            self.warn_btn.setIcon(self.style().standardIcon(QStyle.SP_MessageBoxWarning))
+        except:
+            pass
+        self.warn_btn.setStyleSheet("color: #FFD24D;")
+        self.warn_btn.setIconSize(QSize(26, 26))
+        self.warn_btn.setVisible(False)
+        layout.addWidget(self.warn_btn)
+        layout.addItem(QSpacerItem(20, 10, QSizePolicy.Expanding, QSizePolicy.Minimum))
+        self .sidebar_btn =QPushButton (nf.icons['nf-cod-triangle_left'])
+        self .sidebar_btn .setObjectName ("sidebarChip")
         self .sidebar_btn .setFlat (True )
         self .sidebar_btn .setToolTip (t ("Collapse Sidebar")if t else "Collapse Sidebar")
-        self .sidebar_btn .setFont (QFont ("Consolas",11 ))
-        self .sidebar_btn .setStyleSheet ("QPushButton { background-color: rgba(242, 229, 88, 0.8); color: #333; border: 1px solid rgba(212, 200, 74, 0.8); border-radius: 4px; } QPushButton:hover { background-color: rgba(232, 218, 74, 0.9); }")
+        self .sidebar_btn .setFont (QFont ("Hack Nerd Font",14 ))
         self .sidebar_btn .clicked .connect (self .sidebar_toggle_clicked .emit )
         layout .addWidget (self .sidebar_btn )
-        theme_btn =QPushButton (nf .icons ['nf-md-theme_light_dark'])
-        theme_btn .setObjectName ("controlChip")
-        theme_btn .setFlat (True )
-        theme_btn .setToolTip (t ("toggle_theme")if t else "Toggle Theme")
-        theme_btn .setFont (QFont ("Hack Nerd Font",11 ))
-        theme_btn .setStyleSheet ("QPushButton { background-color: rgba(242, 229, 88, 0.8); color: #333; border: 1px solid rgba(212, 200, 74, 0.8); border-radius: 4px; } QPushButton:hover { background-color: rgba(232, 218, 74, 0.9); }")
-        theme_btn .clicked .connect (self .theme_toggle_clicked .emit )
-        layout .addWidget (theme_btn )
-        discord_btn =QPushButton (nf .icons ['nf-md-discord'])
-        discord_btn .setObjectName ("controlChip")
-        discord_btn .setFlat (True )
-        discord_btn .setToolTip ("Join Discord")
-        discord_btn .setFont (QFont ("Hack Nerd Font",11 ))
-        discord_btn .setStyleSheet ("QPushButton { background-color: rgba(88, 101, 242, 0.8); color: white; border: 1px solid rgba(64, 84, 214, 0.8); border-radius: 4px; } QPushButton:hover { background-color: rgba(71, 82, 196, 0.9); }")
-        discord_btn .clicked .connect (self ._open_discord )
-        layout .addWidget (discord_btn )
+        theme_btn = QPushButton(nf.icons['nf-md-theme_light_dark'])
+        theme_btn.setObjectName("themeChip")
+        theme_btn.setFlat(True)
+        theme_btn.setToolTip(t("toggle_theme") if t else "Toggle Theme")
+        theme_btn.setFont(QFont("Hack Nerd Font", 14))
+        theme_btn.clicked.connect(self.theme_toggle_clicked.emit)
+        layout.addWidget(theme_btn)
+        discord_btn = QPushButton(nf.icons['nf-fa-discord'])
+        discord_btn.setObjectName("discordChip")
+        discord_btn.setFlat(True)
+        discord_btn.setToolTip("Join Discord")
+        discord_btn.setFont(QFont("Hack Nerd Font", 14))
+        discord_btn.clicked.connect(self._open_discord)
+        layout.addWidget(discord_btn)
         minimize_btn =QPushButton (nf .icons ['nf-md-circle_medium'])
         minimize_btn .setObjectName ("controlChip")
         minimize_btn .setFlat (True )
@@ -152,10 +151,11 @@ class HeaderWidget (QWidget ):
         layout .addWidget (close_btn )
     def _open_github (self ,event ):
         import webbrowser
-        webbrowser .open ("https://github.com/deafdudecomputers/PalworldSaveTools/releases/latest")
-    def _open_discord (self ):
         import webbrowser
-        webbrowser .open ("https://discord.gg/YWZFPy9G8J")
+        webbrowser .open ("https://github.com/deafdudecomputers/PalworldSaveTools/releases/latest")
+    def _open_discord(self):
+        import webbrowser
+        webbrowser.open("https://discord.gg/YWZFPy9G8J")
     def update_logo (self ):
         base_path =constants .get_assets_path ()
         logo_name ='PalworldSaveTools_Blue.png'if self .is_dark_mode else 'PalworldSaveTools_Black.png'
@@ -176,10 +176,10 @@ class HeaderWidget (QWidget ):
         self .warn_btn .setVisible (show )
     def set_sidebar_collapsed (self ,collapsed ):
         if collapsed :
-            self .sidebar_btn .setText ("\u25B6")
+            self .sidebar_btn .setText (nf.icons['nf-cod-triangle_right'])
             self .sidebar_btn .setToolTip (t ("Expand Sidebar")if t else "Expand Sidebar")
         else :
-            self .sidebar_btn .setText ("\u25C0")
+            self .sidebar_btn .setText (nf.icons['nf-cod-triangle_left'])
             self .sidebar_btn .setToolTip (t ("Collapse Sidebar")if t else "Collapse Sidebar")
     def start_pulse_animation (self ,latest_version ):
         if self ._pulse_timer is not None :
@@ -222,7 +222,7 @@ class HeaderWidget (QWidget ):
             self .menu_chip_btn .setText (f"{nf .icons ['nf-md-menu']} {t ('menu_button')if t else 'Menu'}")
             self .menu_chip_btn .setToolTip (t ("Open Menu")if t else "Open Menu")
         if hasattr (self ,'sidebar_btn'):
-            collapsed =self .sidebar_btn .text ()=="\u25B6"
+            collapsed =self .sidebar_btn .text ()==nf.icons['nf-cod-triangle_right']
             self .set_sidebar_collapsed (collapsed )
     def set_menu_actions (self ,actions_dict ):
         from ..widgets import MenuPopup 
