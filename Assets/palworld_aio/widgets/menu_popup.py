@@ -46,7 +46,7 @@ class HoverMenuButton (QPushButton ):
                 text-align: left;
                 color: #A6B8C8;
             }
-            QPushButton#menuPopupButton:hover {
+            QPushButton#menuPopupButton[hovered="true"] {
                 background: rgba(125, 211, 252, 0.1);
                 color: #7DD3FC;
             }
@@ -90,11 +90,14 @@ class MenuPopup (QWidget ):
     def _check_cursor_position (self ):
         cursor_pos =QGuiApplication .primaryScreen ().availableGeometry ().topLeft ()+QCursor .pos ()
         cursor_pos =QCursor .pos ()
-        over_button =None 
+        over_button =None
         for category ,btn in self .menu_buttons .items ():
-            if self ._is_point_in_widget (cursor_pos ,btn ):
-                over_button =category 
-                break 
+            is_hovered =self ._is_point_in_widget (cursor_pos ,btn )
+            btn .setProperty ("hovered",is_hovered )
+            btn .style ().unpolish (btn )
+            btn .style ().polish (btn )
+            if is_hovered :
+                over_button =category
         over_popup =self ._is_point_in_widget (cursor_pos ,self )
         over_submenu =self ._current_menu and self ._is_point_in_widget (cursor_pos ,self ._current_menu )
         if over_button and over_button !=self ._current_category :
@@ -144,8 +147,7 @@ class MenuPopup (QWidget ):
         """)
     def _create_menu_button (self ,key ,icon_key ,label ):
         btn =HoverMenuButton (key ,icon_key ,label ,self .container )
-        btn .installEventFilter (self )
-        return btn 
+        return btn
     def set_menu_actions (self ,actions_dict ):
         self ._menu_actions =actions_dict 
     def _show_submenu (self ,category ,button ):
@@ -176,6 +178,7 @@ class MenuPopup (QWidget ):
     def _clear_all_highlights (self ):
         for category ,btn in self .menu_buttons .items ():
             btn .setProperty ("active",False )
+            btn .setProperty ("hovered",False )
             btn .style ().unpolish (btn )
             btn .style ().polish (btn )
     def _update_button_highlight (self ,category ,active ):
