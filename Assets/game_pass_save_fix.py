@@ -180,14 +180,14 @@ class GamePassSaveFixWidget (QWidget ):
     def run_save_extractor (self ):
         import gc 
         try :
-            import xgp_save_extract as extractor
+            import xgp_save_extract as extractor 
             extractor .main (self .xgp_source_folder )
             zip_files =[f for f in os .listdir (base_dir )if f .startswith ("palworld_")and f .endswith (".zip")]
             if not zip_files :return 
             valid_zip_path =max ([os .path .join (base_dir ,f )for f in zip_files ],key =os .path .getsize )
             if os .path .exists ("./saves"):shutil .rmtree ("./saves")
             if not self .unzip_file (valid_zip_path ,"./saves"):
-                return
+                return 
             backup_dir =os .path .join (root_dir ,"XGP_converted_saves")
             os .makedirs (backup_dir ,exist_ok =True )
             for f in zip_files :

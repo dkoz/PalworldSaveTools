@@ -93,23 +93,20 @@ def find_user_containers (pkg_name :str )->List [Tuple [int |str ,Path ]]:
 def find_user_containers_from_path (wgs_dir :Path )->List [Tuple [int |str ,Path ]]:
     if not wgs_dir .is_dir ():
         return []
-    # Check if this directory itself is a user container directory
-    if (wgs_dir / "containers.index").exists():
-        # Treat this as a single user directory
-        user_id = 0  # dummy
-        user_name = get_xbox_user_name(user_id) or "User"
-        return [(user_name, wgs_dir)]
-    # Otherwise, scan for user subdirectories
-    has_backups =False
+    if (wgs_dir /"containers.index").exists ():
+        user_id =0 
+        user_name =get_xbox_user_name (user_id )or "User"
+        return [(user_name ,wgs_dir )]
+    has_backups =False 
     valid_user_dirs =[]
     for entry in wgs_dir .iterdir ():
         if not entry .is_dir ():
-            continue
+            continue 
         if entry .name =="t":
-            continue
+            continue 
         if "backup"in entry .name :
-            has_backups =True
-            continue
+            has_backups =True 
+            continue 
         if len (entry .name .split ("_"))==2 :
             valid_user_dirs .append (entry )
     if has_backups :
@@ -123,7 +120,7 @@ def find_user_containers_from_path (wgs_dir :Path )->List [Tuple [int |str ,Path
         user_id =int (user_id_hex ,16 )
         user_name =get_xbox_user_name (user_id )
         user_dirs .append ((user_name or user_id ,valid_user_dir ))
-    return user_dirs
+    return user_dirs 
 def read_user_containers (user_wgs_dir :Path )->Tuple [str ,List [Dict [str ,Any ]]]:
     containers_dir =user_wgs_dir 
     containers_idx_path =containers_dir /"containers.index"
@@ -318,5 +315,5 @@ def main (wgs_path =None ):
             print (f"Failed to extract saves:")
             traceback .print_exc ()
             print ()
-    return zip_full_path
+    return zip_full_path 
 if __name__ =="__main__":main ()

@@ -648,8 +648,28 @@ class MainWindow (QMainWindow ):
         menu .exec (panel .tree .viewport ().mapToGlobal (pos ))
     def _load_save (self ):
         if constants .loaded_level_json is not None :
-            self ._restart_program ()
-            return 
+            constants .loaded_level_json =None 
+            constants .current_save_path =None 
+            constants .backup_save_path =None 
+            constants .srcGuildMapping =None 
+            constants .base_guild_lookup ={}
+            constants .files_to_delete =set ()
+            constants .PLAYER_PAL_COUNTS ={}
+            constants .player_levels ={}
+            constants .PLAYER_DETAILS_CACHE ={}
+            constants .PLAYER_REMAPS ={}
+            constants .exclusions ={}
+            constants .selected_source_player =None 
+            constants .dps_executor =None 
+            constants .dps_futures =[]
+            constants .dps_tasks =[]
+            constants .original_loaded_level_json =None 
+            try :
+                from palobject import MappingCacheObject 
+                MappingCacheObject ._MappingCacheInstances .clear ()
+            except ImportError :
+                from ..palobject import MappingCacheObject 
+                MappingCacheObject ._MappingCacheInstances .clear ()
         save_manager .load_save (parent =self )
     def _restart_program (self ):
         import sys 

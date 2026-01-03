@@ -14,7 +14,6 @@ try :
 except ImportError :
     from ..import constants 
 def get_assets_path ():
-
     env =os .environ .get ("ASSETS_PATH")
     if env :
         return os .path .abspath (env )
@@ -31,7 +30,6 @@ def get_assets_path ():
         return base 
     return os .path .abspath (base )
 def load_tool_icons ():
-
     icon_file =os .path .join (get_assets_path (),"data","configs","toolicon.json")
     if not os .path .exists (icon_file ):
         return {}
@@ -54,7 +52,6 @@ MANAGEMENT_TOOL_KEYS =[
 "tool.restore_map",
 ]
 def center_on_parent (dialog ):
-
     from PySide6 .QtWidgets import QApplication 
     screen =QApplication .primaryScreen ().availableGeometry ()
     size =dialog .sizeHint ()
@@ -63,7 +60,6 @@ def center_on_parent (dialog ):
         size =dialog .size ()
     dialog .move ((screen .width ()-size .width ())//2 ,(screen .height ()-size .height ())//2 )
 class ConversionOptionsDialog (QDialog ):
-
     def __init__ (self ,parent =None ):
         super ().__init__ (parent )
         self .selected_option =None 
@@ -147,7 +143,6 @@ class ToolButton (QWidget ):
         self ._animate_hover (False )
         super ().leaveEvent (event )
     def _animate_hover (self ,hovering ):
-
         if not hasattr (self ,'_bg_animation'):
             self ._bg_animation =QPropertyAnimation (self ,b"bg_opacity")
             self ._bg_animation .setDuration (200 )
@@ -180,7 +175,6 @@ class ToolButton (QWidget ):
     bg_opacity =property (get_bg_opacity ,set_bg_opacity )
     text_opacity =property (get_text_opacity ,set_text_opacity )
     def paintEvent (self ,event ):
-
         from PySide6 .QtGui import QPainter ,QColor ,QPen ,QPainterPath 
         from PySide6 .QtCore import QRectF 
         painter =QPainter (self )
@@ -256,7 +250,6 @@ class ToolsTab (QWidget ):
         scroll .setWidget (content )
         main_layout .addWidget (scroll ,1 )
     def _get_tool_icon_path (self ,tool_key ):
-
         if tool_key in self .tool_icons :
             icon_name =self .tool_icons [tool_key ]
             icon_dir =os .path .join (get_assets_path (),"data","icon")
@@ -330,7 +323,6 @@ class ToolsTab (QWidget ):
         except Exception as e :
             print (f"Error running management tool {index }: {e }")
     def _animate_dialog_slide_in (self ,dialog ):
-
         if dialog is None :
             return 
         dialog .adjustSize ()
@@ -348,4 +340,4 @@ class ToolsTab (QWidget ):
             btn .text_label .setText (t (key )if t else key )
             btn .text_label .setToolTip (t (key )if t else key )
     def refresh (self ):
-        pass
+        pass 

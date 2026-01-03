@@ -4,7 +4,6 @@ from PySide6 .QtWidgets import QWidget ,QVBoxLayout ,QLabel
 from PySide6 .QtCore import Qt ,QTimer ,QPropertyAnimation ,QEasingCurve 
 from PySide6 .QtGui import QPixmap ,QMovie 
 class LoadingPopup (QWidget ):
-
     def __init__ (self ,parent =None ):
         super ().__init__ (parent ,Qt .Window |Qt .FramelessWindowHint |Qt .WindowStaysOnTopHint )
         self .setAttribute (Qt .WA_TranslucentBackground ,True )
@@ -13,7 +12,6 @@ class LoadingPopup (QWidget ):
         self .fade_animation =None 
         self ._is_visible =False 
     def _setup_ui (self ):
-
         layout =QVBoxLayout (self )
         layout .setContentsMargins (0 ,0 ,0 ,0 )
         self .gif_label =QLabel (self )
@@ -37,7 +35,6 @@ class LoadingPopup (QWidget ):
             self ._show_fallback ()
         layout .addWidget (self .gif_label )
     def _get_gif_path (self ):
-
         if getattr (sys ,'frozen',False ):
             base_dir =os .path .dirname (sys .executable )
             assets_dir =os .path .join (base_dir ,'Assets')
@@ -47,7 +44,6 @@ class LoadingPopup (QWidget ):
         gif_path =os .path .join (assets_dir ,'data','gui','chillet-loading.gif')
         return gif_path 
     def _show_fallback (self ):
-
         self .gif_label .setText ("Loading...")
         self .gif_label .setStyleSheet ("""
             QLabel {
@@ -62,7 +58,6 @@ class LoadingPopup (QWidget ):
         """)
         self .setFixedSize (200 ,120 )
     def show_with_fade (self ):
-
         if self ._is_visible :
             return 
         self ._center_on_screen ()
@@ -76,7 +71,6 @@ class LoadingPopup (QWidget ):
         self .fade_animation .start ()
         self ._is_visible =True 
     def hide_with_fade (self ,on_complete =None ):
-
         if not self ._is_visible :
             if on_complete :
                 on_complete ()
@@ -94,7 +88,6 @@ class LoadingPopup (QWidget ):
         self .fade_animation .finished .connect (on_fade_complete )
         self .fade_animation .start ()
     def _center_on_screen (self ):
-
         from PySide6 .QtWidgets import QApplication 
         screen =QApplication .primaryScreen ().availableGeometry ()
         size =self .size ()
@@ -102,7 +95,6 @@ class LoadingPopup (QWidget ):
         y =(screen .height ()-size .height ())//2 
         self .move (x ,y )
     def closeEvent (self ,event ):
-
         if hasattr (self ,'movie')and self .movie :
             self .movie .stop ()
         super ().closeEvent (event )

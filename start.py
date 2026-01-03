@@ -585,7 +585,6 @@ def update_gui_progress (step :int ,message :str ,pct :int =0 ):
         except Exception :
             pass 
 def spawn_aio_and_exit (venv_py :Path ):
-
     global splash_window ,app 
     try :
         if splash_window is not None :

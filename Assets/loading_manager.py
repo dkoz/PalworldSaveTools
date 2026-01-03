@@ -1,8 +1,8 @@
-import sys ,os ,time ,random ,subprocess ,threading ,json ,traceback
-import tkinter as tk
-from PySide6 .QtWidgets import QApplication ,QWidget ,QVBoxLayout ,QHBoxLayout ,QFrame ,QLabel ,QPushButton ,QTextEdit ,QGraphicsOpacityEffect ,QMessageBox ,QProgressBar ,QDialog
-from PySide6 .QtCore import Qt ,QTimer ,QThread ,Signal ,QPropertyAnimation ,QPoint ,QSize
-from PySide6 .QtGui import QPixmap ,QFont
+import sys ,os ,time ,random ,subprocess ,threading ,json ,traceback 
+import tkinter as tk 
+from PySide6 .QtWidgets import QApplication ,QWidget ,QVBoxLayout ,QHBoxLayout ,QFrame ,QLabel ,QPushButton ,QTextEdit ,QGraphicsOpacityEffect ,QMessageBox ,QProgressBar ,QDialog 
+from PySide6 .QtCore import Qt ,QTimer ,QThread ,Signal ,QPropertyAnimation ,QPoint ,QSize 
+from PySide6 .QtGui import QPixmap ,QFont 
 from import_libs import *
 _result_data ={"status":"idle","data":None }
 def get_base_directory ():
