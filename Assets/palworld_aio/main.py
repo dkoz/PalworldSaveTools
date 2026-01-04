@@ -6,14 +6,14 @@ os .environ ['QT_DEBUG_PLUGINS']='0'
 if getattr (sys ,'frozen',False ):
     class MockLogger :
         def __getattr__ (self ,name ):
-            return lambda *args ,**kwargs :None 
+            return lambda *args ,**kwargs :None
         def remove (self ):
-            pass 
+            pass
         def add (self ,*args ,**kwargs ):
-            pass 
+            pass
     sys .modules ['loguru']=type ('MockModule',(),{'logger':MockLogger ()})()
     sys .modules ['loguru.logger']=MockLogger ()
-    import io 
+    import io
     class MockStdin :
         def read (self ,size =-1 ):
             return ""
@@ -24,8 +24,9 @@ if getattr (sys ,'frozen',False ):
         def __iter__ (self ):
             return iter ([])
         def __next__ (self ):
-            raise StopIteration 
-    sys .stdin =MockStdin ()
+            raise StopIteration
+    if "--spawn-loader"not in sys .argv :
+        sys .stdin =MockStdin ()
     sys .stdout =io .StringIO ()
     sys .stderr =io .StringIO ()
 if getattr (sys ,'frozen',False ):
