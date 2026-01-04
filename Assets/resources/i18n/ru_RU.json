@@ -636,5 +636,6 @@
   "map.info.base_camps": "Базовые лагеря:",
   "map.info.base_id": "ID базы:",
   "map.info.location": "Местоположение:",
-  "slot.path_placeholder": "Путь к Level.sav"
+  "slot.path_placeholder": "Путь к Level.sav",
+  "github.tooltip": "Нажмите, чтобы открыть репозиторий GitHub"
 }

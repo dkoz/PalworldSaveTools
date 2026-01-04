@@ -639,5 +639,6 @@
   "map.info.base_camps": "基地营地:",
   "map.info.base_id": "基地ID:",
   "map.info.location": "位置:",
-  "slot.path_placeholder": "Level.sav路径"
+  "slot.path_placeholder": "Level.sav路径",
+  "github.tooltip": "点击打开 GitHub 仓库"
 }

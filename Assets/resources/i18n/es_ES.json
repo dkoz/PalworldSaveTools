@@ -629,5 +629,6 @@
   "map.info.base_camps": "Campamentos base:",
   "map.info.base_id": "ID base:",
   "map.info.location": "Ubicación:",
-  "slot.path_placeholder": "Ruta a Level.sav"
+  "slot.path_placeholder": "Ruta a Level.sav",
+  "github.tooltip": "Haz clic para abrir el repositorio de GitHub"
 }

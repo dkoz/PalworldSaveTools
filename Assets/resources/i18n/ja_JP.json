@@ -645,5 +645,6 @@
   "map.info.base_camps": "ベースキャンプ:",
   "map.info.base_id": "ベースID:",
   "map.info.location": "場所:",
-  "slot.path_placeholder": "Level.savへのパス"
+  "slot.path_placeholder": "Level.savへのパス",
+  "github.tooltip": "クリックしてGitHubリポジトリを開く"
 }

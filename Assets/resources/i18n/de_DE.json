@@ -639,5 +639,6 @@
   "map.info.base_camps": "Basislager:",
   "map.info.base_id": "Basis-ID:",
   "map.info.location": "Standort:",
-  "slot.path_placeholder": "Pfad zu Level.sav"
+  "slot.path_placeholder": "Pfad zu Level.sav",
+  "github.tooltip": "Klicke, um das GitHub-Repository zu öffnen"
 }

@@ -77,7 +77,7 @@ class HeaderWidget (QWidget ):
         self .app_version_label .setObjectName ("versionChip")
         self .app_version_label .setCursor (QCursor (Qt .PointingHandCursor ))
         self .app_version_label .setFont (QFont ("Hack Nerd Font",11 ))
-        self .app_version_label .setToolTip ("Click to open GitHub repository")
+        self .app_version_label .setToolTip (t ("github.tooltip")if t else "Click to open GitHub repository")
         self .app_version_label .mousePressEvent =self ._open_github 
         layout .addWidget (self .app_version_label ,alignment =Qt .AlignVCenter )
         self .game_version_label =QLabel (f"{nf .icons ['nf-fa-save']} {game_version }")
@@ -221,6 +221,8 @@ class HeaderWidget (QWidget ):
             self .maximize_btn .setToolTip (t ("button.maximize")if t else "Maximize")
         if hasattr (self ,'close_btn'):
             self .close_btn .setToolTip (t ("button.close")if t else "Close")
+        if hasattr (self ,'app_version_label'):
+            self .app_version_label .setToolTip (t ("github.tooltip")if t else "Click to open GitHub repository")
     def set_menu_actions (self ,actions_dict ):
         from ..widgets import MenuPopup 
         if self ._menu_popup is None :
@@ -230,4 +232,4 @@ class HeaderWidget (QWidget ):
         from ..widgets import MenuPopup 
         if self ._menu_popup is None :
             self ._menu_popup =MenuPopup (self )
-        return self ._menu_popup 
+        return self ._menu_popup

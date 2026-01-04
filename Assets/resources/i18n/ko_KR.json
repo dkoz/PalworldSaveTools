@@ -639,5 +639,6 @@
   "map.info.base_camps": "기지 캠프:",
   "map.info.base_id": "기지 ID:",
   "map.info.location": "위치:",
-  "slot.path_placeholder": "Level.sav 경로"
+  "slot.path_placeholder": "Level.sav 경로",
+  "github.tooltip": "클릭하여 GitHub 저장소를 엽니다"
 }

@@ -619,5 +619,6 @@
   "map.info.base_camps": "Camps de base:",
   "map.info.base_id": "ID base:",
   "map.info.location": "Localisation:",
-  "slot.path_placeholder": "Chemin vers Level.sav"
+  "slot.path_placeholder": "Chemin vers Level.sav",
+  "github.tooltip": "Cliquez pour ouvrir le dépôt GitHub"
 }

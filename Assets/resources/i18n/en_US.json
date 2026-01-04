@@ -711,5 +711,6 @@
   "map.info.members": "Members:",
   "map.info.base_camps": "Base Camps:",
   "map.info.base_id": "Base ID:",
-  "map.info.location": "Location:"
+  "map.info.location": "Location:",
+  "github.tooltip": "Click to open GitHub repository"
 }
