@@ -63,7 +63,7 @@ class DetachedStatusWindow (QWidget ):
     def __init__ (self ,parent =None ):
         super ().__init__ ()
         self .parent =parent 
-        self .setWindowFlags (Qt .Window |Qt .FramelessWindowHint |Qt .WindowStaysOnTopHint |Qt .Tool )
+        self .setWindowFlags (Qt .Window |Qt .FramelessWindowHint |Qt .Tool )
         self .setAttribute (Qt .WA_TranslucentBackground )
         self .setMinimumSize (600 ,400 )
         self ._drag_pos =QPoint ()
@@ -124,9 +124,9 @@ class DetachedStatusWindow (QWidget ):
     def setup_status_ui (self ):
         head =QHBoxLayout ()
         txt_color ="#dfeefc"if self .is_dark else "#000000"
-        title_label =QLabel ("Console")
-        title_label .setStyleSheet (f"font-weight: bold; font-size: 14px; color: {txt_color};")
-        head .addWidget (title_label )
+        self .title_label =QLabel ("Console")
+        self .title_label .setStyleSheet (f"font-weight: bold; font-size: 14px; color: {txt_color};")
+        head .addWidget (self .title_label )
         head .addStretch ()
         self .close_btn =QPushButton ("✕")
         self .close_btn .setFixedSize (40 ,40 )
@@ -138,6 +138,11 @@ class DetachedStatusWindow (QWidget ):
         self .text_edit .setReadOnly (True )
         self .text_edit .setObjectName ("consoleTextEdit")
         self .inner .addWidget (self .text_edit )
+    def update_theme (self ,is_dark ):
+        self .is_dark =is_dark 
+        self ._load_theme ()
+        txt_color ="#dfeefc"if self .is_dark else "#000000"
+        self .title_label .setStyleSheet (f"font-weight: bold; font-size: 14px; color: {txt_color};")
     def append_message (self ,text ):
         self .text_edit .append (text )
         document =self .text_edit .document ()
@@ -572,6 +577,9 @@ class MainWindow (QMainWindow ):
         # Apply theme changes to results widget and stats panel
         if hasattr (self ,'results_widget'):
             self .results_widget .set_theme (self .is_dark_mode )
+        # Update detached console window if open
+        if self .status_stream .detach_window :
+            self .status_stream .detach_window .update_theme (self .is_dark_mode )
     def _toggle_dashboard (self ):
         if self ._dashboard_collapsed :
             self .results_widget .show ()

@@ -430,10 +430,11 @@ QTabBar::tab {
     border-bottom: none;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
-    padding: 8px 16px;
+    padding: 10px 18px;
     margin-right: 2px;
     color: #2C3E50;
     font-weight: 600;
+    font-size: 11px;
 }
 
 /* Custom tab bar styling for separate tab bar */
@@ -527,14 +528,21 @@ QWidget#statsGrid {
 
 QLabel#statsHeader {
     color: #1A202C;
+    font-weight: 700;
+    font-size: 11px;
+    padding: 6px;
 }
 
 QLabel#statsField {
     color: #4A5568;
+    font-weight: 600;
+    font-size: 10px;
 }
 
 QLabel#statsValue {
     color: #1A202C;
+    font-weight: 700;
+    font-size: 12px;
 }
 
 /* ===== Results Panel Refinement ===== */
