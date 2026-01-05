@@ -63,7 +63,7 @@ class DetachedStatusWindow (QWidget ):
     def __init__ (self ,parent =None ):
         super ().__init__ ()
         self .parent =parent 
-        self .setWindowFlags (Qt .Window |Qt .FramelessWindowHint |Qt .Tool |Qt .WindowStaysOnTopHint )
+        self .setWindowFlags (Qt .Window |Qt .FramelessWindowHint |Qt .Tool )
         self .setAttribute (Qt .WA_TranslucentBackground )
         self .setMinimumSize (600 ,400 )
         self ._drag_pos =QPoint ()
