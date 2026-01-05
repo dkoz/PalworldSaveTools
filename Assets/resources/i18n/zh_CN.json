@@ -640,6 +640,7 @@
   "map.info.base_id": "基地ID:",
   "map.info.location": "位置:",
   "slot.path_placeholder": "Level.sav路径",
+<<<<<<< HEAD
   "github.tooltip": "点击打开 GitHub 仓库",
   "paldefender.title": "生成 PalDefender killnearestbase 命令",
   "confirm.delete_guild_title": "确认删除公会",
@@ -673,4 +674,7 @@
   "tool.convert.done": "转换完成",
   "tool.convert.level_done": "已将 {source} 转换为 {target}",
   "tool.convert.players_done": "已转换 {count} 个玩家文件"
+=======
+  "github.tooltip": "点击打开 GitHub 仓库"
+>>>>>>> 9f54371633b5deb9bf5a084f7b704155041a4caf
 }

@@ -646,6 +646,7 @@
   "map.info.base_id": "ベースID:",
   "map.info.location": "場所:",
   "slot.path_placeholder": "Level.savへのパス",
+<<<<<<< HEAD
   "github.tooltip": "クリックしてGitHubリポジトリを開く",
   "paldefender.title": "PalDefender killnearestbase コマンドを生成",
   "confirm.delete_guild_title": "ギルド削除の確認",
@@ -704,4 +705,7 @@
   "tool.convert.done": "変換完了",
   "tool.convert.level_done": "{source} を {target} に変換しました",
   "tool.convert.players_done": "{count} 個のプレイヤーファイルを変換しました"
+=======
+  "github.tooltip": "クリックしてGitHubリポジトリを開く"
+>>>>>>> 9f54371633b5deb9bf5a084f7b704155041a4caf
 }

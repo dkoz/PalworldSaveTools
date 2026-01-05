@@ -692,6 +692,7 @@
 "deletion.guild_deleted": "Guild deleted",
 "deletion.base_deleted": "Base deleted",
 "guild.leader_changed": "Guild leader changed",
+<<<<<<< HEAD
 "paldefender.title": "Generate PalDefender killnearestbase Commands",
 "confirm.delete_guild_title": "Confirm Delete Guild",
 "confirm.delete_guild_msg": "Delete guild \"{name}\" and all {count} bases?\n\nThis will also delete all characters owned by guild members.",
@@ -718,6 +719,9 @@
 "exclusions.add_title": "Add to Exclusions",
 "exclusions.remove_title": "Remove from Exclusions",
 "restore_map.source": "Restore Source: {file}",
+=======
+  "restore_map.source": "Restore Source: {file}",
+>>>>>>> 9f54371633b5deb9bf5a084f7b704155041a4caf
   "character_transfer.source_players": "Source Players",
   "character_transfer.target_players": "Target Players",
   "character_transfer.tip": "Tip: Select source and target players, then press Transfer. Use 'Save Changes' to persist.",
@@ -737,6 +741,7 @@
   "map.info.base_camps": "Base Camps:",
   "map.info.base_id": "Base ID:",
   "map.info.location": "Location:",
+<<<<<<< HEAD
   "github.tooltip": "Click to open GitHub repository",
   "anti_air_reset_count": "Reset {count} anti-air turrets",
   "dungeons_reset_count": "Reset {count} dungeons",
@@ -766,4 +771,7 @@
   "tool.convert.done": "Conversion Done",
   "tool.convert.level_done": "{source} converted to {target}",
   "tool.convert.players_done": "Converted {count} player files."
+=======
+  "github.tooltip": "Click to open GitHub repository"
+>>>>>>> 9f54371633b5deb9bf5a084f7b704155041a4caf
 }

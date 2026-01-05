@@ -622,6 +622,7 @@ class MainWindow (QMainWindow ):
             self .refresh_all ()
             self .results_widget .refresh_stats_before ()
             self .status_bar .showMessage (t ('status.loaded')if t else 'Save loaded successfully',5000 )
+<<<<<<< HEAD
             msg_box =QMessageBox (self )
             msg_box .setWindowTitle (t ('success.title'))
             msg_box .setText (t ('save.loaded'))
@@ -636,6 +637,12 @@ class MainWindow (QMainWindow ):
             msg_box .setIcon (QMessageBox .Critical )
             msg_box .addButton (t ('button.ok'),QMessageBox .AcceptRole )
             msg_box .exec ()
+=======
+            QMessageBox .information (self ,t ('success.title'),t ('save.loaded'))
+        else :
+            self .status_bar .showMessage (t ('status.load_failed')if t else 'Failed to load save',5000 )
+            QMessageBox .critical (self ,t ('error.title'),t ('save.load_failed'))
+>>>>>>> 9f54371633b5deb9bf5a084f7b704155041a4caf
     def _on_save_finished (self ,duration ):
         self .status_bar .showMessage (f"{t ('status.saved')if t else 'Save completed'} ({duration :.2f}s)",5000 )
         msg_box =QMessageBox (self )
@@ -964,7 +971,11 @@ class MainWindow (QMainWindow ):
                 if delete_base_camp (b ,gid ):
                     cnt +=1 
         if cnt >0 :
+<<<<<<< HEAD
             QMessageBox .information (self ,t ('Done'),t ('orphaned_bases_deleted',count =cnt ))
+=======
+            QMessageBox .information (self ,t ('Done'),f'Deleted {cnt } orphaned bases')
+>>>>>>> 9f54371633b5deb9bf5a084f7b704155041a4caf
     def _delete_duplicate_players (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))

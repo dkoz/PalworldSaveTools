@@ -637,6 +637,7 @@
   "map.info.base_id": "ID базы:",
   "map.info.location": "Местоположение:",
   "slot.path_placeholder": "Путь к Level.sav",
+<<<<<<< HEAD
   "github.tooltip": "Нажмите, чтобы открыть репозиторий GitHub",
   "paldefender.title": "Создать команды PalDefender killnearestbase",
   "confirm.delete_guild_title": "Подтвердить удаление гильдии",
@@ -670,4 +671,7 @@
   "tool.convert.done": "Преобразование завершено",
   "tool.convert.level_done": "Преобразовано {source} в {target}",
   "tool.convert.players_done": "Преобразовано {count} файлов игроков."
+=======
+  "github.tooltip": "Нажмите, чтобы открыть репозиторий GitHub"
+>>>>>>> 9f54371633b5deb9bf5a084f7b704155041a4caf
 }

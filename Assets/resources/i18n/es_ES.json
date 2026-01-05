@@ -630,6 +630,7 @@
   "map.info.base_id": "ID base:",
   "map.info.location": "Ubicación:",
   "slot.path_placeholder": "Ruta a Level.sav",
+<<<<<<< HEAD
   "github.tooltip": "Haz clic para abrir el repositorio de GitHub",
   "paldefender.title": "Generar comandos de PalDefender killnearestbase",
   "confirm.delete_guild_title": "Confirmar eliminación de gremio",
@@ -663,4 +664,7 @@
   "tool.convert.done": "Conversión completada",
   "tool.convert.level_done": "Convertido {source} a {target}",
   "tool.convert.players_done": "Convertidos {count} archivos de jugadores."
+=======
+  "github.tooltip": "Haz clic para abrir el repositorio de GitHub"
+>>>>>>> 9f54371633b5deb9bf5a084f7b704155041a4caf
 }

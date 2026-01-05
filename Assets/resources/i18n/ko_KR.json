@@ -640,6 +640,7 @@
   "map.info.base_id": "기지 ID:",
   "map.info.location": "위치:",
   "slot.path_placeholder": "Level.sav 경로",
+<<<<<<< HEAD
   "github.tooltip": "클릭하여 GitHub 저장소를 엽니다",
   "paldefender.title": "PalDefender killnearestbase 명령 생성",
   "confirm.delete_guild_title": "길드 삭제 확인",
@@ -673,4 +674,7 @@
   "tool.convert.done": "변환 완료",
   "tool.convert.level_done": "{source}을(를) {target}로 변환했습니다",
   "tool.convert.players_done": "{count}개의 플레이어 파일을 변환했습니다"
+=======
+  "github.tooltip": "클릭하여 GitHub 저장소를 엽니다"
+>>>>>>> 9f54371633b5deb9bf5a084f7b704155041a4caf
 }
