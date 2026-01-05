@@ -13,7 +13,7 @@ QPushButton ,QFrame ,QMenuBar ,QMenu ,QStatusBar ,
 QSplitter ,QMessageBox ,QFileDialog ,QInputDialog ,QDialog ,QCheckBox ,QComboBox ,QApplication ,
 QStackedWidget ,QTextEdit
 )
-from PySide6 .QtCore import Qt ,QTimer ,Signal ,QObject ,QPoint
+from PySide6 .QtCore import Qt ,QTimer ,Signal ,QObject ,QPoint ,QPropertyAnimation ,QEasingCurve
 from PySide6 .QtGui import QIcon ,QFont ,QAction ,QPixmap ,QCloseEvent ,QTextCursor
 from i18n import t ,set_language ,load_resources
 from common import get_versions
@@ -181,7 +181,15 @@ class StatusBarStream (QObject ):
         if not self .detached :
             self .detached =True 
             self .detach_window =DetachedStatusWindow (self .parent )
+            self .detach_window .setWindowOpacity (0.0 )
             self .detach_window .show ()
+            # Add fade-in animation
+            self .detach_window .fade_animation =QPropertyAnimation (self .detach_window ,b"windowOpacity")
+            self .detach_window .fade_animation .setDuration (300 )
+            self .detach_window .fade_animation .setStartValue (0.0 )
+            self .detach_window .fade_animation .setEndValue (1.0 )
+            self .detach_window .fade_animation .setEasingCurve (QEasingCurve .InOutQuad )
+            self .detach_window .fade_animation .start ()
             self .detach_state_changed .emit (True )
     def attach (self ):
         if self .detached :
