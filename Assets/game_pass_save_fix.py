@@ -112,6 +112,11 @@ class GamePassSaveFixWidget (QWidget ):
     def closeEvent (self ,event ):
         shutil .rmtree (os .path .join (root_dir ,"saves"),ignore_errors =True )
         event .accept ()
+    def keyPressEvent (self ,event ):
+        if event .key ()==Qt .Key_Escape :
+            self .close ()
+        else :
+            super ().keyPressEvent (event )
     def get_save_game_pass (self ):
         default =os .path .expandvars (r"%LOCALAPPDATA%\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData\wgs")
         folder =QFileDialog .getExistingDirectory (self ,"Select XGP Save Folder",default )
@@ -180,14 +185,14 @@ class GamePassSaveFixWidget (QWidget ):
         saveFolders =self .list_folders_in_directory ("./saves")
         if not saveFolders :
             print ("No save files found")
-            return
+            return 
         saveList =[]
-        successful =0
+        successful =0 
         for saveName in saveFolders :
             name =self .convert_sav_JSON (saveName )
             if name :
                 saveList .append (name )
-                successful +=1
+                successful +=1 
         self .update_combobox_signal .emit (saveList )
         print ("Choose a save to convert:")
         total =len (saveFolders )

@@ -147,8 +147,8 @@ QWidget.toolRow {
     margin: 4px 0px;
 }
 QWidget.toolRow:hover {
-    background: rgba(37,150,190,0.1);
-    border: 2px solid #2596be;
+    background: rgba(37,150,190,0.08);
+    border: 2px solid rgba(125,211,252,0.2);
 }
 
 
@@ -287,7 +287,8 @@ QFrame#treePanel {
 }
 
 QTreeWidget QHeaderView::section:hover {
-    background-color: rgba(37,99,235,0.2);
+    background-color: rgba(37,99,235,0.35);
+    color: #B8E4FF;
 }
 
 /* QProgressBar */
@@ -745,6 +746,7 @@ QTreeWidget#searchTree QHeaderView::section {
 
 QTreeWidget#searchTree QHeaderView::section:hover {
     background-color: rgba(37,99,235,0.25);
+    color: #AEE9FF;
 }
 
 /* ===== Loading Window Styles ===== */

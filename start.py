@@ -1,19 +1,19 @@
-from __future__ import annotations
-import os
-import sys
-import subprocess
-import threading
-import queue
-import time
-import traceback
-import tempfile
-import json
-import signal
-import atexit
-from pathlib import Path
-from packaging .requirements import Requirement
-from importlib .metadata import version ,PackageNotFoundError
-from typing import Optional ,Tuple
+from __future__ import annotations 
+import os 
+import sys 
+import subprocess 
+import threading 
+import queue 
+import time 
+import traceback 
+import tempfile 
+import json 
+import signal 
+import atexit 
+from pathlib import Path 
+from packaging .requirements import Requirement 
+from importlib .metadata import version ,PackageNotFoundError 
+from typing import Optional ,Tuple 
 PROJECT_DIR =Path (__file__ ).resolve ().parent 
 if os .environ .get ("PST_NO_GUI","")in ("1","true","True"):
     GUI_AVAILABLE =False 
@@ -184,20 +184,20 @@ QProgressBar::chunk {
     border-radius: 8px;
 }
 """
-app =None
-splash_window =None
-short_label :Optional ["QLabel"]=None
-tiny_label :Optional ["QLabel"]=None
-gui_progress_bar :Optional ["QProgressBar"]=None
-_logo_original_pixmap :Optional ["QPixmap"]=None
-_target_pct =0
-_displayed_pct =0
-_tick_timer =None
-_install_timer =None
-_joke_timer =None
-_last_real_pct :Optional [int ]=None
-_current_step =0
-_worker_thread :Optional [threading .Thread ]=None
+app =None 
+splash_window =None 
+short_label :Optional ["QLabel"]=None 
+tiny_label :Optional ["QLabel"]=None 
+gui_progress_bar :Optional ["QProgressBar"]=None 
+_logo_original_pixmap :Optional ["QPixmap"]=None 
+_target_pct =0 
+_displayed_pct =0 
+_tick_timer =None 
+_install_timer =None 
+_joke_timer =None 
+_last_real_pct :Optional [int ]=None 
+_current_step =0 
+_worker_thread :Optional [threading .Thread ]=None 
 child_procs =[]
 def cleanup_children ():
     for p in child_procs [:]:

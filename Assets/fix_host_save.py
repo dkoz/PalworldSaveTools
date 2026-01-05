@@ -323,6 +323,11 @@ class FixHostSaveWindow (QWidget ):
         self .old_tree .itemSelectionChanged .connect (self .update_source_selection )
         self .new_tree .itemSelectionChanged .connect (self .update_target_selection )
         QTimer .singleShot (0 ,lambda :center_window (self ))
+    def keyPressEvent (self ,event ):
+        if event .key ()==Qt .Key_Escape :
+            self .close ()
+        else :
+            super ().keyPressEvent (event )
     def update_source_selection (self ):
         selected =self .old_tree .selectedItems ()
         if selected :

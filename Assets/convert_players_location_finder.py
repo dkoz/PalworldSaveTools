@@ -44,23 +44,23 @@ def convert_players_location_finder (ext ):
         print ("No valid files found for conversion.")
         return True 
     loop =QEventLoop ()
-    converted_count =0
+    converted_count =0 
     def task ():
-        nonlocal converted_count
+        nonlocal converted_count 
         for src ,dst in files_to_convert :
             if ext =="sav":
                 convert_json_to_sav (src ,dst )
             else :
                 convert_sav_to_json (src ,dst )
             print (f"Converted {src } to {dst }")
-            converted_count +=1
+            converted_count +=1 
         gc .collect ()
     run_with_loading (lambda _ :loop .quit (),task )
     loop .exec ()
     time .sleep (0.5 )
-    from PySide6 .QtWidgets import QMessageBox
+    from PySide6 .QtWidgets import QMessageBox 
     QMessageBox .information (None ,t ("tool.convert.done"),t ("tool.convert.players_done",count =converted_count ))
-    return True
+    return True 
 def main ():
     if len (sys .argv )!=2 or sys .argv [1 ]not in ["sav","json"]:
         print ("Usage: script.py <sav|json>")

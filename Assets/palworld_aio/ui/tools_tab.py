@@ -43,13 +43,13 @@ CONVERTING_TOOL_KEYS =[
 "tool.convert.saves",
 "tool.convert.gamepass.steam",
 "tool.convert.steamid",
+"tool.restore_map",
 ]
 MANAGEMENT_TOOL_KEYS =[
 "tool.slot_injector",
 "tool.modify_save",
 "tool.character_transfer",
 "tool.fix_host_save",
-"tool.restore_map",
 ]
 def center_window (win ):
     screen =QApplication .primaryScreen ().availableGeometry ()
@@ -78,24 +78,31 @@ def center_on_parent (dialog ):
 class ConversionOptionsDialog (QDialog ):
     def __init__ (self ,parent =None ):
         super ().__init__ (parent )
-        self .selected_option =None 
+        self .setAttribute (Qt .WA_StyledBackground ,True )
+        self .selected_option =None
         self .setWindowTitle (t ("tool.convert.saves")if t else "Convert Save Files")
         self .setModal (True )
         self .setFixedWidth (380 )
         self ._setup_ui ()
+        self ._load_theme ()
     def _setup_ui (self ):
-        layout =QVBoxLayout (self )
-        layout .setContentsMargins (16 ,16 ,16 ,16 )
-        layout .setSpacing (8 )
+        main_layout =QVBoxLayout (self )
+        main_layout .setContentsMargins (14 ,14 ,14 ,14 )
+        main_layout .setSpacing (12 )
+        glass =QFrame ()
+        glass .setObjectName ("glass")
+        glass_layout =QVBoxLayout (glass )
+        glass_layout .setContentsMargins (12 ,12 ,12 ,12 )
+        glass_layout .setSpacing (12 )
         title_label =QLabel (t ("tool.convert.saves")if t else "Convert Save Files")
-        title_label .setObjectName ("dialogTitle")
+        title_label .setFont (QFont ("Segoe UI",13 ,QFont .Bold ))
         title_label .setAlignment (Qt .AlignCenter )
-        layout .addWidget (title_label )
+        glass_layout .addWidget (title_label )
         separator =QFrame ()
         separator .setFrameShape (QFrame .HLine )
         separator .setObjectName ("dialogSeparator")
-        layout .addWidget (separator )
-        layout .addSpacing (4 )
+        glass_layout .addWidget (separator )
+        glass_layout .addSpacing (4 )
         options =[
         ("tool.convert.level.to_json",0 ),
         ("tool.convert.level.to_sav",1 ),
@@ -108,17 +115,47 @@ class ConversionOptionsDialog (QDialog ):
             btn .setFixedHeight (36 )
             btn .setCursor (QCursor (Qt .PointingHandCursor ))
             btn .clicked .connect (lambda checked ,idx =index :self ._on_option_selected (idx ))
-            layout .addWidget (btn )
-        layout .addSpacing (8 )
+            glass_layout .addWidget (btn )
+        glass_layout .addStretch (1 )
         cancel_btn =QPushButton (t ("Cancel")if t else "Cancel")
         cancel_btn .setObjectName ("dialogCancel")
-        cancel_btn .setFixedHeight (32 )
         cancel_btn .setCursor (QCursor (Qt .PointingHandCursor ))
         cancel_btn .clicked .connect (self .reject )
-        layout .addWidget (cancel_btn )
+        glass_layout .addWidget (cancel_btn ,alignment =Qt .AlignCenter )
+        main_layout .addWidget (glass )
     def _on_option_selected (self ,index ):
-        self .selected_option =index 
+        self .selected_option =index
         self .accept ()
+    def keyPressEvent (self ,event ):
+        if event .key ()==Qt .Key_Escape :
+            self .reject ()
+        else :
+            super ().keyPressEvent (event )
+    def _load_theme (self ):
+        is_dark =self .parent ().parent_window .is_dark_mode if self .parent ()and hasattr (self .parent (),'parent_window')else True
+        base_path =constants .get_assets_path ()if hasattr (constants ,'get_assets_path')else get_assets_path ()
+        theme_file ='darkmode.qss'if is_dark else 'lightmode.qss'
+        theme_path =os .path .join (base_path ,'data','gui',theme_file )
+        if os .path .exists (theme_path ):
+            try :
+                with open (theme_path ,'r',encoding ='utf-8')as f :
+                    qss_content =f .read ()
+                    self .setStyleSheet (qss_content )
+            except Exception as e :
+                print (f"Failed to load theme {theme_file }: {e }")
+                self ._apply_fallback_styles (is_dark )
+        else :
+            self ._apply_fallback_styles (is_dark )
+    def _apply_fallback_styles (self ,is_dark ):
+        if is_dark :
+            bg_gradient ="qlineargradient(spread:pad, x1:0.0, y1:0.0, x2:1.0, y2:1.0, stop:0 #07080a, stop:0.5 #08101a, stop:1 #05060a)"
+            txt_color ="#dfeefc"
+            accent_color ="#7DD3FC"
+        else :
+            bg_gradient ="qlineargradient(spread:pad, x1:0.0, y1:0.0, x2:1.0, y2:1.0, stop:0 #e6ecef, stop:0.5 #bdd5df, stop:1 #a7c9da)"
+            txt_color ="#000000"
+            accent_color ="#1e3a8a"
+        self .setStyleSheet (f"QDialog {{ background: {bg_gradient }; color: {txt_color }; font-family: 'Segoe UI', Roboto, Arial; }}")
 class ToolButton (QWidget ):
     clicked =Signal ()
     def __init__ (self ,label_text ,tooltip_text ,icon_path =None ,parent =None ):
@@ -128,6 +165,8 @@ class ToolButton (QWidget ):
         self .setMouseTracking (True )
         self .is_hovered =False 
         self .hover_animation =None 
+        self ._current_bg_opacity =0.0
+        self ._current_text_opacity =0.8
         layout =QHBoxLayout (self )
         layout .setContentsMargins (8 ,6 ,8 ,6 )
         layout .setSpacing (12 )
@@ -163,7 +202,7 @@ class ToolButton (QWidget ):
             self ._bg_animation =QPropertyAnimation (self ,b"bg_opacity")
             self ._bg_animation .setDuration (200 )
             self ._bg_animation .setEasingCurve (QEasingCurve .InOutQuad )
-        target_opacity =0.15 if hovering else 0.0 
+        target_opacity =0.3 if hovering else 0.0
         self ._bg_animation .setStartValue (self ._current_bg_opacity if hasattr (self ,'_current_bg_opacity')else 0.0 )
         self ._bg_animation .setEndValue (target_opacity )
         self ._bg_animation .start ()
@@ -197,7 +236,7 @@ class ToolButton (QWidget ):
         painter .setRenderHint (QPainter .Antialiasing )
         bg_opacity =self ._current_bg_opacity if hasattr (self ,'_current_bg_opacity')else 0.0 
         if bg_opacity >0 :
-            bg_color =QColor (125 ,211 ,252 ,int (bg_opacity *255 ))
+            bg_color =QColor (37 ,150 ,190 ,int (bg_opacity *255 ))
             painter .fillRect (self .rect (),bg_color )
         super ().paintEvent (event )
         icon_rect =self .icon_label .geometry ()
@@ -208,7 +247,7 @@ class ToolButton (QWidget ):
         if self .icon_label .pixmap ()and not self .icon_label .pixmap ().isNull ():
             painter .drawPixmap (icon_rect .topLeft (),self .icon_label .pixmap ())
         painter .restore ()
-        stroke_color =QColor (125 ,211 ,252 ,255 )
+        stroke_color =QColor (37 ,150 ,190 ,255 )
         stroke_pen =QPen (stroke_color )
         stroke_pen .setWidth (2 )
         path =QPainterPath ()
@@ -294,11 +333,12 @@ class ToolsTab (QWidget ):
             raise 
     def _run_converting_tool (self ,index ):
         try :
-            dialog =None 
+            dialog =None
             if index ==0 :
                 options_dialog =ConversionOptionsDialog (self )
-                center_window (options_dialog )
-                if options_dialog .exec ()==QDialog .Accepted and options_dialog .selected_option is not None :
+                self ._animate_dialog_slide_in (options_dialog )
+                result =options_dialog .exec ()
+                if result ==QDialog .Accepted and options_dialog .selected_option is not None :
                     if options_dialog .selected_option ==0 :
                         self ._import_and_call ("convert_level_location_finder","convert_level_location_finder","json")
                     elif options_dialog .selected_option ==1 :
@@ -311,6 +351,8 @@ class ToolsTab (QWidget ):
                 dialog =self ._import_and_call ("game_pass_save_fix","game_pass_save_fix")
             elif index ==2 :
                 dialog =self ._import_and_call ("convertids","convert_steam_id")
+            elif index ==3 :
+                dialog =self ._import_and_call ("restore_map","restore_map")
             if dialog is not None :
                 self ._animate_dialog_slide_in (dialog )
                 if not hasattr (self ,'_active_dialogs'):
@@ -320,7 +362,7 @@ class ToolsTab (QWidget ):
             print (f"Error running converting tool {index }: {e }")
     def _run_management_tool (self ,index ):
         try :
-            dialog =None 
+            dialog =None
             if index ==0 :
                 dialog =self ._import_and_call ("slot_injector","slot_injector")
             elif index ==1 :
@@ -329,8 +371,6 @@ class ToolsTab (QWidget ):
                 dialog =self ._import_and_call ("character_transfer","character_transfer")
             elif index ==3 :
                 dialog =self ._import_and_call ("fix_host_save","fix_host_save")
-            elif index ==4 :
-                dialog =self ._import_and_call ("restore_map","restore_map")
             if dialog is not None :
                 self ._animate_dialog_slide_in (dialog )
                 if not hasattr (self ,'_active_dialogs'):
@@ -340,9 +380,9 @@ class ToolsTab (QWidget ):
             print (f"Error running management tool {index }: {e }")
     def _animate_dialog_slide_in (self ,dialog ):
         if dialog is None :
-            return 
+            return
         dialog .adjustSize ()
-        center_on_parent (dialog )
+        center_window (dialog )
         dialog .setWindowOpacity (0.0 )
         dialog .show ()
         self .fade_animation =QPropertyAnimation (dialog ,b"windowOpacity")

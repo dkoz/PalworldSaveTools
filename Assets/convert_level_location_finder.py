@@ -48,9 +48,9 @@ def convert_level_location_finder (ext ):
     loop .exec ()
     time .sleep (0.5 )
     print (f"Converted {level_file } to {output_path }")
-    from PySide6 .QtWidgets import QMessageBox
+    from PySide6 .QtWidgets import QMessageBox 
     QMessageBox .information (None ,t ("tool.convert.done"),t ("tool.convert.level_done",source =level_file ,target =output_path ))
-    return True
+    return True 
 def main ():
     if len (sys .argv )!=2 or sys .argv [1 ]not in ["sav","json"]:
         print ("Usage: script.py <sav|json>")

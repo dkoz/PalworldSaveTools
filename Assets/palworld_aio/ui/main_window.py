@@ -1,24 +1,24 @@
-import os
-import json
-import webbrowser
-import urllib .request
-import re
-import io
-import sys
-from functools import partial
-from loguru import logger
+import os 
+import json 
+import webbrowser 
+import urllib .request 
+import re 
+import io 
+import sys 
+from functools import partial 
+from loguru import logger 
 from PySide6 .QtWidgets import (
 QMainWindow ,QWidget ,QVBoxLayout ,QHBoxLayout ,QLabel ,
 QPushButton ,QFrame ,QMenuBar ,QMenu ,QStatusBar ,
 QSplitter ,QMessageBox ,QFileDialog ,QInputDialog ,QDialog ,QCheckBox ,QComboBox ,QApplication ,
-QStackedWidget ,QTextEdit
+QStackedWidget ,QTextEdit 
 )
-from PySide6 .QtCore import Qt ,QTimer ,Signal ,QObject ,QPoint ,QPropertyAnimation ,QEasingCurve
-from PySide6 .QtGui import QIcon ,QFont ,QAction ,QPixmap ,QCloseEvent ,QTextCursor
-from i18n import t ,set_language ,load_resources
-from common import get_versions
-from import_libs import run_with_loading
-from .tools_tab import center_on_parent
+from PySide6 .QtCore import Qt ,QTimer ,Signal ,QObject ,QPoint ,QPropertyAnimation ,QEasingCurve 
+from PySide6 .QtGui import QIcon ,QFont ,QAction ,QPixmap ,QCloseEvent ,QTextCursor 
+from i18n import t ,set_language ,load_resources 
+from common import get_versions 
+from import_libs import run_with_loading 
+from .tools_tab import center_on_parent 
 GITHUB_RAW_URL ="https://raw.githubusercontent.com/deafdudecomputers/PalworldSaveTools/main/Assets/common.py"
 GITHUB_LATEST_ZIP ="https://github.com/deafdudecomputers/PalworldSaveTools/releases/latest"
 try :
@@ -58,7 +58,7 @@ except ImportError :
     from ..player_manager import rename_player 
     from ..map_generator import generate_world_map 
     from ..dialogs import InputDialog ,DaysInputDialog ,PalDefenderDialog 
-from ..widgets import SearchPanel ,StatsPanel
+from ..widgets import SearchPanel ,StatsPanel 
 class DetachedStatusWindow (QWidget ):
     def __init__ (self ,parent =None ):
         super ().__init__ ()
@@ -100,7 +100,8 @@ class DetachedStatusWindow (QWidget ):
             try :
                 with open (theme_path ,'r',encoding ='utf-8')as f :
                     qss_content =f .read ()
-                    self .setStyleSheet (qss_content )
+                    from PySide6 .QtWidgets import QApplication 
+                    QApplication .instance ().setStyleSheet (qss_content )
             except Exception as e :
                 print (f"Failed to load theme {theme_file }: {e }")
                 self ._apply_fallback_styles ()
@@ -125,7 +126,7 @@ class DetachedStatusWindow (QWidget ):
         head =QHBoxLayout ()
         txt_color ="#dfeefc"if self .is_dark else "#000000"
         self .title_label =QLabel ("Console")
-        self .title_label .setStyleSheet (f"font-weight: bold; font-size: 14px; color: {txt_color};")
+        self .title_label .setStyleSheet (f"font-weight: bold; font-size: 14px; color: {txt_color };")
         head .addWidget (self .title_label )
         head .addStretch ()
         self .close_btn =QPushButton ("✕")
@@ -142,7 +143,7 @@ class DetachedStatusWindow (QWidget ):
         self .is_dark =is_dark 
         self ._load_theme ()
         txt_color ="#dfeefc"if self .is_dark else "#000000"
-        self .title_label .setStyleSheet (f"font-weight: bold; font-size: 14px; color: {txt_color};")
+        self .title_label .setStyleSheet (f"font-weight: bold; font-size: 14px; color: {txt_color };")
     def append_message (self ,text ):
         self .text_edit .append (text )
         document =self .text_edit .document ()
@@ -156,8 +157,8 @@ class DetachedStatusWindow (QWidget ):
         self .text_edit .setTextCursor (cursor )
     def closeEvent (self ,event ):
         if self .parent and hasattr (self .parent ,'status_stream'):
-            self .parent .status_stream .detach_window =None
-            self .parent .status_stream .detached =False
+            self .parent .status_stream .detach_window =None 
+            self .parent .status_stream .detached =False 
             self .parent .status_stream .detach_state_changed .emit (False )
         event .accept ()
 class StatusBarStream (QObject ):
@@ -165,7 +166,7 @@ class StatusBarStream (QObject ):
     detach_state_changed =Signal (bool )
     def __init__ (self ,status_bar ,parent =None ):
         QObject .__init__ (self )
-        self .status_bar =status_bar
+        self .status_bar =status_bar 
         self .parent =parent 
         self .stringio =io .StringIO ()
         self .detached =False 
@@ -181,14 +182,13 @@ class StatusBarStream (QObject ):
         if text .strip ():
             self .text_written .emit (text .strip ())
     def flush (self ):
-        pass
+        pass 
     def detach (self ):
         if not self .detached :
             self .detached =True 
             self .detach_window =DetachedStatusWindow (self .parent )
             self .detach_window .setWindowOpacity (0.0 )
             self .detach_window .show ()
-            # Add fade-in animation
             self .detach_window .fade_animation =QPropertyAnimation (self .detach_window ,b"windowOpacity")
             self .detach_window .fade_animation .setDuration (300 )
             self .detach_window .fade_animation .setStartValue (0.0 )
@@ -198,11 +198,11 @@ class StatusBarStream (QObject ):
             self .detach_state_changed .emit (True )
     def attach (self ):
         if self .detached :
-            self .detached =False
+            self .detached =False 
             self .detach_state_changed .emit (False )
             if self .detach_window :
                 self .detach_window .close ()
-                self .detach_window =None
+                self .detach_window =None 
     def __getattr__ (self ,name ):
         return getattr (self .stringio ,name )
 class MainWindow (QMainWindow ):
@@ -227,18 +227,15 @@ class MainWindow (QMainWindow ):
         self ._setup_menus ()
         self ._setup_connections ()
         self ._check_update ()
-        # Start zombie process monitor at app launch
         try :
-            from common import unlock_self_folder
+            from common import unlock_self_folder 
             unlock_self_folder ()
         except Exception :
-            pass
-        # Redirect print statements to status bar
+            pass 
         self .status_stream =StatusBarStream (self .status_bar ,self )
         self .status_stream .detach_state_changed .connect (self ._on_detach_state_changed )
-        sys .stdout =self .status_stream
-        sys .stderr =self .status_stream
-        # Redirect loguru logging to status bar
+        sys .stdout =self .status_stream 
+        sys .stderr =self .status_stream 
         logger .add (self .status_stream ,level ="INFO",format ="{message}")
     def _setup_ui (self ):
         self .setWindowTitle (t ('deletion.title')if t else 'All-in-One Tools')
@@ -499,20 +496,20 @@ class MainWindow (QMainWindow ):
             try :
                 with open (theme_path ,'r',encoding ='utf-8')as f :
                     qss_content =f .read ()
-                    self .setStyleSheet (qss_content )
+                    from PySide6 .QtWidgets import QApplication 
+                    QApplication .instance ().setStyleSheet (qss_content )
             except Exception as e :
                 print (f"Failed to load theme {theme_file }: {e }")
                 self ._apply_fallback_styles ()
         else :
             print (f"Theme file not found: {theme_path }")
             self ._apply_fallback_styles ()
-        
-        # Apply theme to results widget and stats panel
         if hasattr (self ,'results_widget')and self .results_widget :
             self .results_widget .set_theme (self .is_dark_mode )
     def _apply_fallback_styles (self ):
-        border_color = "rgba(70,70,70,1.0)" if self.is_dark_mode else "rgba(70,70,70,1.0)"
-        self .setStyleSheet (f"""
+        border_color ="rgba(70,70,70,1.0)"if self .is_dark_mode else "rgba(70,70,70,1.0)"
+        from PySide6 .QtWidgets import QApplication
+        QApplication .instance ().setStyleSheet (f"""
             QMainWindow {{
                 background-color: {constants .BG };
             }}
@@ -574,10 +571,8 @@ class MainWindow (QMainWindow ):
             self .header_widget .set_theme (self .is_dark_mode )
         if hasattr (self ,'tab_bar_container'):
             self .tab_bar_container .set_theme (self .is_dark_mode )
-        # Apply theme changes to results widget and stats panel
         if hasattr (self ,'results_widget'):
             self .results_widget .set_theme (self .is_dark_mode )
-        # Update detached console window if open
         if self .status_stream .detach_window :
             self .status_stream .detach_window .update_theme (self .is_dark_mode )
     def _toggle_dashboard (self ):
@@ -991,7 +986,7 @@ class MainWindow (QMainWindow ):
     def _delete_duplicate_players (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
-            return
+            return 
         def task ():
             return delete_duplicated_players (self )
         def on_finished (removed ):
@@ -1001,7 +996,7 @@ class MainWindow (QMainWindow ):
     def _delete_inactive_players (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
-            return
+            return 
         days =DaysInputDialog .get_days (t ('deletion.inactive_days_title'),t ('deletion.inactive_days_prompt'),self )
         if days :
             def task ():
@@ -1013,7 +1008,7 @@ class MainWindow (QMainWindow ):
     def _delete_unreferenced (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
-            return
+            return 
         def task ():
             return delete_unreferenced_data (self )
         def on_finished (result ):
@@ -1025,7 +1020,7 @@ class MainWindow (QMainWindow ):
     def _delete_non_base_map_objs (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
-            return
+            return 
         def task ():
             return delete_non_base_map_objects (self )
         def on_finished (removed ):
@@ -1035,7 +1030,7 @@ class MainWindow (QMainWindow ):
     def _delete_all_skins (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
-            return
+            return 
         def task ():
             return delete_all_skins (self )
         def on_finished (removed ):
@@ -1045,7 +1040,7 @@ class MainWindow (QMainWindow ):
     def _unlock_private_chests (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
-            return
+            return 
         def task ():
             return unlock_all_private_chests (self )
         def on_finished (unlocked ):
@@ -1055,7 +1050,7 @@ class MainWindow (QMainWindow ):
     def _remove_invalid_items (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
-            return
+            return 
         def task ():
             return remove_invalid_items_from_save (self )
         def on_finished (fixed ):
@@ -1065,7 +1060,7 @@ class MainWindow (QMainWindow ):
     def _remove_invalid_structures (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
-            return
+            return 
         def task ():
             return delete_invalid_structure_map_objects (self )
         def on_finished (removed ):
@@ -1075,7 +1070,7 @@ class MainWindow (QMainWindow ):
     def _remove_invalid_pals (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
-            return
+            return 
         def task ():
             return remove_invalid_pals_from_save (self )
         def on_finished (removed ):
@@ -1085,7 +1080,7 @@ class MainWindow (QMainWindow ):
     def _reset_missions (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
-            return
+            return 
         def task ():
             return fix_missions (self )
         def on_finished (result ):
@@ -1095,14 +1090,14 @@ class MainWindow (QMainWindow ):
     def _reset_anti_air (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
-            return
+            return 
         count =reset_anti_air_turrets (self )
         self .refresh_all ()
         QMessageBox .information (self ,t ('Done'),t ('anti_air_reset_count',count =count ))
     def _reset_dungeons (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
-            return
+            return 
         count =reset_dungeons (self )
         self .refresh_all ()
         QMessageBox .information (self ,t ('Done'),t ('dungeons_reset_count',count =count ))
@@ -1125,7 +1120,7 @@ class MainWindow (QMainWindow ):
     def _rebuild_all_guilds (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error'),t ('error.no_save_loaded'))
-            return
+            return 
         def task ():
             return rebuild_all_guilds ()
         def on_finished (success ):
@@ -1165,12 +1160,12 @@ class MainWindow (QMainWindow ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error')if t else 'Error',
             t ('error.no_save_loaded')if t else 'No save file loaded.')
-            return
+            return 
         def task ():
             return generate_world_map ()
         def on_finished (path ):
             if path :
-                from common import open_file_with_default_app
+                from common import open_file_with_default_app 
                 open_file_with_default_app (path )
                 msg_box =QMessageBox (self )
                 msg_box .setWindowTitle (t ('Done')if t else 'Done')
@@ -1325,17 +1320,17 @@ class MainWindow (QMainWindow ):
     def _export_all_bases (self ):
         if not constants .loaded_level_json :
             QMessageBox .warning (self ,t ('Error')if t else 'Error',t ('error.no_save_loaded')if t else 'No save file loaded.')
-            return
+            return 
         bases =get_bases ()
         if not bases :
             QMessageBox .information (self ,t ('Info')if t else 'Info','No bases found in the save.')
-            return
+            return 
         export_dir =QFileDialog .getExistingDirectory (self ,'Select Export Directory')
         if not export_dir :
-            return
+            return 
         def task ():
-            successful_exports =0
-            failed_exports =0
+            successful_exports =0 
+            failed_exports =0 
             failed_bases =[]
             class CustomEncoder (json .JSONEncoder ):
                 def default (self ,obj ):
@@ -1349,21 +1344,21 @@ class MainWindow (QMainWindow ):
                 try :
                     data =export_base_json (constants .loaded_level_json ,bid )
                     if not data :
-                        failed_exports +=1
+                        failed_exports +=1 
                         failed_bases .append (f'Base {bid } (no data)')
-                        continue
+                        continue 
                     safe_gname =''.join (c for c in gname if c .isalnum ()or c in (' ','-','_')).rstrip ()
                     filename =f'base_{bid }_{safe_gname }.json'
                     file_path =os .path .join (export_dir ,filename )
                     with open (file_path ,'w',encoding ='utf-8')as f :
                         json .dump (data ,f ,cls =CustomEncoder ,indent =2 )
-                    successful_exports +=1
+                    successful_exports +=1 
                 except Exception as e :
-                    failed_exports +=1
+                    failed_exports +=1 
                     failed_bases .append (f'Base {bid } (error: {str (e )})')
-            return successful_exports ,failed_exports ,failed_bases ,export_dir
+            return successful_exports ,failed_exports ,failed_bases ,export_dir 
         def on_finished (result ):
-            successful_exports ,failed_exports ,failed_bases ,export_dir =result
+            successful_exports ,failed_exports ,failed_bases ,export_dir =result 
             if successful_exports >0 :
                 msg =f'Successfully exported {successful_exports } base(s) to {export_dir }.'
                 if failed_exports >0 :

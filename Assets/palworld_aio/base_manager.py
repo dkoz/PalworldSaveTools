@@ -78,20 +78,17 @@ def export_base_json (loaded_level_json ,source_base_id ):
     src_id_str =_s (source_base_id )
     src_base_entry =next ((b for b in base_camp_data if _s (b .get ('key'))==src_id_str ),None )
     if not src_base_entry :
-        return None
-    base_level =1
+        return None 
+    base_level =1 
     group_id_str =_s (src_base_entry ['value']['RawData']['value'].get ('group_id_belong_to',''))
     for g in group_map :
         if _s (g ['key'])==group_id_str :
             base_level =g ['value']['RawData']['value'].get ('base_camp_level',1 )
-            break
-
-    # Use fast_deepcopy for better performance
+            break 
     try :
-        _deep =fast_deepcopy
+        _deep =fast_deepcopy 
     except :
-        _deep =copy .deepcopy
-
+        _deep =copy .deepcopy 
     export_data ={
     'base_camp':_deep (src_base_entry ),
     'base_camp_level':base_level ,
@@ -108,26 +105,20 @@ def export_base_json (loaded_level_json ,source_base_id ):
         w_cont =next ((c for c in char_containers if _s (c .get ('key',{}).get ('ID',{}).get ('value'))==src_worker_container_id ),None )
         if w_cont :
             export_data ['char_containers'].append (_deep (w_cont ))
-
-            # Pre-filter characters for better performance
             char_instance_ids ={_s (slot .get ('RawData',{}).get ('value',{}).get ('instance_id','00000000-0000-0000-0000-000000000000'))
-                               for slot in w_cont ['value']['Slots']['value'].get ('values',[])}
-
+            for slot in w_cont ['value']['Slots']['value'].get ('values',[])}
             for char_entry in char_map :
                 if _s (char_entry ['key']['InstanceId']['value'])in char_instance_ids :
                     export_data ['characters'].append (_deep (char_entry ))
     except :
-        pass
-
-    # Pre-filter map objects for better performance
-    base_map_objects =[obj for obj in map_objs
-                      if isinstance (_get_model_raw (obj ),dict )and
-                      _s (_get_model_raw (obj ).get ('base_camp_id_belong_to',''))==src_id_str ]
-
+        pass 
+    base_map_objects =[obj for obj in map_objs 
+    if isinstance (_get_model_raw (obj ),dict )and 
+    _s (_get_model_raw (obj ).get ('base_camp_id_belong_to',''))==src_id_str ]
     for obj in base_map_objects :
         oid =str (obj .get ('MapObjectId',{}).get ('value',''))
         if oid .startswith ('PalEgg')and 'Hatching'not in oid and ('Incubator'not in oid ):
-            continue
+            continue 
         export_data ['map_objects'].append (_deep (obj ))
         try :
             mm =obj ['ConcreteModel']['value']['ModuleMap']['value']
@@ -146,14 +137,14 @@ def export_base_json (loaded_level_json ,source_base_id ):
                             s_raw =slot .get ('RawData',{}).get ('value',{})
                             s_id =str (s_raw .get ('item',{}).get ('static_id',''))
                             if s_id .startswith ('PalEgg_'):
-                                continue
+                                continue 
                             loc_id =_s (s_raw .get ('item',{}).get ('dynamic_id',{}).get ('local_id_in_created_world','00000000-0000-0000-0000-000000000000'))
                             if loc_id !='00000000-0000-0000-0000-000000000000':
                                 d_entry =next ((d for d in all_dyn_items if _s (d ['RawData']['value']['id']['local_id_in_created_world'])==loc_id ),None )
                                 if d_entry :
                                     export_data ['dynamic_items'].append (_deep (d_entry ))
                             cleaned_slots .append (slot )
-                        nic ['value']['Slots']['value']['values']=cleaned_slots
+                        nic ['value']['Slots']['value']['values']=cleaned_slots 
                         export_data ['item_containers'].append (nic )
                 elif 'CharacterContainer'in str (mod .get ('key','')):
                     cc =next ((c for c in char_containers if _s (c .get ('key',{}).get ('ID',{}).get ('value'))==cid ),None )
@@ -169,7 +160,7 @@ def export_base_json (loaded_level_json ,source_base_id ):
 def import_base_json (loaded_level_json ,exported_data ,target_guild_id ,offset =(8000 ,0 ,0 ),collision_threshold =5000 ):
     success ,msg =validate_blueprint_version (exported_data )
     if not success :
-        return False
+        return False 
     try :
         _deep =fast_deepcopy 
     except :
@@ -178,7 +169,7 @@ def import_base_json (loaded_level_json ,exported_data ,target_guild_id ,offset 
     data =raw_prop if isinstance (raw_prop ,dict )else {}
     base_camp_data =data .get ('BaseCampSaveData',{}).get ('value',[])
     if not base_camp_data or len (base_camp_data )==0 :
-        return False
+        return False 
     groups =data .get ('GroupSaveDataMap',{}).get ('value',[])
     char_containers =data .get ('CharacterContainerSaveData',{}).get ('value',[])
     item_containers =data .get ('ItemContainerSaveData',{}).get ('value',[])

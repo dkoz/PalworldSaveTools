@@ -105,22 +105,17 @@ class StatsPanel (QWidget ):
     def set_theme (self ,is_dark ):
         self .is_dark_mode =is_dark 
         self ._update_colors ()
-    
     def _update_colors (self ):
-        # Use CSS class selectors instead of hardcoded colors
-        # This allows the colors to be styled via QSS files
         for key ,(label ,_ )in self .stat_key_labels .items ():
             if key .startswith ('header_'):
                 label .setObjectName ("statsHeader")
-                label .setStyleSheet ("")  # Clear inline styles to use QSS
+                label .setStyleSheet ("")
             elif key .startswith ('field_'):
                 label .setObjectName ("statsField")
-                label .setStyleSheet ("")  # Clear inline styles to use QSS
-        
+                label .setStyleSheet ("")
         for label in self .stat_labels .values ():
             label .setObjectName ("statsValue")
-            label .setStyleSheet ("")  # Clear inline styles to use QSS
-    
+            label .setStyleSheet ("")
     def refresh_labels (self ):
         for key ,(label ,label_key )in self .stat_key_labels .items ():
             if key .startswith ('header_'):

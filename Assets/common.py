@@ -1,4 +1,4 @@
-import os ,sys ,subprocess
+import os ,sys ,subprocess 
 APP_NAME ="PalworldSaveTools"
 APP_VERSION ="1.1.49"
 GAME_VERSION ="0.7.0"
@@ -36,38 +36,36 @@ def get_python_executable ():
 def get_versions ():
     return APP_VERSION ,GAME_VERSION 
 def open_file_with_default_app (file_path ):
-    import platform
+    import platform 
     if not os .path .exists (file_path ):
         print (f"File not found: {file_path }")
-        return False
+        return False 
     try :
         if platform .system ()=="Windows":
             os .startfile (file_path )
         elif platform .system ()=="Darwin":
-            import subprocess
+            import subprocess 
             subprocess .run (["open",file_path ])
         else :
-            import subprocess
+            import subprocess 
             subprocess .run (["xdg-open",file_path ])
-        return True
+        return True 
     except Exception as e :
         print (f"Error opening file {file_path }: {e }")
-        return False
+        return False 
 def unlock_self_folder ():
     if getattr (sys ,'frozen',False ):
         folder =os .path .dirname (os .path .abspath (sys .executable ))
     else :
-        # For development, monitor the project root directory (parent of Assets)
         script_dir =os .path .dirname (os .path .abspath (sys .argv [0 ]))
-        assets_dir =os .path .dirname (script_dir )  # Assets directory
-        folder =os .path .dirname (assets_dir )  # Project root (parent of Assets)
+        assets_dir =os .path .dirname (script_dir )
+        folder =os .path .dirname (assets_dir )
     folder_escaped =folder .replace ("\\","\\\\").replace ("'","''")
     parent_pid =os .getpid ()
-
     ps_command =(
     f"$ErrorActionPreference = 'SilentlyContinue'; "
-    f"$target = '{folder_escaped}'; "
-    f"$pPid = {parent_pid}; "
+    f"$target = '{folder_escaped }'; "
+    f"$pPid = {parent_pid }; "
     f"$currentPid = $PID; "
     "function Global-Nuke { "
     "  try { "
@@ -113,9 +111,9 @@ def unlock_self_folder ():
     "Stop-Process -Id $currentPid -Force"
     )
     si =subprocess .STARTUPINFO ()
-    si .dwFlags =subprocess .STARTF_USESHOWWINDOW
-    si .dwFlags |=subprocess .STARTF_USESHOWWINDOW
-    si .wShowWindow =subprocess .SW_HIDE
+    si .dwFlags =subprocess .STARTF_USESHOWWINDOW 
+    si .dwFlags |=subprocess .STARTF_USESHOWWINDOW 
+    si .wShowWindow =subprocess .SW_HIDE 
     try :
         subprocess .Popen (
         ["powershell","-WindowStyle","Hidden","-ExecutionPolicy","Bypass","-Command",ps_command ],
@@ -124,4 +122,4 @@ def unlock_self_folder ():
         cwd =os .path .dirname (folder )
         )
     except Exception :
-        pass
+        pass 

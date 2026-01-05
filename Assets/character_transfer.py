@@ -175,21 +175,26 @@ class CharacterTransferWindow (QWidget ):
         target_level_path_label =self .target_level_path_label 
         current_selection_label =self .current_selection_label 
     def closeEvent (self ,event ):
-        global level_json ,host_json ,targ_lvl ,targ_json 
-        global target_raw_gvas ,targ_json_gvas ,player_list_cache 
-        global modified_target_players ,modified_targets_data 
-        level_json =None 
-        host_json =None 
-        targ_lvl =None 
-        targ_json =None 
-        target_raw_gvas =None 
-        targ_json_gvas =None 
+        global level_json ,host_json ,targ_lvl ,targ_json
+        global target_raw_gvas ,targ_json_gvas ,player_list_cache
+        global modified_target_players ,modified_targets_data
+        level_json =None
+        host_json =None
+        targ_lvl =None
+        targ_json =None
+        target_raw_gvas =None
+        targ_json_gvas =None
         player_list_cache =[]
         modified_target_players =set ()
         modified_targets_data ={}
-        import gc 
+        import gc
         gc .collect ()
         event .accept ()
+    def keyPressEvent (self ,event ):
+        if event .key ()==Qt .Key_Escape :
+            self .close ()
+        else :
+            super ().keyPressEvent (event )
     def setup_ui (self ):
         self .setWindowTitle (t ("tool.character_transfer"))
         self .setFixedSize (1200 ,640 )

@@ -232,4 +232,4 @@ class HeaderWidget (QWidget ):
         from ..widgets import MenuPopup 
         if self ._menu_popup is None :
             self ._menu_popup =MenuPopup (self )
-        return self ._menu_popup
+        return self ._menu_popup 

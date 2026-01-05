@@ -267,7 +267,7 @@ class MapGraphicsView (QGraphicsView ):
         self .coords_label .setVisible (False )
         self .zoom_label =QLabel ((t ("zoom")if t else "Zoom")+": 100%",self )
         self .zoom_label .setStyleSheet ("background-color: rgba(0, 0, 0, 150); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; min-width: 80px;")
-        self .zoom_label .move (self .width ()-90 ,self .height ()-30 )
+        self .zoom_label .move (self .width ()-100 ,self .height ()-30 )
         self .zoom_label .setAlignment (Qt .AlignCenter )
     def animate_to_coords (self ,x ,y ,zoom_level =None ):
         if zoom_level is None :
@@ -396,14 +396,18 @@ class MapGraphicsView (QGraphicsView ):
     def resizeEvent (self ,event ):
         super ().resizeEvent (event )
         self .coords_label .move (10 ,self .height ()-30 )
-        self .zoom_label .move (self .width ()-90 ,self .height ()-30 )
+        self .zoom_label .move (self .width ()-100 ,self .height ()-30 )
     def reset_view (self ):
         self .resetTransform ()
-        self .current_zoom =1.0 
+        self .current_zoom =1.0
         if self .scene ():
-            self .fitInView (self .scene ().sceneRect (),Qt .KeepAspectRatio )
-            if self .scene ().sceneRect ().width ()>0 :
-                self .current_zoom =self .viewport ().width ()/self .scene ().sceneRect ().width ()
+            rect =self .scene ().sceneRect ()
+            if rect .width ()>0 and rect .height ()>0 :
+                viewport =self .viewport ()
+                scale_x =viewport .width ()/rect .width ()
+                scale_y =viewport .height ()/rect .height ()
+                scale =max (scale_x ,scale_y )
+                self .scale (scale ,scale )
         self .zoom_changed .emit (self .current_zoom )
 class MapTab (QWidget ):
     def __init__ (self ,parent =None ):
@@ -462,8 +466,8 @@ class MapTab (QWidget ):
         "animation_speed":8 ,"hover_alpha":80 ,"radius_multiplier":1.5 
         },
         "zoom":{
-        "factor":1.15 ,"min":0.1 ,"max":20.0 ,
-        "double_click_target":2.5 ,"animation_speed":0.2 ,"animation_fps":60 
+        "factor":1.15 ,"min":1.0 ,"max":20.0 ,
+        "double_click_target":2.5 ,"animation_speed":0.2 ,"animation_fps":60
         },
         "effects":{
         "delete":{"enabled":True ,"duration":1000 ,"max_radius":150 ,
@@ -561,20 +565,26 @@ class MapTab (QWidget ):
         self .guild_tree .setColumnWidth (0 ,120 )
         self .guild_tree .setColumnWidth (1 ,110 )
         self .guild_tree .setColumnWidth (2 ,90 )
-        self .guild_tree .setColumnWidth (3 ,60 )
+        self .guild_tree .setColumnWidth (3 ,45 )
         self .guild_tree .itemExpanded .connect (self ._on_item_expanded )
         self .guild_tree .itemClicked .connect (self ._on_tree_item_clicked )
         self .guild_tree .itemDoubleClicked .connect (self ._on_tree_item_double_clicked )
         self .guild_tree .setContextMenuPolicy (Qt .CustomContextMenu )
         self .guild_tree .customContextMenuRequested .connect (self ._on_tree_context_menu )
+        self .guild_tree .setSortingEnabled (True )
+        self .guild_tree .header ().setMouseTracking (True )
+        self .guild_tree .header ().setAttribute (Qt .WA_Hover ,True )
+        self .guild_tree .header ().setSectionsClickable (True )
         sidebar_layout .addWidget (self .guild_tree )
         self .info_label =QLabel (t ('map.info.select_base')if t else 'Click on a base marker or list item to view details')
         self .info_label .setWordWrap (True )
-        self .info_label .setStyleSheet ("padding: 10px; background-color: rgba(0, 180, 255, 30); border-radius: 4px;")
+        self .info_label .setObjectName ("sectionHeader")
         sidebar_layout .addWidget (self .info_label )
-        self ._splitter =splitter 
+        self ._splitter =splitter
         splitter .addWidget (self ._map_widget )
         splitter .addWidget (self ._sidebar_widget )
+        splitter .setStretchFactor (0 ,1 )
+        splitter .setStretchFactor (1 ,1 )
         splitter .setSizes ([850 ,550 ])
         layout .addWidget (splitter )
         QTimer .singleShot (100 ,self ._fix_initial_layout )
@@ -583,8 +593,16 @@ class MapTab (QWidget ):
             self ._splitter .setSizes ([850 ,550 ])
             self ._splitter .updateGeometry ()
             self .updateGeometry ()
-            if self .scene :
-                self .view .fitInView (self .scene .sceneRect (),Qt .KeepAspectRatio )
+            if self .scene and self .map_width >0 and self .map_height >0 :
+                viewport =self .view .viewport ()
+                scale_x =viewport .width ()/self .map_width 
+                scale_y =viewport .height ()/self .map_height 
+                scale =max (scale_x ,scale_y )
+                self .view .resetTransform ()
+            self .view .scale (scale ,scale )
+            self .view .current_zoom =1.0
+            self .view .zoom_label .setText ((t ("zoom")if t else "Zoom")+f": {int (1.0 *100 )}%")
+            self .view .zoom_changed .emit (1.0 )
     def _on_marker_hover_enter (self ,base_data ,global_pos ):
         self .hover_overlay .show_for_base (base_data ,QPoint (int (global_pos .x ()),int (global_pos .y ())))
     def _on_marker_hover_leave (self ):
@@ -603,11 +621,14 @@ class MapTab (QWidget ):
         self .scene .addItem (self .map_item )
         self .scene .setSceneRect (self .map_item .boundingRect ())
         if self .map_width >0 and self .map_height >0 :
-            self .view .fitInView (self .scene .sceneRect (),Qt .KeepAspectRatio )
             viewport =self .view .viewport ()
-            self .view .current_zoom =self .view .viewport ().width ()/self .map_width 
-            self .view .zoom_label .setText ((t ("zoom")if t else "Zoom")+f": {int (self .view .current_zoom *100 )}%")
-            self .view .zoom_changed .emit (self .view .current_zoom )
+            scale_x =viewport .width ()/self .map_width 
+            scale_y =viewport .height ()/self .map_height 
+            scale =max (scale_x ,scale_y )
+            self .view .scale (scale ,scale )
+            self .view .current_zoom =1.0
+            self .view .zoom_label .setText ((t ("zoom")if t else "Zoom")+f": {int (1.0 *100 )}%")
+            self .view .zoom_changed .emit (1.0 )
     def _setup_animation (self ):
         self .anim_timer =QTimer (self )
         self .anim_timer .timeout .connect (self ._update_animations )

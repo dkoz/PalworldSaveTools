@@ -431,4 +431,4 @@ class PalDefenderDialog (QDialog ):
             self ._append_output (f'Level filter applied: <= {max_level }.')
         self ._append_output (f'Excluded guilds: {excluded_guilds }')
         self ._append_output (f'Excluded bases: {excluded_bases }')
-        return guild_count >0
+        return guild_count >0 
