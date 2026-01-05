@@ -76,6 +76,14 @@ class DetachedStatusWindow (QWidget ):
         self .inner =QVBoxLayout (self .container )
         self .inner .setContentsMargins (10 ,5 ,10 ,10 )
         self .setup_status_ui ()
+        self .setWindowOpacity (0.0 )
+        self .show ()
+        self .fade_animation =QPropertyAnimation (self ,b"windowOpacity")
+        self .fade_animation .setDuration (400 )
+        self .fade_animation .setStartValue (0.0 )
+        self .fade_animation .setEndValue (1.0 )
+        self .fade_animation .setEasingCurve (QEasingCurve .OutCubic )
+        self .fade_animation .start ()
     def mousePressEvent (self ,event ):
         if event .button ()==Qt .LeftButton :
             self ._drag_pos =event .globalPosition ().toPoint ()-self .frameGeometry ().topLeft ()

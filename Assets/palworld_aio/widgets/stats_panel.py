@@ -10,6 +10,7 @@ class StatsPanel (QWidget ):
     def __init__ (self ,parent =None ):
         super ().__init__ (parent )
         self .stats_before ={}
+        self .is_dark_mode =True 
         self ._setup_ui ()
     def _setup_ui (self ):
         layout =QGridLayout (self )
@@ -101,6 +102,30 @@ class StatsPanel (QWidget ):
                     after_val =int (after_val )if after_val .isdigit ()else 0 
                 result [external_key ]=before_val -after_val 
             self .update_stats (result ,'result')
+    def set_theme (self ,is_dark ):
+        self .is_dark_mode =is_dark 
+        self ._update_colors ()
+    
+    def _update_colors (self ):
+        # Define colors for different themes
+        if self .is_dark_mode :
+            emphasis_color =constants .EMPHASIS 
+            muted_color =constants .MUTED 
+        else :
+            # Light mode colors
+            emphasis_color ="#000000"  # Black text for light mode
+            muted_color ="#666666"     # Dark gray for muted text in light mode
+        
+        # Update all labels with appropriate colors
+        for key ,(label ,_ )in self .stat_key_labels .items ():
+            if key .startswith ('header_'):
+                label .setStyleSheet (f"color: {emphasis_color };")
+            elif key .startswith ('field_'):
+                label .setStyleSheet (f"color: {muted_color };")
+        
+        for label in self .stat_labels .values ():
+            label .setStyleSheet (f"color: {emphasis_color };")
+    
     def refresh_labels (self ):
         for key ,(label ,label_key )in self .stat_key_labels .items ():
             if key .startswith ('header_'):

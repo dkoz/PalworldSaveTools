@@ -522,12 +522,12 @@ QWidget#resultsWidget QLabel#sectionHeader {
 
 /* Stats Panel in Light Mode */
 QWidget#statsGrid {
-    background: rgba(240,245,255,0.8);
+    background: rgba(240,245,255,0.95);
 }
 
 QLabel#statsHeader {
-    color: #1A365D;
-    background: rgba(37,150,190,0.1);
+    color: #1A202C;
+    background: rgba(255,255,255,0.9);
 }
 
 QLabel#statsField {
@@ -536,7 +536,7 @@ QLabel#statsField {
 
 QLabel#statsValue {
     color: #1A202C;
-    background: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.9);
 }
 
 /* ===== Results Panel Refinement ===== */
@@ -584,7 +584,7 @@ QFrame#gradientSeparator {
 
 /* Stats Grid Enhancement */
 QWidget#statsGrid {
-    background: rgba(240,245,255,0.8);
+    background: rgba(240,245,255,0.95);
     border-radius: 8px;
     padding: 10px;
 }
