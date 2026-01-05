@@ -527,7 +527,6 @@ QWidget#statsGrid {
 
 QLabel#statsHeader {
     color: #1A202C;
-    background: rgba(255,255,255,0.9);
 }
 
 QLabel#statsField {
@@ -536,7 +535,6 @@ QLabel#statsField {
 
 QLabel#statsValue {
     color: #1A202C;
-    background: rgba(255,255,255,0.9);
 }
 
 /* ===== Results Panel Refinement ===== */

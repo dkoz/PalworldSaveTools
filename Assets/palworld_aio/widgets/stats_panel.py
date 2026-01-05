@@ -107,24 +107,19 @@ class StatsPanel (QWidget ):
         self ._update_colors ()
     
     def _update_colors (self ):
-        # Define colors for different themes
-        if self .is_dark_mode :
-            emphasis_color =constants .EMPHASIS 
-            muted_color =constants .MUTED 
-        else :
-            # Light mode colors
-            emphasis_color ="#000000"  # Black text for light mode
-            muted_color ="#666666"     # Dark gray for muted text in light mode
-        
-        # Update all labels with appropriate colors
+        # Use CSS class selectors instead of hardcoded colors
+        # This allows the colors to be styled via QSS files
         for key ,(label ,_ )in self .stat_key_labels .items ():
             if key .startswith ('header_'):
-                label .setStyleSheet (f"color: {emphasis_color };")
+                label .setObjectName ("statsHeader")
+                label .setStyleSheet ("")  # Clear inline styles to use QSS
             elif key .startswith ('field_'):
-                label .setStyleSheet (f"color: {muted_color };")
+                label .setObjectName ("statsField")
+                label .setStyleSheet ("")  # Clear inline styles to use QSS
         
         for label in self .stat_labels .values ():
-            label .setStyleSheet (f"color: {emphasis_color };")
+            label .setObjectName ("statsValue")
+            label .setStyleSheet ("")  # Clear inline styles to use QSS
     
     def refresh_labels (self ):
         for key ,(label ,label_key )in self .stat_key_labels .items ():

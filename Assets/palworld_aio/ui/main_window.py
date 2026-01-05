@@ -501,6 +501,10 @@ class MainWindow (QMainWindow ):
         else :
             print (f"Theme file not found: {theme_path }")
             self ._apply_fallback_styles ()
+        
+        # Apply theme to results widget and stats panel
+        if hasattr (self ,'results_widget')and self .results_widget :
+            self .results_widget .set_theme (self .is_dark_mode )
     def _apply_fallback_styles (self ):
         border_color = "rgba(70,70,70,1.0)" if self.is_dark_mode else "rgba(70,70,70,1.0)"
         self .setStyleSheet (f"""
@@ -565,6 +569,9 @@ class MainWindow (QMainWindow ):
             self .header_widget .set_theme (self .is_dark_mode )
         if hasattr (self ,'tab_bar_container'):
             self .tab_bar_container .set_theme (self .is_dark_mode )
+        # Apply theme changes to results widget and stats panel
+        if hasattr (self ,'results_widget'):
+            self .results_widget .set_theme (self .is_dark_mode )
     def _toggle_dashboard (self ):
         if self ._dashboard_collapsed :
             self .results_widget .show ()

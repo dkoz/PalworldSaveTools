@@ -12,6 +12,7 @@ class ResultsWidget (QWidget ):
     def __init__ (self ,parent =None ):
         super ().__init__ (parent )
         self .setObjectName ("resultsWidget")
+        self .is_dark_mode =True 
         self ._setup_ui ()
     def refresh_labels (self ):
         if hasattr (self ,'results_title'):
@@ -93,11 +94,13 @@ class ResultsWidget (QWidget ):
         card_layout .setSpacing (4 )
         label =QLabel (label_text )
         label .setFont (QFont (constants .FONT_FAMILY ,9 ,QFont .Bold ))
-        label .setStyleSheet (f"color: {constants .MUTED };")
+        label .setObjectName ("statsField")  # Use same class as stats panel for consistency
+        label .setStyleSheet ("")  # Clear inline styles to use QSS
         card_layout .addWidget (label )
         value_label =QLabel ('N/A')
         value_label .setFont (QFont (constants .FONT_FAMILY ,constants .FONT_SIZE ))
-        value_label .setStyleSheet (f"color: {constants .TEXT };")
+        value_label .setObjectName ("statsValue")  # Use same class as stats panel for consistency
+        value_label .setStyleSheet ("")  # Clear inline styles to use QSS
         value_label .setWordWrap (True )
         card_layout .addWidget (value_label )
         return {'container':container ,'value_label':value_label ,'label':label }
@@ -120,6 +123,38 @@ class ResultsWidget (QWidget ):
         self .player_value .setText ('N/A')
         self .guild_value .setText ('N/A')
         self .base_value .setText ('N/A')
+    
+    def set_theme (self ,is_dark ):
+        self .is_dark_mode =is_dark
+        if hasattr (self ,'stats_panel'):
+            self .stats_panel .set_theme (is_dark )
+        # Refresh the value cards with new theme colors
+        self ._refresh_value_card_colors ()
+    
+    def _refresh_value_card_colors (self ):
+        """Update colors of all value cards based on current theme"""
+        # Use CSS class selectors instead of hardcoded colors
+        # This allows the colors to be styled via QSS files
+        if hasattr (self ,'player_label'):
+            self .player_label .setObjectName ("statsField")
+            self .player_label .setStyleSheet ("")  # Clear inline styles to use QSS
+        if hasattr (self ,'player_value'):
+            self .player_value .setObjectName ("statsValue")
+            self .player_value .setStyleSheet ("")  # Clear inline styles to use QSS
+        
+        if hasattr (self ,'guild_label'):
+            self .guild_label .setObjectName ("statsField")
+            self .guild_label .setStyleSheet ("")  # Clear inline styles to use QSS
+        if hasattr (self ,'guild_value'):
+            self .guild_value .setObjectName ("statsValue")
+            self .guild_value .setStyleSheet ("")  # Clear inline styles to use QSS
+        
+        if hasattr (self ,'base_label'):
+            self .base_label .setObjectName ("statsField")
+            self .base_label .setStyleSheet ("")  # Clear inline styles to use QSS
+        if hasattr (self ,'base_value'):
+            self .base_value .setObjectName ("statsValue")
+            self .base_value .setStyleSheet ("")  # Clear inline styles to use QSS
     def update_stats (self ,stats ):
         if hasattr (self ,'stats_panel')and self .stats_panel :
             self .stats_panel .update_stats (stats )
