@@ -659,5 +659,7 @@
   "tool.convert.players_done": "Convertidos {count} archivos de jugadores.",
   "console.detach": "Desacoplar",
   "console.reattach": "Volver a acoplar",
-  "console.title": "Consola"
+  "console.title": "Consola",
+  "deletion.menu.trim_overfilled_inventories": "Recortar inventarios sobrecargados",
+  "deletion.trimmed_inventories": "{fixed} inventarios sobrecargados recortados"
 }

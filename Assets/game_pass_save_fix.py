@@ -119,6 +119,8 @@ class GamePassSaveFixWidget (QWidget ):
             super ().keyPressEvent (event )
     def get_save_game_pass (self ):
         default =os .path .expandvars (r"%LOCALAPPDATA%\Packages\PocketpairInc.Palworld_ad4psfrxyesvt\SystemAppData\wgs")
+        self .raise_ ()
+        self .activateWindow ()
         folder =QFileDialog .getExistingDirectory (self ,"Select XGP Save Folder",default )
         if not folder :return 
         self .xgp_source_folder =folder 
@@ -137,6 +139,8 @@ class GamePassSaveFixWidget (QWidget ):
         self .update_combobox_signal .emit (list (self .direct_saves_map .keys ()))
     def get_save_steam (self ):
         import gc 
+        self .raise_ ()
+        self .activateWindow ()
         folder =QFileDialog .getExistingDirectory (self ,"Select Steam Save Folder to Transfer")
         if not folder :return 
         sav_path =os .path .join (folder ,"Level.sav")
@@ -302,6 +306,8 @@ class GamePassSaveFixWidget (QWidget ):
         try :
             steam_default =os .path .expandvars (r"%localappdata%\Pal\Saved\SaveGames")
             initial =steam_default if os .path .isdir (steam_default )else root_dir 
+            self .raise_ ()
+            self .activateWindow ()
             destination =QFileDialog .getExistingDirectory (self ,"Select where to place converted save",initial )
             if not destination :return 
             source_base =getattr (self ,"direct_saves_map",{}).get (saveName ,os .path .join (root_dir ,"saves",saveName ))

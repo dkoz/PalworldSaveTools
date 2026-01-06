@@ -463,6 +463,8 @@
 "deletion.menu.remove_invalid_skins_summary": "Deleted {removed_level_skins} skin entries from Level.sav. Cleaned {fixed_player_files} player files.",
 "deletion.menu.delete_all_skins": "Delete All Skins",
 "deletion.menu.reset_dungeons": "Reset Dungeons",
+"deletion.menu.trim_overfilled_inventories": "Trim Overfilled Inventories",
+"deletion.trimmed_inventories": "Trimmed {fixed} overfilled inventories",
 "reset_dungeons.reset_success": "Successfully reset dungeons",
 "reset_dungeons.none_found": "Dungeon data not found",
 "export.base": "Export Base",

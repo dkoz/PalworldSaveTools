@@ -668,5 +668,7 @@
   "tool.convert.players_done": "{count} 個のプレイヤーファイルを変換しました",
   "console.detach": "切り離す",
   "console.reattach": "再接続",
-  "console.title": "コンソール"
+  "console.title": "コンソール",
+  "deletion.menu.trim_overfilled_inventories": "オーバーフローしたインベントリをトリム",
+  "deletion.trimmed_inventories": "{fixed} オーバーフローしたインベントリをトリムしました"
 }

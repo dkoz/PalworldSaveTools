@@ -32,7 +32,7 @@ try :
     delete_invalid_structure_map_objects ,delete_all_skins ,unlock_all_private_chests ,
     remove_invalid_items_from_save ,remove_invalid_pals_from_save ,fix_missions ,
     reset_anti_air_turrets ,reset_dungeons ,unlock_viewing_cage_for_player ,
-    fix_all_negative_timestamps ,reset_selected_player_timestamp 
+    fix_all_negative_timestamps ,reset_selected_player_timestamp ,detect_and_trim_overfilled_inventories 
     )
     from palworld_aio .guild_manager import move_player_to_guild ,rebuild_all_guilds ,make_member_leader ,rename_guild ,max_guild_level 
     from palworld_aio .base_manager import export_base_json ,import_base_json ,clone_base_complete 
@@ -51,7 +51,7 @@ except ImportError :
     delete_invalid_structure_map_objects ,delete_all_skins ,unlock_all_private_chests ,
     remove_invalid_items_from_save ,remove_invalid_pals_from_save ,fix_missions ,
     reset_anti_air_turrets ,reset_dungeons ,unlock_viewing_cage_for_player ,
-    fix_all_negative_timestamps ,reset_selected_player_timestamp 
+    fix_all_negative_timestamps ,reset_selected_player_timestamp ,detect_and_trim_overfilled_inventories 
     )
     from ..guild_manager import move_player_to_guild ,rebuild_all_guilds ,make_member_leader ,rename_guild ,max_guild_level 
     from ..base_manager import export_base_json ,import_base_json ,clone_base_complete 
@@ -236,9 +236,9 @@ class MainWindow (QMainWindow ):
             pass 
         self .status_stream =StatusBarStream (self .status_bar ,self )
         self .status_stream .detach_state_changed .connect (self ._on_detach_state_changed )
-        sys .stdout =self .status_stream
-        sys .stderr =self .status_stream
-        import logging
+        sys .stdout =self .status_stream 
+        sys .stderr =self .status_stream 
+        import logging 
         handler =logging .StreamHandler (self .status_stream )
         handler .setLevel (logging .INFO )
         handler .setFormatter (logging .Formatter ("{message}",style ='{'))
@@ -429,6 +429,7 @@ class MainWindow (QMainWindow ):
         (t ('base.export_all')if t else 'Export All Bases',self ._export_all_bases ),
         (t ('guild.menu.rebuild_all_guilds')if t else 'Rebuild All Guilds',self ._rebuild_all_guilds ),
         (t ('guild.menu.move_selected_player_to_selected_guild')if t else 'Move Player to Guild',self ._move_player_to_guild ),
+        (t ('deletion.menu.trim_overfilled_inventories')if t else 'Trim Overfilled Inventories',self ._trim_overfilled_inventories ),
         ],
         'maps':[
         (t ('deletion.menu.show_map')if t else 'Show Map',self ._show_map ),
@@ -469,7 +470,7 @@ class MainWindow (QMainWindow ):
         "language":"en_US",
         "show_icons":True ,
         "boot_preference":"menu",
-        "console_detached":False
+        "console_detached":False 
         }
         if os .path .exists (user_cfg_path ):
             try :
@@ -605,7 +606,7 @@ class MainWindow (QMainWindow ):
                 self .status_stream .attach ()
             else :
                 self .status_stream .detach ()
-        self .user_settings ["console_detached"] =self .status_stream .detached if self .status_stream else False
+        self .user_settings ["console_detached"]=self .status_stream .detached if self .status_stream else False 
         self ._save_user_settings ()
     def _on_detach_state_changed (self ,detached ):
         detach_btn =self .status_bar .findChild (QPushButton )
@@ -1474,6 +1475,16 @@ class MainWindow (QMainWindow ):
             )
     def _import_base (self ,gid ):
         self ._import_base_to_guild (gid )
+    def _trim_overfilled_inventories (self ):
+        if not constants .current_save_path :
+            QMessageBox .warning (self ,t ('error.title')if t else 'Error',t ('error.no_save_loaded')if t else 'No save file loaded.')
+            return 
+        def task ():
+            return detect_and_trim_overfilled_inventories (self )
+        def on_finished (fixed ):
+            self .refresh_all ()
+            QMessageBox .information (self ,t ('done')if t else 'Done',t ('deletion.trimmed_inventories',fixed =fixed )if t else f'Trimmed {fixed } overfilled inventories')
+        run_with_loading (on_finished ,task )
     def _clone_base (self ,bid ,gid ):
         if clone_base_complete (constants .loaded_level_json ,bid ,gid ):
             self .refresh_all ()

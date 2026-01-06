@@ -668,5 +668,7 @@
   "tool.convert.players_done": "{count}개의 플레이어 파일을 변환했습니다",
   "console.detach": "분리",
   "console.reattach": "다시 첨부",
-  "console.title": "콘솔"
+  "console.title": "콘솔",
+  "deletion.menu.trim_overfilled_inventories": "초과된 인벤토리 정리",
+  "deletion.trimmed_inventories": "{fixed} 초과된 인벤토리 정리됨"
 }

@@ -766,6 +766,69 @@ def unlock_viewing_cage_for_player (player_uid ,parent =None ):
         return False 
     except Exception as e :
         return False 
+def detect_and_trim_overfilled_inventories (parent =None ):
+    import copy 
+    if not constants .current_save_path :
+        return 0 
+    players_dir =os .path .join (constants .current_save_path ,'Players')
+    if not os .path .exists (players_dir ):
+        return 0 
+    player_files =[f for f in os .listdir (players_dir )if f .endswith ('.sav')and '_dps'not in f ]
+    fixed_containers =0 
+    try :
+        wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
+        item_containers =wsd .get ('ItemContainerSaveData',{}).get ('value',[])
+        container_lookup ={str (c ['key']['ID']['value']):c for c in item_containers if 'key'in c }
+        for player_file in player_files :
+            player_uid =player_file .replace ('.sav','')
+            try :
+                player_path =os .path .join (players_dir ,player_file )
+                player_json =sav_to_json (player_path )
+                if 'properties'in player_json and 'SaveData'in player_json ['properties']:
+                    inv_info =player_json ['properties']['SaveData']['value']['InventoryInfo']['value']
+                elif 'SaveData'in player_json :
+                    inv_info =player_json ['SaveData']['value']['InventoryInfo']['value']
+                else :
+                    continue 
+                main_id =str (inv_info ['CommonContainerId']['value']['ID']['value'])
+                key_id =str (inv_info ['EssentialContainerId']['value']['ID']['value'])
+                additional_inventory_count =0 
+                if key_id in container_lookup :
+                    key_slots =container_lookup [key_id ]['value']['Slots']['value']['values']
+                    additional_items =['AdditionalInventory_001','AdditionalInventory_002','AdditionalInventory_003','AdditionalInventory_004']
+                    for slot in key_slots :
+                        try :
+                            item_id =slot .get ('RawData',{}).get ('value',{}).get ('item',{}).get ('static_id','')
+                            if item_id in additional_items :
+                                additional_inventory_count +=1 
+                        except :
+                            continue 
+                player_max_slots =42 +(additional_inventory_count *3 )
+                if main_id in container_lookup :
+                    container =container_lookup [main_id ]
+                    slots =container ['value']['Slots']['value']['values']
+                    current_slot_num =container ['value'].get ('SlotNum',{}).get ('value',0 )
+                    if len (slots )!=player_max_slots or current_slot_num !=player_max_slots :
+                        if len (slots )>=player_max_slots or (len (slots )<player_max_slots and len (slots )>=42 ):
+                            if len (slots )>player_max_slots :
+                                slots [:]=slots [:player_max_slots ]
+                            elif len (slots )<player_max_slots :
+                                if len (slots )>0 :
+                                    template_slot =copy .deepcopy (slots [0 ])
+                                    template_slot ['RawData']['value']['item']['static_id']=""
+                                    template_slot ['RawData']['value']['item']['dynamic_id']['created_world_id']="00000000-0000-0000-0000-000000000000"
+                                    template_slot ['RawData']['value']['item']['dynamic_id']['local_id']="00000000-0000-0000-0000-000000000000"
+                                    template_slot ['RawData']['value']['count']=0 
+                                    while len (slots )<player_max_slots :
+                                        slots .append (copy .deepcopy (template_slot ))
+                            if 'SlotNum'in container ['value']:
+                                container ['value']['SlotNum']['value']=len (slots )
+                            fixed_containers +=1 
+            except Exception as e :
+                pass 
+        return fixed_containers 
+    except Exception as e :
+        return 0 
 def fix_all_negative_timestamps (parent =None ):
     if not constants .loaded_level_json :
         return 0 

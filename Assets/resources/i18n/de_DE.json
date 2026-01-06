@@ -689,5 +689,7 @@
   "tool.convert.players_done": "{count} Spielerdateien konvertiert.",
   "console.detach": "Trennen",
   "console.reattach": "Erneut anhängen",
-  "console.title": "Konsole"
+  "console.title": "Konsole",
+  "deletion.menu.trim_overfilled_inventories": "Überfüllte Inventare beschneiden",
+  "deletion.trimmed_inventories": "{fixed} überfüllte Inventare beschnitten"
 }

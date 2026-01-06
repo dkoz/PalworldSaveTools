@@ -78,7 +78,7 @@ def center_on_parent (dialog ):
 class ConversionOptionsDialog (QDialog ):
     def __init__ (self ,parent =None ):
         super ().__init__ (parent )
-        self .selected_option =None
+        self .selected_option =None 
         self .setWindowTitle (t ("tool.convert.saves")if t else "Convert Save Files")
         self .setModal (True )
         self .setFixedWidth (380 )
@@ -131,7 +131,7 @@ class ConversionOptionsDialog (QDialog ):
         else :
             super ().keyPressEvent (event )
     def _load_theme (self ):
-        is_dark =self .parent ().parent_window .is_dark_mode if self .parent ()and hasattr (self .parent (),'parent_window')else True
+        is_dark =self .parent ().parent_window .is_dark_mode if self .parent ()and hasattr (self .parent (),'parent_window')else True 
         base_path =constants .get_assets_path ()if hasattr (constants ,'get_assets_path')else get_assets_path ()
         theme_file ='darkmode.qss'if is_dark else 'lightmode.qss'
         theme_path =os .path .join (base_path ,'data','gui',theme_file )
@@ -393,4 +393,4 @@ class ToolsTab (QWidget ):
             btn .text_label .setText (t (key )if t else key )
             btn .text_label .setToolTip (t (key )if t else key )
     def refresh (self ):
-        pass
+        pass 

@@ -258,10 +258,10 @@ class MapGraphicsView (QGraphicsView ):
         self .max_zoom =zoom_config ['max']
         self .zoom_timer =QTimer ()
         self .zoom_timer .timeout .connect (self ._smooth_zoom_step )
-        self .target_zoom =1.0
-        self .target_center =None
-        self .is_animating =False
-        self .base_scale =1.0
+        self .target_zoom =1.0 
+        self .target_center =None 
+        self .is_animating =False 
+        self .base_scale =1.0 
         self .coords_label =QLabel (f"{t ('cursor_coords')if t else 'Cursor'}: 0, 0",self )
         self .coords_label .setStyleSheet ("background-color: rgba(0, 0, 0, 150); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; min-width: 120px;")
         self .coords_label .move (10 ,self .height ()-30 )
@@ -402,7 +402,7 @@ class MapGraphicsView (QGraphicsView ):
         self .zoom_label .move (self .width ()-100 ,self .height ()-30 )
     def reset_view (self ):
         self .resetTransform ()
-        self .current_zoom =1.0
+        self .current_zoom =1.0 
         if self .scene ():
             rect =self .scene ().sceneRect ()
             if rect .width ()>0 and rect .height ()>0 :
@@ -410,7 +410,7 @@ class MapGraphicsView (QGraphicsView ):
                 scale_x =viewport .width ()/rect .width ()
                 scale_y =viewport .height ()/rect .height ()
                 scale =max (scale_x ,scale_y )
-                self .base_scale =scale
+                self .base_scale =scale 
                 self .scale (scale ,scale )
         self .zoom_changed .emit (self .current_zoom )
 class MapTab (QWidget ):
