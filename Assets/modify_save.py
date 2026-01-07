@@ -1,7 +1,19 @@
 from import_libs import *
-from PySide6 .QtWidgets import QSizePolicy ,QDialog ,QVBoxLayout ,QHBoxLayout ,QLabel ,QPushButton ,QScrollArea ,QMainWindow ,QWidget ,QComboBox ,QLineEdit ,QFileDialog ,QApplication ,QFrame ,QProgressBar 
-from PySide6 .QtGui import QIcon ,QPixmap ,QFont 
-from PySide6 .QtCore import Qt ,QTimer 
+from PySide6 .QtWidgets import QSizePolicy ,QDialog ,QVBoxLayout ,QHBoxLayout ,QLabel ,QPushButton ,QScrollArea ,QMainWindow ,QWidget ,QComboBox ,QLineEdit ,QFileDialog ,QApplication ,QFrame ,QProgressBar
+from PySide6 .QtGui import QIcon ,QPixmap ,QFont
+from PySide6 .QtCore import Qt ,QTimer
+import ssl
+
+def _get_ssl_context():
+    """Create SSL context using bundled CA certificate file"""
+    ca_file = os.path.join(get_assets_directory(), "cert", "cacert.pem")
+    if os.path.exists(ca_file):
+        context = ssl.create_default_context(cafile=ca_file)
+        return context
+    else:
+        # Fallback to default context if CA file not found
+        return ssl.create_default_context()
+
 def load_styles (widget ):
     user_cfg_path =os .path .join (get_assets_directory (),"data","configs","user.cfg")
     theme ="dark"
@@ -23,12 +35,13 @@ def _format_bytes (num :int )->str :
         num /=1024 
 def download_from_github (repo_owner ,repo_name ,version ,download_path ,progress_callback =None ):
     file_url =get_release_assets (repo_owner ,repo_name ,version )
-    if not file_url :print ("Error: No valid asset found.");return None 
+    if not file_url :print ("Error: No valid asset found.");return None
     try :
         file_name =file_url .split ("/")[-1 ]
         file_path =os .path .join (download_path ,file_name )
         req =urllib .request .Request (file_url ,headers ={"User-Agent":"Mozilla/5.0"})
-        with urllib .request .urlopen (req ,timeout =60 )as response ,open (file_path ,"wb")as f :
+        context = _get_ssl_context()
+        with urllib .request .urlopen (req ,context=context ,timeout =60 )as response ,open (file_path ,"wb")as f :
             total =int (response .getheader ("Content-Length","0")or 0 )
             downloaded =0 
             block =1024 *128 
@@ -51,11 +64,12 @@ def download_from_github (repo_owner ,repo_name ,version ,download_path ,progres
         return file_path 
     except Exception as e :
         print (f"Error downloading file: {e }")
-        return None 
+        return None
 def get_release_assets (repo_owner ,repo_name ,version ):
     api_url =f"https://api.github.com/repos/{repo_owner }/{repo_name }/releases/tags/{version }"
     try :
-        with urllib .request .urlopen (api_url )as response :
+        context = _get_ssl_context()
+        with urllib .request .urlopen (api_url ,context=context )as response :
             release_data =json .load (response )
             for asset in release_data .get ('assets',[]):
                 name =asset ['name'].lower ()
@@ -63,11 +77,12 @@ def get_release_assets (repo_owner ,repo_name ,version ):
                     return asset ['browser_download_url']
     except Exception as e :
         print (f"Error fetching release info: {e }")
-    return None 
+    return None
 def get_release_asset_url_filtered (repo_owner ,repo_name ,version ,keywords ,extensions ):
     api_url =f"https://api.github.com/repos/{repo_owner }/{repo_name }/releases/tags/{version }"
     try :
-        with urllib .request .urlopen (api_url )as response :
+        context = _get_ssl_context()
+        with urllib .request .urlopen (api_url ,context=context )as response :
             release_data =json .load (response )
             for asset in release_data .get ('assets',[]):
                 name =asset .get ('name','').lower ()
@@ -75,7 +90,7 @@ def get_release_asset_url_filtered (repo_owner ,repo_name ,version ,keywords ,ex
                     return asset .get ('browser_download_url')
     except Exception as e :
         print (f"Error fetching filtered release info: {e }")
-    return None 
+    return None
 def extract_zip (directory ,partial_name ,extract_to ):
     for root ,_ ,files in os .walk (directory ):
         for file in files :
@@ -99,12 +114,13 @@ def extract_exact_zip (zip_path ,extract_to ):
 def get_latest_version (repo_owner ,repo_name ):
     api_url =f"https://api.github.com/repos/{repo_owner }/{repo_name }/releases/latest"
     try :
-        with urllib .request .urlopen (api_url )as response :
+        context = _get_ssl_context()
+        with urllib .request .urlopen (api_url ,context=context )as response :
             latest_release =json .load (response )
             return latest_release ['tag_name']
     except Exception as e :
         print (f"Error fetching release info: {e }")
-        return None 
+        return None
 def find_exe (folder ):
     for root ,_ ,files in os .walk (folder ):
         for f in files :
@@ -137,8 +153,9 @@ def _download_to (path_dir ,file_url ,progress_callback =None ):
         os .makedirs (path_dir ,exist_ok =True )
         file_name =file_url .split ("/")[-1 ];file_path =os .path .join (path_dir ,file_name )
         req =urllib .request .Request (file_url ,headers ={"User-Agent":"Mozilla/5.0"})
-        with urllib .request .urlopen (req ,timeout =60 )as response ,open (file_path ,"wb")as f :
-            total =int (response .getheader ("Content-Length","0")or 0 );downloaded =0 ;block =1024 *128 ;last_pct =-1 
+        context = _get_ssl_context()
+        with urllib .request .urlopen (req ,context=context ,timeout =60 )as response ,open (file_path ,"wb")as f :
+            total =int (response .getheader ("Content-Length","0")or 0 );downloaded =0 ;block =1024 *128 ;last_pct =-1
             while True :
                 chunk =response .read (block )
                 if not chunk :break 
@@ -154,7 +171,7 @@ def _download_to (path_dir ,file_url ,progress_callback =None ):
         print (f"File '{file_name }' downloaded successfully to '{path_dir }'")
         return file_path 
     except Exception as e :
-        print (f"Error downloading file: {e }");return None 
+        print (f"Error downloading file: {e }");return None
 def _launch_pal_editor ():
     repo_owner ="KrisCris";repo_name ="Palworld-Pal-Editor";version =get_latest_version (repo_owner ,repo_name )
     if not version :print ("Unable to fetch latest release version.");open_file_with_default_app ("https://github.com/KrisCris/Palworld-Pal-Editor");return 

@@ -44,7 +44,8 @@ build_exe_options ={
 "include_files":[
 ("Assets/","Assets/"),
 ("readme.md","readme.md"),
-("license","license")
+("license","license"),
+("Assets/resources/cert/cacert.pem","Assets/resources/cert/cacert.pem")
 ],
 "zip_include_packages":[],
 "zip_exclude_packages":["*"],
@@ -59,7 +60,7 @@ ps6_a =find_pyside6_assets ()
 if ps6_a :build_exe_options ["include_files"].append (ps6_a )
 setup (
 name ="PalworldSaveTools",
-version ="1.1.50",
+version="1.1.51",
 options ={"build_exe":build_exe_options },
 executables =[
 Executable (
