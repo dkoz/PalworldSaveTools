@@ -354,12 +354,6 @@ def import_base_json (loaded_level_json ,exported_data ,target_guild_id ,offset 
                 c_raw ['group_id']=target_guild_id 
                 spv =c_raw ['object']['SaveParameter']['value']
                 spv ['SlotId']['value']['ContainerId']['value']['ID']['value']=new_worker_container_id 
-                if 'WorkRegion'in spv :
-                    spv ['WorkRegion']['value']['group_id']['value']=z 
-                if 'WorkerID'in spv :
-                    spv ['WorkerID']['value']=z 
-                if 'TaskData'in spv :
-                    spv ['TaskData']['value']={}
                 if 'MapObjectConcreteInstanceIdAssignedToExpedition'in spv :
                     spv ['MapObjectConcreteInstanceIdAssignedToExpedition']['value']=z 
             except :
@@ -367,7 +361,21 @@ def import_base_json (loaded_level_json ,exported_data ,target_guild_id ,offset 
             char_map .append (n_char )
             if target_group :
                 try :
-                    target_group ['value']['RawData']['value'].setdefault ('individual_character_handle_ids',[]).append ({'guid':z ,'instance_id':new_iid })
+                    raw =target_group ['value']['RawData']['value']
+                    handles =raw .setdefault ('individual_character_handle_ids',[])
+                    seen ={}
+                    unique_handles =[]
+                    for h in handles :
+                        try :
+                            inst =str (h ['instance_id'])
+                            if inst not in seen :
+                                seen [inst ]=True 
+                                unique_handles .append (h )
+                        except :
+                            unique_handles .append (h )
+                    handles [:]=unique_handles 
+                    if str (new_iid )not in seen :
+                        handles .append ({'guid':z ,'instance_id':new_iid })
                 except :
                     pass 
     for nwe in cloned_works :

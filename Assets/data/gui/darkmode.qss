@@ -876,3 +876,681 @@ QTextEdit#consoleTextEdit QScrollBar::add-page:vertical,
 QTextEdit#consoleTextEdit QScrollBar::sub-page:vertical {
     background: none;
 }
+
+/* ===== Edit Pals Frameless Dialog Styles ===== */
+
+/* Dialog container */
+QWidget#editPalsContainer {
+    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1,
+                stop:0 rgba(12,14,18,0.98), stop:0.5 rgba(10,16,22,0.98), stop:1 rgba(8,12,18,0.98));
+    border: 1px solid rgba(125,211,252,0.2);
+    border-radius: 12px;
+}
+
+/* Title bar */
+QWidget#editPalsTitleBar {
+    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
+                stop:0 rgba(125,211,252,0.08), stop:1 rgba(167,139,250,0.08));
+    border: none;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+QLabel#titleBarIcon {
+    font-size: 20px;
+    padding: 0px 4px;
+}
+
+QLabel#titleBarTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
+                stop:0 #7DD3FC, stop:1 #A78BFA);
+    padding: 0px 8px;
+}
+
+QPushButton#titleBarMinimize, QPushButton#titleBarMaximize {
+    background: transparent;
+    border: none;
+    color: #A6B8C8;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+QPushButton#titleBarMinimize:hover, QPushButton#titleBarMaximize:hover {
+    background: rgba(255,255,255,0.1);
+    color: #FFFFFF;
+}
+
+QPushButton#titleBarClose {
+    background: transparent;
+    border: none;
+    color: #FB7185;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+QPushButton#titleBarClose:hover {
+    background: rgba(251,113,133,0.2);
+    color: #FFFFFF;
+}
+
+/* Content area */
+QWidget#editPalsContent {
+    background: transparent;
+}
+
+/* Section headers in edit pals */
+QLabel#editPalsSection {
+    background: rgba(125,211,252,0.08);
+    border: 1px solid rgba(125,211,252,0.15);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #7DD3FC;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+/* Pal card widgets */
+QFrame#palCard {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 8px;
+}
+
+QFrame#palCard:hover {
+    background: rgba(125,211,252,0.08);
+    border-color: rgba(125,211,252,0.2);
+}
+
+QFrame#palCard[selected="true"] {
+    background: rgba(125,211,252,0.15);
+    border-color: rgba(125,211,252,0.4);
+}
+
+/* Skill badges */
+QLabel#skillBadge {
+    background: rgba(34,197,94,0.15);
+    border: 1px solid rgba(34,197,94,0.25);
+    border-radius: 4px;
+    padding: 3px 8px;
+    color: #22C55E;
+    font-size: 10px;
+}
+
+QLabel#skillBadge:hover {
+    background: rgba(34,197,94,0.25);
+}
+
+/* Stats display */
+QLabel#statsValue {
+    color: #FFFFFF;
+    font-weight: 700;
+}
+
+QLabel#statsLabel {
+    color: #A6B8C8;
+    font-size: 11px;
+}
+
+/* Input fields */
+QLineEdit#editPalsInput {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: #dfeefc;
+    font-size: 11px;
+}
+
+QLineEdit#editPalsInput:focus {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(125,211,252,0.3);
+}
+
+/* Spin boxes */
+QSpinBox#editPalsSpin {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 4px;
+    color: #dfeefc;
+}
+
+QSpinBox#editPalsSpin:focus {
+    border-color: rgba(125,211,252,0.3);
+}
+
+/* Combo boxes */
+QComboBox#editPalsCombo {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: #dfeefc;
+}
+
+QComboBox#editPalsCombo:hover {
+    border-color: rgba(125,211,252,0.2);
+}
+
+QComboBox#editPalsCombo::drop-down {
+    border: none;
+    padding-right: 20px;
+}
+
+/* Action buttons */
+QPushButton#editPalsActionButton {
+    background: rgba(125,211,252,0.12);
+    border: 1px solid rgba(125,211,252,0.2);
+    border-radius: 6px;
+    padding: 8px 16px;
+    color: #7DD3FC;
+    font-weight: 600;
+    font-size: 11px;
+}
+
+QPushButton#editPalsActionButton:hover {
+    background: rgba(125,211,252,0.2);
+    border-color: rgba(125,211,252,0.4);
+    color: #FFFFFF;
+}
+
+QPushButton#editPalsActionButton:pressed {
+    background: rgba(125,211,252,0.3);
+}
+
+/* Danger button */
+QPushButton#editPalsDangerButton {
+    background: rgba(251,113,133,0.12);
+    border: 1px solid rgba(251,113,133,0.2);
+    border-radius: 6px;
+    padding: 8px 16px;
+    color: #FB7185;
+    font-weight: 600;
+    font-size: 11px;
+}
+
+QPushButton#editPalsDangerButton:hover {
+    background: rgba(251,113,133,0.2);
+    border-color: rgba(251,113,133,0.4);
+    color: #FFFFFF;
+}
+
+/* Success button */
+QPushButton#editPalsSuccessButton {
+    background: rgba(34,197,94,0.12);
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 6px;
+    padding: 8px 16px;
+    color: #22C55E;
+    font-weight: 600;
+    font-size: 11px;
+}
+
+QPushButton#editPalsSuccessButton:hover {
+    background: rgba(34,197,94,0.2);
+    border-color: rgba(34,197,94,0.4);
+    color: #FFFFFF;
+}
+
+/* Group boxes */
+QGroupBox#editPalsGroup {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    margin-top: 8px;
+    padding: 12px;
+    font-size: 11px;
+    color: #A6B8C8;
+}
+
+QGroupBox#editPalsGroup::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 2px 8px;
+    color: #7DD3FC;
+    font-weight: 600;
+}
+
+/* Scroll areas */
+QScrollArea#editPalsScroll {
+    background: transparent;
+    border: none;
+}
+
+QScrollArea#editPalsScroll > QWidget > QWidget {
+    background: transparent;
+}
+
+/* Pal selector widget */
+QFrame#palSelectorWidget {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+}
+
+QFrame#palSelectorWidget:hover {
+    border-color: rgba(125,211,252,0.2);
+}
+
+QFrame#palSelectorWidget[selected="true"] {
+    background: rgba(125,211,252,0.12);
+    border-color: rgba(125,211,252,0.4);
+}
+
+/* Enhanced tab styling for Edit Pals */
+QTabWidget#editPalsTab::pane {
+    background: rgba(18,20,24,0.85);
+    border: 1px solid rgba(125,211,252,0.1);
+    border-radius: 10px;
+    padding: 12px;
+    margin-top: -1px;
+}
+
+/* Context menu for edit pals */
+QMenu#editPalsContextMenu {
+    background: rgba(12,14,18,0.98);
+    border: 1px solid rgba(125,211,252,0.2);
+    border-radius: 8px;
+    padding: 4px;
+}
+
+QMenu#editPalsContextMenu::item {
+    padding: 8px 20px;
+    border-radius: 4px;
+    color: #E6EEF6;
+}
+
+QMenu#editPalsContextMenu::item:selected {
+    background: rgba(125,211,252,0.15);
+    color: #FFFFFF;
+}
+
+QMenu#editPalsContextMenu::separator {
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 4px 10px;
+}
+
+/* ===== Edit Pals Tab Widget Styles ===== */
+
+QTabWidget#editPalsTab::pane {
+    background: rgba(18,20,24,0.85);
+    border: 1px solid rgba(125,211,252,0.1);
+    border-radius: 10px;
+    padding: 12px;
+    margin-top: -1px;
+}
+
+QTabWidget#editPalsTab::tab-bar {
+    left: 10px;
+}
+
+QTabWidget#editPalsTab QTabBar::tab {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-bottom: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 10px 20px;
+    color: #A6B8C8;
+    font-weight: 600;
+    font-size: 12px;
+    margin-right: 4px;
+}
+
+QTabWidget#editPalsTab QTabBar::tab:hover {
+    background: rgba(125,211,252,0.08);
+    color: #7DD3FC;
+}
+
+QTabWidget#editPalsTab QTabBar::tab:selected {
+    background: rgba(125,211,252,0.15);
+    border: 1px solid rgba(125,211,252,0.3);
+    border-bottom: none;
+    color: #7DD3FC;
+}
+
+/* Save and Cancel tabs special styling */
+QTabWidget#editPalsTab QTabBar::tab:last {
+    background: rgba(34,197,94,0.12);
+    border-color: rgba(34,197,94,0.25);
+    color: #22C55E;
+}
+
+QTabWidget#editPalsTab QTabBar::tab:last:hover {
+    background: rgba(34,197,94,0.2);
+}
+
+QTabWidget#editPalsTab QTabBar::tab:nth-of-type(5) {
+    background: rgba(251,113,133,0.12);
+    border-color: rgba(251,113,133,0.25);
+    color: #FB7185;
+}
+
+QTabWidget#editPalsTab QTabBar::tab:nth-of-type(5):hover {
+    background: rgba(251,113,133,0.2);
+}
+
+/* ===== Section Labels ===== */
+
+QLabel#sectionLabel {
+    color: #7DD3FC;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 4px 0px;
+}
+
+/* ===== Slot Count Label ===== */
+
+QLabel#slotCountLabel {
+    color: #A6B8C8;
+    font-size: 11px;
+    padding: 4px 8px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 4px;
+}
+
+QLabel#slotCountLabel[warning="true"] {
+    color: #FB7185;
+    font-weight: bold;
+}
+
+/* ===== Pal Name Label ===== */
+
+QLabel#palNameLabel {
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* ===== Stats Display Label ===== */
+
+QLabel#statsDisplay {
+    color: #dfeefc;
+    font-size: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    padding: 8px 12px;
+    line-height: 1.4;
+}
+
+/* ===== Gender Icon Label ===== */
+
+QLabel#genderIconLabel {
+    font-size: 16px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* ===== Skill Buttons ===== */
+
+QPushButton#skillButton {
+    text-align: left;
+    padding: 6px 10px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.04);
+    color: #dfeefc;
+    font-size: 11px;
+    font-weight: 500;
+    min-width: 150px;
+}
+
+QPushButton#skillButton:hover {
+    background: rgba(125,211,252,0.12);
+    border-color: rgba(125,211,252,0.3);
+    color: #7DD3FC;
+}
+
+QPushButton#skillButton:pressed {
+    background: rgba(125,211,252,0.2);
+}
+
+/* ===== Star Buttons ===== */
+
+QPushButton#starButton {
+    font-size: 16px;
+    color: #FFD700;
+    border: none;
+    background: transparent;
+    padding: 0px;
+    min-width: 24px;
+    max-width: 24px;
+    border-radius: 4px;
+}
+
+QPushButton#starButton:hover {
+    background: rgba(255,215,0,0.15);
+    color: #FFA500;
+}
+
+QPushButton#starButton:pressed {
+    background: rgba(255,215,0,0.25);
+}
+
+/* ===== Pal Icon ===== */
+
+QFrame#palIcon {
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 40px;
+    background-color: rgba(30,35,45,0.8);
+}
+
+QFrame#palIcon:hover {
+    border: 2px solid #7DD3FC;
+    background-color: rgba(40,45,55,0.9);
+}
+
+/* ===== Pal Card (Enhanced) ===== */
+
+QFrame#palCard {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 8px;
+}
+
+QFrame#palCard:hover {
+    background: rgba(125,211,252,0.08);
+    border-color: rgba(125,211,252,0.2);
+}
+
+QFrame#palCard[selected="true"] {
+    background: rgba(125,211,252,0.15);
+    border-color: rgba(125,211,252,0.4);
+}
+
+/* ===== Skills Scroll Area ===== */
+
+QScrollArea#skillsScrollArea {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 6px;
+}
+
+QScrollArea#skillsScrollArea > QWidget > QWidget {
+    background: transparent;
+}
+
+/* ===== Pal Container ===== */
+
+QWidget#palContainer {
+    background: transparent;
+}
+
+/* ===== Combo Box Drop-down Items ===== */
+
+QComboBox#editPalsCombo QAbstractItemView {
+    background: rgba(18,20,24,0.98);
+    border: 1px solid rgba(125,211,252,0.2);
+    border-radius: 6px;
+    padding: 4px;
+    selection-background-color: rgba(125,211,252,0.2);
+    selection-color: #FFFFFF;
+    color: #dfeefc;
+}
+
+QComboBox#editPalsCombo QAbstractItemView::item {
+    padding: 6px 12px;
+    border-radius: 4px;
+    min-height: 24px;
+}
+
+QComboBox#editPalsCombo QAbstractItemView::item:hover {
+    background: rgba(125,211,252,0.15);
+}
+
+QComboBox#editPalsCombo QAbstractItemView::item:selected {
+    background: rgba(125,211,252,0.25);
+    color: #7DD3FC;
+}
+
+/* ===== Spin Box Enhancements ===== */
+
+QSpinBox#editPalsSpin::up-button,
+QSpinBox#editPalsSpin::down-button {
+    background: rgba(255,255,255,0.05);
+    border: none;
+    width: 20px;
+    border-radius: 3px;
+}
+
+QSpinBox#editPalsSpin::up-button:hover,
+QSpinBox#editPalsSpin::down-button:hover {
+    background: rgba(125,211,252,0.15);
+}
+
+QSpinBox#editPalsSpin::up-arrow {
+    image: none;
+    border: 5px solid transparent;
+    border-bottom: 5px solid #7DD3FC;
+    margin: 1px;
+}
+
+QSpinBox#editPalsSpin::down-arrow {
+    image: none;
+    border: 5px solid transparent;
+    border-top: 5px solid #7DD3FC;
+    margin: 1px;
+}
+
+/* ===== List Widget for Skill Select Dialog ===== */
+
+QListWidget {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    color: #dfeefc;
+    font-size: 12px;
+    padding: 4px;
+}
+
+QListWidget::item {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 2px;
+}
+
+QListWidget::item:hover {
+    background: rgba(125,211,252,0.12);
+}
+
+QListWidget::item:selected {
+    background: rgba(125,211,252,0.2);
+    color: #7DD3FC;
+}
+
+QListWidget::item:selected:!active {
+    background: rgba(125,211,252,0.15);
+}
+
+/* ===== Dialog Enhancement for Skill Select ===== */
+
+QDialog[dialogType="skillSelect"] {
+    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1,
+                stop:0 rgba(12,14,18,0.98), stop:1 rgba(8,12,18,0.98));
+    border: 1px solid rgba(125,211,252,0.2);
+    border-radius: 12px;
+}
+
+/* ===== ScrollBar Styling for Edit Pals ===== */
+
+QScrollArea#editPalsScroll QScrollBar:vertical,
+QScrollArea#skillsScrollArea QScrollBar:vertical {
+    background: rgba(255,255,255,0.02);
+    width: 12px;
+    border-radius: 6px;
+    margin: 0px;
+}
+
+QScrollArea#editPalsScroll QScrollBar::handle:vertical,
+QScrollArea#skillsScrollArea QScrollBar::handle:vertical {
+    background: rgba(125,211,252,0.2);
+    min-height: 30px;
+    border-radius: 6px;
+}
+
+QScrollArea#editPalsScroll QScrollBar::handle:vertical:hover,
+QScrollArea#skillsScrollArea QScrollBar::handle:vertical:hover {
+    background: rgba(125,211,252,0.35);
+}
+
+QScrollArea#editPalsScroll QScrollBar::add-line:vertical,
+QScrollArea#editPalsScroll QScrollBar::sub-line:vertical,
+QScrollArea#skillsScrollArea QScrollBar::add-line:vertical,
+QScrollArea#skillsScrollArea QScrollBar::sub-line:vertical {
+    height: 0px;
+    background: none;
+}
+
+QScrollArea#editPalsScroll QScrollBar::add-page:vertical,
+QScrollArea#editPalsScroll QScrollBar::sub-page:vertical,
+QScrollArea#skillsScrollArea QScrollBar::add-page:vertical,
+QScrollArea#skillsScrollArea QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+/* ===== Horizontal ScrollBar ===== */
+
+QScrollArea#editPalsScroll QScrollBar:horizontal,
+QScrollArea#skillsScrollArea QScrollBar:horizontal {
+    background: rgba(255,255,255,0.02);
+    height: 12px;
+    border-radius: 6px;
+    margin: 0px;
+}
+
+QScrollArea#editPalsScroll QScrollBar::handle:horizontal,
+QScrollArea#skillsScrollArea QScrollBar::handle:horizontal {
+    background: rgba(125,211,252,0.2);
+    min-width: 30px;
+    border-radius: 6px;
+}
+
+QScrollArea#editPalsScroll QScrollBar::handle:horizontal:hover,
+QScrollArea#skillsScrollArea QScrollBar::handle:horizontal:hover {
+    background: rgba(125,211,252,0.35);
+}
+
+QScrollArea#editPalsScroll QScrollBar::add-line:horizontal,
+QScrollArea#editPalsScroll QScrollBar::sub-line:horizontal,
+QScrollArea#skillsScrollArea QScrollBar::add-line:horizontal,
+QScrollArea#skillsScrollArea QScrollBar::sub-line:horizontal {
+    width: 0px;
+    background: none;
+}
+
+QScrollArea#editPalsScroll QScrollBar::add-page:horizontal,
+QScrollArea#editPalsScroll QScrollBar::sub-page:horizontal,
+QScrollArea#skillsScrollArea QScrollBar::add-page:horizontal,
+QScrollArea#skillsScrollArea QScrollBar::sub-page:horizontal {
+    background: none;
+}
+

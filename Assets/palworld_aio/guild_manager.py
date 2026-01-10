@@ -76,27 +76,29 @@ def move_player_to_guild (player_uid ,target_guild_id ):
                 raw ['group_id']=new_gid_obj 
                 sp ['OwnerPlayerUId']['value']=found ['player_uid']
                 try :
-                    sp ['WorkRegion']['group_id']['value']=zero 
-                except :
-                    pass 
-                try :
-                    sp ['WorkerID']['value']=zero 
-                except :
-                    pass 
-                try :
-                    if 'TaskData'in sp :
-                        sp ['TaskData']['value']={}
-                except :
-                    pass 
-                try :
                     if 'MapObjectConcreteInstanceIdAssignedToExpedition'in sp :
                         del sp ['MapObjectConcreteInstanceIdAssignedToExpedition']
                 except :
                     pass 
-                try :
-                    del sp ['WorkSuitabilityOptionInfo']
-                except :
-                    pass 
+        except :
+            pass 
+    if origin_group :
+        try :
+            origin_raw =origin_group ['value']['RawData']['value']
+            origin_handles =origin_raw .get ('individual_character_handle_ids',[])
+            if isinstance (origin_handles ,list ):
+                origin_handles [:]=[h for h in origin_handles if str (h .get ('instance_id',''))not in moved_instance_ids ]
+                seen ={}
+                unique_handles =[]
+                for h in origin_handles :
+                    try :
+                        inst =str (h ['instance_id'])
+                        if inst not in seen :
+                            seen [inst ]=True 
+                            unique_handles .append (h )
+                    except :
+                        unique_handles .append (h )
+                origin_handles [:]=unique_handles 
         except :
             pass 
     for entry in group_map :
@@ -108,11 +110,23 @@ def move_player_to_guild (player_uid ,target_guild_id ):
             if not isinstance (handles ,list ):
                 handles =[]
                 raw ['individual_character_handle_ids']=handles 
-            for inst in moved_instance_ids :
+            seen ={}
+            unique_handles =[]
+            for h in handles :
                 try :
-                    handles .append ({'guid':zero ,'instance_id':inst })
+                    inst =str (h ['instance_id'])
+                    if inst not in seen :
+                        seen [inst ]=True 
+                        unique_handles .append (h )
                 except :
-                    pass 
+                    unique_handles .append (h )
+            handles [:]=unique_handles 
+            existing =set (seen .keys ())
+            for inst in moved_instance_ids :
+                inst_str =str (inst )
+                if inst_str not in existing :
+                    handles .append ({'guid':zero ,'instance_id':inst })
+                    existing .add (inst_str )
             break 
         except :
             pass 
@@ -141,6 +155,8 @@ def rebuild_all_players_pals ():
     players_folder =os .path .join (constants .current_save_path ,'Players')
     if not os .path .isdir (players_folder ):
         return False 
+    def nu (x ):
+        return str (x ).replace ('-','').lower ()
     real_players ={p .get ('player_uid')for g in gmap for p in g .get ('value',{}).get ('RawData',{}).get ('value',{}).get ('players',[])if p .get ('player_uid')}
     id_map ={}
     new_params =[]
@@ -161,25 +177,8 @@ def rebuild_all_players_pals ():
         raw2 =cp ['value']['RawData']['value']
         sp2 =raw2 ['object']['SaveParameter']['value']
         sp2 ['OwnerPlayerUId']['value']=owner 
-        gid =next ((g ['value']['RawData']['value'].get ('group_id')for g in gmap for p in g ['value']['RawData']['value'].get ('players',[])if p .get ('player_uid')==owner ),zero )
+        gid =next ((g ['value']['RawData']['value'].get ('group_id')for g in gmap if nu (owner )in {nu (p ['player_uid'])for p in g ['value']['RawData']['value'].get ('players',[])}),zero )
         raw2 ['group_id']=gid 
-        try :
-            sp2 ['WorkerID']['value']=zero 
-        except :
-            pass 
-        try :
-            sp2 ['WorkRegion']['group_id']['value']=zero 
-        except :
-            pass 
-        try :
-            if 'TaskData'in sp2 :
-                sp2 ['TaskData']['value']={}
-        except :
-            pass 
-        try :
-            del sp2 ['WorkSuitabilityOptionInfo']
-        except :
-            pass 
         try :
             del sp2 ['MapObjectConcreteInstanceIdAssignedToExpedition']
         except :
@@ -207,9 +206,23 @@ def rebuild_all_players_pals ():
                 if str (h ['instance_id'])in id_map :
                     h ['instance_id']=id_map [str (h ['instance_id'])]
             handles =raw .get ('individual_character_handle_ids',[])
-            handles .clear ()
-            for n in id_map .values ():
-                handles .append ({'guid':zero ,'instance_id':n })
+            if not isinstance (handles ,list ):
+                handles =[]
+                raw ['individual_character_handle_ids']=handles 
+            handles [:]=[h for h in handles if str (h .get ('instance_id',''))not in id_map ]
+            seen ={}
+            unique_handles =[]
+            for h in handles :
+                try :
+                    inst =str (h ['instance_id'])
+                    if inst not in seen :
+                        seen [inst ]=True 
+                        unique_handles .append (h )
+                except :
+                    unique_handles .append (h )
+            handles [:]=unique_handles 
+            for old_id ,new_id in id_map .items ():
+                handles .append ({'guid':zero ,'instance_id':new_id })
         except :
             pass 
     final_cmap =[]
@@ -228,7 +241,6 @@ def rebuild_all_players_pals ():
 def rebuild_all_guilds ():
     if not constants .current_save_path or not constants .loaded_level_json :
         return False 
-    rebuild_all_players_pals ()
     wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
     def nu (x ):
         return str (x ).replace ('-','').lower ()
@@ -236,6 +248,21 @@ def rebuild_all_guilds ():
     group_map =wsd ['GroupSaveDataMap']['value']
     cmap =wsd ['CharacterSaveParameterMap']['value']
     guilds ={}
+    base_pals_by_gid ={}
+    for ch in cmap :
+        try :
+            rawf =ch ['value']['RawData']['value']
+            raw =rawf .get ('object',{}).get ('SaveParameter',{}).get ('value',{})
+            owner =raw .get ('OwnerPlayerUId',{}).get ('value')
+            if not owner :
+                gid =rawf .get ('group_id')
+                if gid :
+                    gid_str =nu (gid )
+                    if gid_str not in base_pals_by_gid :
+                        base_pals_by_gid [gid_str ]=[]
+                    base_pals_by_gid [gid_str ].append (ch )
+        except :
+            pass 
     for g in group_map :
         try :
             if g ['value']['GroupType']['value']['value']=='EPalGroupType::Guild':
@@ -257,17 +284,27 @@ def rebuild_all_guilds ():
                 if owner and nu (owner )in players_clean :
                     pals .append (ch )
                     continue 
-                gid2 =rawf .get ('group_id')
-                if not owner and gid2 and (nu (gid2 )==nu (g_gid )):
-                    pals .append (ch )
             except :
                 pass 
+        gid_str =nu (g_gid )
+        if gid_str in base_pals_by_gid :
+            pals .extend (base_pals_by_gid [gid_str ])
         ginfo ['pals']=pals 
     for ginfo in guilds .values ():
         gid =ginfo ['gid']
         handles =ginfo ['handles']
-        handles .clear ()
-        existing =set ()
+        seen ={}
+        unique_handles =[]
+        for h in handles :
+            try :
+                inst =nu (h ['instance_id'])
+                if inst not in seen :
+                    seen [inst ]=True 
+                    unique_handles .append (h )
+            except :
+                unique_handles .append (h )
+        handles [:]=unique_handles 
+        existing =set (seen .keys ())
         for ch in ginfo ['pals']:
             try :
                 inst =ch ['key']['InstanceId']['value']
@@ -276,25 +313,8 @@ def rebuild_all_guilds ():
                 rawf ['group_id']=gid 
                 sp =rawf ['object']['SaveParameter']['value']
                 try :
-                    sp ['WorkRegion']['group_id']['value']=zero 
-                except :
-                    pass 
-                try :
-                    sp ['WorkerID']['value']=zero 
-                except :
-                    pass 
-                try :
-                    if 'TaskData'in sp :
-                        sp ['TaskData']['value']={}
-                except :
-                    pass 
-                try :
                     if 'MapObjectConcreteInstanceIdAssignedToExpedition'in sp :
                         del sp ['MapObjectConcreteInstanceIdAssignedToExpedition']
-                except :
-                    pass 
-                try :
-                    del sp ['WorkSuitabilityOptionInfo']
                 except :
                     pass 
                 if inst_clean not in existing :
@@ -302,6 +322,9 @@ def rebuild_all_guilds ():
                     existing .add (inst_clean )
             except :
                 pass 
+    duplicates =debug_check_duplicate_handles ()
+    if duplicates :
+        print (f'DUPLICATE HANDLES DETECTED: {duplicates }')
     return True 
 def make_member_leader (guild_id ,player_uid ):
     if not constants .loaded_level_json :
@@ -336,3 +359,30 @@ def max_guild_level (guild_id ):
             g ['value']['RawData']['value']['base_camp_level']=30 
             return True 
     return False 
+def debug_check_duplicate_handles ():
+    if not constants .loaded_level_json :
+        return None 
+    wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
+    group_map =wsd ['GroupSaveDataMap']['value']
+    def nu (x ):
+        return str (x ).replace ('-','').lower ()
+    all_handles ={}
+    duplicates ={}
+    for g in group_map :
+        try :
+            if g ['value']['GroupType']['value']['value']!='EPalGroupType::Guild':
+                continue 
+            gid =str (g ['key'])
+            handles =g ['value']['RawData']['value'].get ('individual_character_handle_ids',[])
+            for h in handles :
+                inst =str (h ['instance_id'])
+                key =nu (inst )
+                if key in all_handles :
+                    if key not in duplicates :
+                        duplicates [key ]=[all_handles [key ]]
+                    duplicates [key ].append (gid )
+                else :
+                    all_handles [key ]=gid 
+        except :
+            pass 
+    return duplicates if duplicates else None 

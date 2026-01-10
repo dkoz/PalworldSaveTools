@@ -971,3 +971,82 @@ def remove_invalid_passives_from_save (parent =None ):
                 except :
                     pass 
     return removed_count 
+def unlock_all_technologies_for_player (player_uid ,parent =None ):
+    if not constants .current_save_path :
+        return False 
+    player_id =str (player_uid ).replace ('-','').lower ()
+    file_path =os .path .join (constants .current_save_path ,'Players',f'{player_id .zfill (32 )}.sav')
+    if not os .path .exists (file_path ):
+        return False 
+    try :
+        base_dir =os .path .dirname (os .path .dirname (os .path .abspath (__file__ )))
+        tech_file =os .path .join (base_dir ,'resources','game_data','technologydata.json')
+        with open (tech_file ,'r',encoding ='utf-8')as f :
+            tech_data =json .load (f )
+        all_techs =[item ['asset']for item in tech_data .get ('technology',[])]
+        p_json =sav_to_json (file_path )
+        def inject_all_techs (data ):
+            if isinstance (data ,dict ):
+                if 'UnlockedRecipeTechnologyNames'in data :
+                    values_list =data ['UnlockedRecipeTechnologyNames']['value']['values']
+                    current_set =set (values_list )
+                    for tech in all_techs :
+                        if tech not in current_set :
+                            values_list .append (tech )
+                for v in data .values ():
+                    inject_all_techs (v )
+            elif isinstance (data ,list ):
+                for item in data :
+                    inject_all_techs (item )
+        inject_all_techs (p_json )
+        json_to_sav (p_json ,file_path )
+        return True 
+    except Exception as e :
+        return False 
+def unlock_all_lab_research_for_guild (guild_id ,parent =None ):
+    if not constants .loaded_level_json :
+        return False 
+    try :
+        base_dir =os .path .dirname (os .path .dirname (os .path .abspath (__file__ )))
+        research_file =os .path .join (base_dir ,'resources','game_data','labresearchdata.json')
+        with open (research_file ,'r',encoding ='utf-8')as f :
+            research_data =json .load (f )
+        wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
+        group_data =wsd .get ('GroupSaveDataMap',{}).get ('value',[])
+        target_guild =None 
+        for g in group_data :
+            if g ['value']['GroupType']['value']['value']=='EPalGroupType::Guild':
+                gid =str (g ['key']).replace ('-','').lower ()
+                if gid ==str (guild_id ).replace ('-','').lower ():
+                    target_guild =g 
+                    break 
+        if not target_guild :
+            return False 
+        wsd =constants .loaded_level_json ['properties']['worldSaveData']['value']
+        if 'GuildExtraSaveDataMap'not in wsd :
+            return False 
+        guild_extra_map =wsd ['GuildExtraSaveDataMap'].get ('value',[])
+        target_extra =None 
+        for extra_entry in guild_extra_map :
+            if isinstance (extra_entry ,dict )and 'key'in extra_entry :
+                extra_gid =str (extra_entry ['key']).replace ('-','').lower ()
+                search_gid =str (guild_id ).replace ('-','').lower ()
+                if extra_gid ==search_gid :
+                    target_extra =extra_entry 
+                    break 
+        if not target_extra :
+            return False 
+        extra_value =target_extra .get ('value',{})
+        if 'Lab'not in extra_value :
+            return False 
+        lab_data =extra_value ['Lab']['value']['RawData']['value']
+        complete_research_list =[]
+        for research_id ,research_info in research_data .items ():
+            complete_research_list .append ({
+            'research_id':research_id ,
+            'work_amount':research_info ['work_amount']
+            })
+        lab_data ['research_info']=complete_research_list 
+        return True 
+    except Exception as e :
+        return False 

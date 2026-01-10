@@ -4,7 +4,7 @@ from fix_host_save import ask_string_with_icon
 from common import get_assets_directory 
 from loading_manager import run_with_loading 
 import nerdfont as nf 
-from PySide6 .QtWidgets import QWidget ,QVBoxLayout ,QHBoxLayout ,QPushButton ,QComboBox ,QFrame ,QMessageBox ,QFileDialog ,QStyleFactory ,QApplication 
+from PySide6 .QtWidgets import QWidget ,QVBoxLayout ,QHBoxLayout ,QPushButton ,QComboBox ,QFrame ,QMessageBox ,QFileDialog ,QStyleFactory ,QApplication ,QLabel 
 from PySide6 .QtCore import Qt ,Signal ,QObject ,QTimer ,QMetaObject ,Q_ARG 
 from PySide6 .QtGui import QIcon ,QFont 
 saves =[]
@@ -382,11 +382,19 @@ class GamePassSaveFixWidget (QWidget ):
             if widget :
                 widget .deleteLater ()
         if saves :
+            label_layout =QHBoxLayout ()
+            label_layout .addStretch ()
+            label =QLabel ("Available Saves ▼")
+            label .setFont (QFont ("Segoe UI",10 ))
+            label_layout .addWidget (label )
+            label_layout .addStretch ()
+            layout .addLayout (label_layout )
             combo_layout =QHBoxLayout ()
             combo_layout .addStretch ()
             combobox =QComboBox ()
             combobox .setFont (QFont ("Segoe UI",10 ))
             combobox .setMinimumWidth (400 )
+            combobox .setPlaceholderText ("Select a save...")
             combobox .addItems (saves )
             combo_layout .addWidget (combobox )
             combo_layout .addStretch ()
@@ -396,7 +404,9 @@ class GamePassSaveFixWidget (QWidget ):
             button =QPushButton (t ("xgp.ui.convert"))
             button .setFont (QFont ("Segoe UI",10 ))
             button .setFixedWidth (250 )
+            button .setEnabled (combobox .currentIndex ()>=0 )
             button .clicked .connect (lambda :self .convert_JSON_sav (combobox .currentText ()))
+            combobox .currentIndexChanged .connect (lambda index :button .setEnabled (index >=0 ))
             button_layout .addWidget (button )
             button_layout .addStretch ()
             layout .addLayout (button_layout )

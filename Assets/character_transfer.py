@@ -594,6 +594,7 @@ def sync_player_timestamps (targ_uid ,target_lvl ):
         return True 
     except :
         return False 
+from palworld_save_tools .archive import UUID as PalUUID 
 def transfer_guild (targ_lvl ,targ_json ,host_guid ,targ_uid ,source_guild_dict ):
     if "GroupSaveDataMap"not in targ_lvl or targ_lvl ["GroupSaveDataMap"].get ("value")is None :
         targ_lvl ["GroupSaveDataMap"]={"value":[]}
@@ -624,18 +625,26 @@ def transfer_guild (targ_lvl ,targ_json ,host_guid ,targ_uid ,source_guild_dict 
         if raw .get ("admin_player_uid")==host_guid :
             raw ["admin_player_uid"]=targ_uid 
         return True 
+    zero_uuid =PalUUID (b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
     if source_guild :
         cloned =fast_deepcopy (source_guild )
         cloned ["key"]=UUID (os .urandom (16 ))
         raw =cloned ["value"]["RawData"]["value"]
         raw ["group_id"]=UUID (os .urandom (16 ))
+        raw ["group_name"]="Transferred Guild"
         raw ["players"]=[source_player ]
         raw ["admin_player_uid"]=targ_uid 
         raw ["base_ids"]=[]
         raw ["map_object_instance_ids_base_camp_points"]=[]
         raw ["individual_character_handle_ids"]=[]
-        raw ["level"]={}
-        raw ["base_camp_ids"]=[]if "base_camp_ids"in raw else []
+        raw ["org_type"]=0 
+        raw ["leading_bytes"]=[0 ,0 ,0 ,0 ]
+        raw ["unknown_1"]=0 
+        raw ["base_camp_level"]=1 
+        raw ["guild_name"]="Transferred Guild"
+        raw ["last_guild_name_modifier_player_uid"]=zero_uuid 
+        raw ["unknown_2"]=[0 ,0 ,0 ,0 ]
+        raw ["trailing_bytes"]=[0 ,0 ,0 ,0 ]
         guilds .append (cloned )
         return True 
     new_g ={
@@ -643,13 +652,22 @@ def transfer_guild (targ_lvl ,targ_json ,host_guid ,targ_uid ,source_guild_dict 
     "value":{
     "GroupType":{"value":{"value":"EPalGroupType::Guild"}},
     "RawData":{"value":{
+    "group_type":"EPalGroupType::Guild",
     "group_id":UUID (os .urandom (16 )),
-    "players":[{"player_uid":targ_uid ,"player_info":{"player_name":targ_json ["SaveData"]["value"]["NickName"]["value"]}}],
-    "admin_player_uid":targ_uid ,
+    "group_name":"Transferred Guild",
     "individual_character_handle_ids":[],
+    "org_type":0 ,
+    "leading_bytes":[0 ,0 ,0 ,0 ],
     "base_ids":[],
+    "unknown_1":0 ,
+    "base_camp_level":1 ,
     "map_object_instance_ids_base_camp_points":[],
-    "group_name":{"value":"Transferred Guild"}
+    "guild_name":"Transferred Guild",
+    "last_guild_name_modifier_player_uid":zero_uuid ,
+    "unknown_2":[0 ,0 ,0 ,0 ],
+    "admin_player_uid":targ_uid ,
+    "players":[{"player_uid":targ_uid ,"player_info":{"last_online_real_time":target_world_tick ,"player_name":targ_json ["SaveData"]["value"]["NickName"]["value"]}}],
+    "trailing_bytes":[0 ,0 ,0 ,0 ]
     }}
     }
     }
@@ -780,10 +798,8 @@ def transfer_pals_only ():
             cp_raw ["group_id"]=str (targ_guild_id )
             pv =cp_raw ["object"]["SaveParameter"]["value"]
             pv ["OwnerPlayerUId"]["value"]=targ_uid 
-            for k in ["OldOwnerPlayerUIds","MapObjectConcreteInstanceIdAssignedToExpedition","WorkSuitabilityOptionInfo"]:
+            for k in ["OldOwnerPlayerUIds","MapObjectConcreteInstanceIdAssignedToExpedition"]:
                 pv .pop (k ,None )
-            if "WorkRegion"in pv :pv ["WorkRegion"]["group_id"]["value"]=zero 
-            if "WorkerID"in pv :pv ["WorkerID"]["value"]=zero 
             src_params .append (cp )
         except :
             continue 
@@ -829,9 +845,21 @@ def transfer_pals_only ():
         raw =entry ["value"]["RawData"]["value"]
         if raw .get ("group_id")==targ_guild_id :
             handles =raw .get ("individual_character_handle_ids",[])
+            handles [:]=[h for h in handles if str (h .get ("instance_id",""))not in id_map ]
+            seen ={}
+            unique_handles =[]
+            for h in handles :
+                try :
+                    inst =str (h ["instance_id"])
+                    if inst not in seen :
+                        seen [inst ]=True 
+                        unique_handles .append (h )
+                except :
+                    unique_handles .append (h )
+            handles [:]=unique_handles 
             for new_inst in id_map .values ():
-                handles .append ({"guid":targ_uid_str ,"instance_id":new_inst })
-            raw ["individual_character_handle_ids"]=handles 
+                handles .append ({"guid":zero ,"instance_id":new_inst })
+            break 
     return True 
 def get_val_safe (p ):
     try :return p ["value"]["RawData"]["value"]["object"]["SaveParameter"]["value"]

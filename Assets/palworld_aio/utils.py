@@ -4,12 +4,14 @@ import re
 import ssl 
 import mmap 
 import pickle 
+import json 
+import math 
 import urllib .request 
 from palworld_save_tools .archive import UUID 
 from palworld_save_tools .gvas import GvasFile 
 from palworld_save_tools .palsav import decompress_sav_to_gvas ,compress_gvas_to_sav 
 from palworld_save_tools .paltypes import PALWORLD_TYPE_HINTS 
-from common import get_versions 
+from common import get_versions ,get_assets_directory 
 from palobject import SKP_PALWORLD_CUSTOM_PROPERTIES 
 try :
     from palworld_aio import constants 
@@ -105,3 +107,59 @@ def toUUID (val ):
 def restart_program ():
     python =sys .executable 
     os .execl (python ,python ,*sys .argv )
+_pal_data_cache =None 
+def get_pal_data (character_key ):
+    global _pal_data_cache 
+    if _pal_data_cache is None :
+        try :
+            paldata_path =os .path .join (get_assets_directory (),"resources","game_data","paldata.json")
+            if os .path .exists (paldata_path ):
+                with open (paldata_path ,'r',encoding ='utf-8')as f :
+                    data =json .load (f )
+                    pals_list =data .get ('pals',[])
+                    _pal_data_cache ={pal ['asset'].lower ():pal for pal in pals_list }
+        except Exception as e :
+            print (f"Error loading pal data: {e }")
+            _pal_data_cache ={}
+    default_scaling ={'scaling':{'hp':10 ,'attack':10 ,'defense':10 }}
+    return _pal_data_cache .get (character_key .lower (),default_scaling )
+def calculate_max_hp (pal_data ,level ,talent_hp =0 ,rank_hp =0 ,is_boss =False ,is_lucky =False ):
+    if not pal_data :
+        return 0 
+    hp_scaling =pal_data .get ('scaling',{}).get ('hp',0 )
+    condenser_bonus =(1 if rank_hp >0 else 0 )*0.05 
+    hp_iv =talent_hp *0.3 /100 
+    hp_soul_bonus =rank_hp *0.03 
+    alpha_scaling =1.2 if is_boss or is_lucky else 1 
+    hp =math .floor (500 +(5 *level )+(hp_scaling *0.5 *level *(1 +hp_iv )*alpha_scaling ))
+    return math .floor (hp *(1 +condenser_bonus )*(1 +hp_soul_bonus ))*1000 
+def calculate_attack (pal_data ,level ,talent_shot =0 ,rank_attack =0 ):
+    if not pal_data :
+        return 0 
+    attack_scaling =pal_data .get ('scaling',{}).get ('attack',0 )
+    condenser_bonus =(1 if rank_attack >0 else 0 )*0.05 
+    attack_iv =talent_shot *0.3 /100 
+    attack_soul_bonus =rank_attack *0.03 
+    attack =math .floor (attack_scaling *0.075 *level *(1 +attack_iv ))
+    return math .floor (attack *(1 +condenser_bonus )*(1 +attack_soul_bonus ))
+def calculate_defense (pal_data ,level ,talent_defense =0 ,rank_defense =0 ):
+    if not pal_data :
+        return 0 
+    defense_scaling =pal_data .get ('scaling',{}).get ('defense',0 )
+    condenser_bonus =(1 if rank_defense >0 else 0 )*0.05 
+    defense_iv =talent_defense *0.3 /100 
+    defense_soul_bonus =rank_defense *0.03 
+    defense =math .floor (50 +defense_scaling *0.075 *level *(1 +defense_iv ))
+    return math .floor (defense *(1 +condenser_bonus )*(1 +defense_soul_bonus ))
+def calculate_work_speed (passive_bonuses =0 ):
+    return 70 *(1 +passive_bonuses )
+def format_character_key (character_id :str )->str :
+    character_id_lower =character_id .lower ()
+    if character_id_lower .startswith ("boss_"):
+        return character_id_lower [5 :]
+    elif character_id_lower .startswith ("predator_"):
+        return character_id_lower [9 :]
+    elif character_id_lower .endswith ("_avatar"):
+        return character_id_lower [:-7 ]
+    else :
+        return character_id_lower 

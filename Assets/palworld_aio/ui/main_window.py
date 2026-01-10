@@ -32,7 +32,8 @@ try :
     delete_invalid_structure_map_objects ,delete_all_skins ,unlock_all_private_chests ,
     remove_invalid_items_from_save ,remove_invalid_pals_from_save ,remove_invalid_passives_from_save ,fix_missions ,
     reset_anti_air_turrets ,reset_dungeons ,unlock_viewing_cage_for_player ,
-    fix_all_negative_timestamps ,reset_selected_player_timestamp ,detect_and_trim_overfilled_inventories 
+    fix_all_negative_timestamps ,reset_selected_player_timestamp ,detect_and_trim_overfilled_inventories ,
+    unlock_all_technologies_for_player ,unlock_all_lab_research_for_guild 
     )
     from palworld_aio .guild_manager import move_player_to_guild ,rebuild_all_guilds ,make_member_leader ,rename_guild ,max_guild_level 
     from palworld_aio .base_manager import export_base_json ,import_base_json ,clone_base_complete 
@@ -822,10 +823,13 @@ class MainWindow (QMainWindow ):
         menu .addAction (self ._create_action (t ('player.rename.menu'),lambda :self ._rename_player (item .text (4 ),item .text (0 ))))
         menu .addAction (self ._create_action (t ('player.viewing_cage.menu'),lambda :self ._unlock_viewing_cage (item .text (4 ))))
         menu .addAction (self ._create_action (t ('player.reset_timestamp.menu')if t else 'Reset Timestamp',lambda :self ._reset_player_timestamp (item .text (4 ))))
+        menu .addAction (self ._create_action (t ('player.edit_pals.menu')if t else 'Edit Pals',lambda :self ._edit_player_pals (item .text (4 ),item .text (0 ))))
+        menu .addAction (self ._create_action (t ('player.unlock_technologies.menu')if t else 'Unlock All Technologies',lambda :self ._unlock_all_technologies_for_player (item .text (4 ))))
         menu .addSeparator ()
         menu .addAction (self ._create_action (t ('guild.ctx.make_leader'),lambda :self ._make_leader (item .text (6 ),item .text (4 ))))
         menu .addAction (self ._create_action (t ('deletion.ctx.delete_guild'),lambda :self ._delete_guild (item .text (6 ))))
         menu .addAction (self ._create_action (t ('guild.rename.menu'),lambda :self ._rename_guild_action (item .text (6 ),item .text (5 ))))
+        menu .addAction (self ._create_action (t ('guild.unlock_lab_research.menu')if t else 'Unlock All Lab Research',lambda :self ._unlock_all_lab_research_for_guild (item .text (6 ))))
         menu .addAction (self ._create_action (t ('guild.menu.max_level'),lambda :self ._max_guild_level (item .text (6 ))))
         menu .addAction (self ._create_action (t ('button.import'),lambda :self ._import_base_to_guild (item .text (6 ))))
         menu .exec (self .players_panel .tree .viewport ().mapToGlobal (pos ))
@@ -839,6 +843,7 @@ class MainWindow (QMainWindow ):
         menu .addAction (self ._create_action (t ('deletion.ctx.delete_guild'),lambda :self ._delete_guild (item .text (1 ))))
         menu .addAction (self ._create_action (t ('guild.rename.menu'),lambda :self ._rename_guild_action (item .text (1 ),item .text (0 ))))
         menu .addAction (self ._create_action (t ('guild.menu.max_level'),lambda :self ._max_guild_level (item .text (1 ))))
+        menu .addAction (self ._create_action (t ('guild.unlock_lab_research.menu')if t else 'Unlock All Lab Research',lambda :self ._unlock_all_lab_research_for_guild (item .text (1 ))))
         menu .addSeparator ()
         menu .addAction (self ._create_action (t ('base.export_guild'),lambda :self ._export_bases_for_guild (item .text (1 ))))
         menu .addAction (self ._create_action (t ('base.import_multi'),lambda :self ._import_base_to_guild (item .text (1 ))))
@@ -853,11 +858,14 @@ class MainWindow (QMainWindow ):
             return 
         menu =QMenu (self )
         menu .addAction (self ._create_action (t ('guild.ctx.make_leader'),lambda :self ._make_leader (guild_data [1 ],item .text (4 ))))
+        menu .addAction (self ._create_action (t ('guild.unlock_lab_research.menu')if t else 'Unlock All Lab Research',lambda :self ._unlock_all_lab_research_for_guild (guild_data [1 ])))
+        menu .addSeparator ()
         menu .addAction (self ._create_action (t ('deletion.ctx.add_exclusion'),lambda :self ._add_exclusion ('players',item .text (4 ))))
         menu .addAction (self ._create_action (t ('deletion.ctx.remove_exclusion'),lambda :self ._remove_exclusion ('players',item .text (4 ))))
         menu .addAction (self ._create_action (t ('deletion.ctx.delete_player'),lambda :self ._delete_player (item .text (4 ))))
         menu .addAction (self ._create_action (t ('player.rename.menu'),lambda :self ._rename_player (item .text (4 ),item .text (0 ).replace ('[L] ',''))))
         menu .addAction (self ._create_action (t ('player.reset_timestamp.menu')if t else 'Reset Timestamp',lambda :self ._reset_player_timestamp (item .text (4 ))))
+        menu .addAction (self ._create_action (t ('player.edit_pals.menu')if t else 'Edit Pals',lambda :self ._edit_player_pals (item .text (4 ),item .text (0 ).replace ('[L] ',''))))
         menu .exec (self .guild_members_panel .tree .viewport ().mapToGlobal (pos ))
     def _show_base_context_menu (self ,pos ):
         item =self .bases_panel .tree .itemAt (pos )
@@ -1491,6 +1499,21 @@ class MainWindow (QMainWindow ):
             QMessageBox .information (self ,t ('success.title'),t ('clone_base.msg'))
         else :
             QMessageBox .warning (self ,t ('error.title'),'Failed to clone base')
+    def _edit_player_pals (self ,uid ,name ):
+        from ..edit_pals import EditPalsDialog 
+        dialog =EditPalsDialog (uid ,name ,self )
+        if dialog .exec ()==QDialog .Accepted :
+            self .refresh_all ()
+    def _unlock_all_technologies_for_player (self ,uid ):
+        if unlock_all_technologies_for_player (uid ,self ):
+            QMessageBox .information (self ,t ('Done')if t else 'Done',t ('player.unlock_technologies.success')if t else 'Unlock All Technologies completed')
+        else :
+            QMessageBox .warning (self ,t ('Error')if t else 'Error',t ('player.unlock_technologies.failed')if t else 'Unlock All Technologies failed')
+    def _unlock_all_lab_research_for_guild (self ,gid ):
+        if unlock_all_lab_research_for_guild (gid ,self ):
+            QMessageBox .information (self ,t ('Done')if t else 'Done',t ('guild.unlock_lab_research.success')if t else 'Unlock All Lab Research completed')
+        else :
+            QMessageBox .warning (self ,t ('Error')if t else 'Error',t ('guild.unlock_lab_research.failed')if t else 'Unlock All Lab Research failed')
     def keyPressEvent (self ,event ):
         if event .key ()==Qt .Key_F5 :
             if constants .current_save_path :

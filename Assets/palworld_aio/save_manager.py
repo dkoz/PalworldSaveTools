@@ -21,9 +21,11 @@ from i18n import t
 try :
     from palworld_aio import constants 
     from palworld_aio .utils import sav_to_json ,json_to_sav ,extract_value ,sanitize_filename ,format_duration_short 
+    from palworld_aio .guild_manager import rebuild_all_guilds 
 except ImportError :
     from .import constants 
     from .utils import sav_to_json ,json_to_sav ,extract_value ,sanitize_filename ,format_duration_short 
+    from .guild_manager import rebuild_all_guilds 
 class SaveManager (QObject ):
     load_started =Signal ()
     load_finished =Signal (bool )
@@ -48,12 +50,12 @@ class SaveManager (QObject ):
         playerdir =os .path .join (d ,'Players')
         if not os .path .isdir (playerdir ):
             QMessageBox .critical (parent ,t ('error.title'),t ('error.players_folder_missing'))
-            return False
+            return False 
         if constants .loaded_level_json is not None :
-            constants .loaded_level_json =None
-            constants .current_save_path =None
-            constants .backup_save_path =None
-            constants .srcGuildMapping =None
+            constants .loaded_level_json =None 
+            constants .current_save_path =None 
+            constants .backup_save_path =None 
+            constants .srcGuildMapping =None 
             constants .base_guild_lookup ={}
             constants .files_to_delete =set ()
             constants .PLAYER_PAL_COUNTS ={}
@@ -61,22 +63,22 @@ class SaveManager (QObject ):
             constants .PLAYER_DETAILS_CACHE ={}
             constants .PLAYER_REMAPS ={}
             constants .exclusions ={}
-            constants .selected_source_player =None
-            constants .dps_executor =None
+            constants .selected_source_player =None 
+            constants .dps_executor =None 
             constants .dps_futures =[]
             constants .dps_tasks =[]
-            constants .original_loaded_level_json =None
+            constants .original_loaded_level_json =None 
         try :
-            from palobject import MappingCacheObject
+            from palobject import MappingCacheObject 
             if hasattr (MappingCacheObject ,'_MappingCacheInstances'):
                 MappingCacheObject ._MappingCacheInstances .clear ()
         except ImportError :
             try :
-                from .palobject import MappingCacheObject
+                from .palobject import MappingCacheObject 
                 if hasattr (MappingCacheObject ,'_MappingCacheInstances'):
                     MappingCacheObject ._MappingCacheInstances .clear ()
             except ImportError :
-                pass
+                pass 
         self .load_started .emit ()
         constants .current_save_path =d 
         constants .backup_save_path =constants .current_save_path 
@@ -174,6 +176,7 @@ class SaveManager (QObject ):
         level_sav_path =os .path .join (constants .current_save_path ,'Level.sav')
         def save_task ():
             t0 =time .perf_counter ()
+            rebuild_all_guilds ()
             json_to_sav (constants .loaded_level_json ,level_sav_path )
             t1 =time .perf_counter ()
             players_folder =os .path .join (constants .current_save_path ,'Players')
